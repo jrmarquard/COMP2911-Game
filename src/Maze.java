@@ -18,7 +18,7 @@ public class Maze {
 		while (counterW < width) {
 			this.nodes.add(new ArrayList<Node>());
 			while (counterH < height) {
-				this.nodes.get(counterH).add(new Node(counterW, counterH));
+				this.nodes.get(counterW).add(new Node(counterW, counterH));
 				counterH++;
 			}
 			counterH = 0;
@@ -72,5 +72,48 @@ public class Maze {
 		} else {
 			//Illegal
 		}
+	}
+	
+	public void printMaze() {
+	   int width = 0;
+	   int height = 0;
+	   System.out.print(" ");
+	   while (width < this.width) {
+		   if (this.getNode(width, height).getUp() == null) {
+			   System.out.print("_ ");
+		   } else {
+			   System.out.print("  ");
+		   }
+		   width++;
+	   }
+	   
+	   System.out.print("\n");
+	   
+	   while (height < this.height) {
+		   width = 0;
+		   if (this.getNode(width, height).getLeft() == null) {
+			   System.out.print("|");
+		   } else {
+			   System.out.print(" ");
+		   }
+		   
+		   while (width < this.width) {
+			   if (this.getNode(width, height).getDown() == null) {
+				   System.out.print("_");
+			   } else {
+				   System.out.print(" ");
+			   }
+			   if (this.getNode(width, height).getRight() == null) {
+				   System.out.print("|");
+			   } else {
+				   System.out.print(" ");
+			   }
+			   
+			   width++;
+		   }
+		   
+		   System.out.print("\n");
+		   height++;
+	   }
 	}
 }
