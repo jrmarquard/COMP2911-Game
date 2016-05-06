@@ -176,6 +176,9 @@ public class Maze {
 	   System.out.print("\n");
 	}
 	
+	/**
+	 * Generates a maze
+	 */
 	public void mazeGenerator() {
 		Stack<Node> explore = new Stack<Node>();
 		ArrayList<Node> visited = new ArrayList<Node>();
@@ -187,18 +190,13 @@ public class Maze {
 		
 		while(!explore.isEmpty()) {
 			ArrayList<Node> neighbourList = unvisitNeighbour(currNode, visited);
-//			System.out.print("Curren ");
-//			currNode.print();
+			
 			if(!neighbourList.isEmpty()) {
 				int	randomNum = rand.nextInt(neighbourList.size());
-				
 				Node chosen = neighbourList.get(randomNum);
-//				System.out.print("Chosen ");
-//				chosen.print();
 				
 				explore.push(currNode);
-				
-				removeWall(currNode, chosen);
+				connectNodes(currNode, chosen);
 				currNode = chosen;
 				visited.add(chosen);
 			} else {
@@ -207,11 +205,19 @@ public class Maze {
 		}
 	}
 	
+	/**
+	 * Returns a list of unvisit neighbors from the given node, 
+	 * if there is no unvisit neighbors, an empty list will be returned
+	 * @param node the node for visiting its neighbors
+	 * @param visited a list that contains the nodes that have been visited
+	 * @return a list of unvisit neighbors from the given node
+	 */
 	private ArrayList<Node> unvisitNeighbour(Node node, ArrayList<Node> visited) {
 		ArrayList<Node> unvisit = new ArrayList<Node>();
 		int x = node.getX();
 		int y = node.getY();
 		
+		// Now looks for neighbors of the given node depending on its position
 		// Nodes that are not at the boarder
 		if(x > 0 && x < this.width - 1 && y > 0 && y < this.height - 1) {
 			if(!visited.contains(this.getNode(x, y + 1))) {
@@ -338,22 +344,37 @@ public class Maze {
 		return unvisit;
 	}
 	
-	private void removeWall(Node nodeA, Node nodeB) {
+	/**
+	 * Connects the two given nodes by comparing their coordinates
+	 * @param nodeA the first node to be connected
+	 * @param nodeB the second node to be connected
+	 */
+	private void connectNodes(Node nodeA, Node nodeB) {
 		int xA = nodeA.getX();
 		int yA = nodeA.getY();
 		int xB = nodeB.getX();
 		int yB = nodeB.getY();
 		
+		// If nodeA is above nodeB
 		if(xA == xB && yA == yB - 1) {
 			nodeA.setDown(nodeB);
 			nodeB.setUp(nodeA);
-		} else if(xA == xB && yA == yB + 1) {
+		} 
+		
+		// If nodeA is below nodeB
+		else if(xA == xB && yA == yB + 1) {
 			nodeA.setUp(nodeB);
 			nodeB.setDown(nodeA);
-		} else if(xA == xB - 1 && yA == yB) {
+		} 
+		
+		// If nodeA is left to nodeB
+		else if(xA == xB - 1 && yA == yB) {
 			nodeA.setRight(nodeB);
 			nodeB.setLeft(nodeA);
-		} else if(xA == xB + 1 && yA == yB) {
+		} 
+		
+		// If nodeA is right to nodeB
+		else if(xA == xB + 1 && yA == yB) {
 			nodeA.setLeft(nodeB);
 			nodeB.setRight(nodeA);
 		}
