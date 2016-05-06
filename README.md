@@ -37,9 +37,9 @@ In this assignment, the aim is to construct an interactive maze puzzle game that
 - John
     - Implementing a graphical front end 
 - Joshua
-    - 
-- Patrick
     - maze generation
+- Patrick
+    - 
 - Tim
     - maze implementation
 - Tyler
