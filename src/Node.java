@@ -56,4 +56,26 @@ public class Node {
 	public void setLeft(Node left) {
 		this.left = left;
 	}
+	
+	public void print() {
+		System.out.println("Node: " + this.x + " " + this.y);
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if(o == null || !(o instanceof Node)) {
+			return false;
+		}
+		
+		if(o == this) {
+			return true;
+		}
+		
+		Node node = (Node) o;
+		if(this.x == node.getX() && this.y == node.getY()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }

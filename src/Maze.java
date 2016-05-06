@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Random;
+import java.util.Stack;
 
 public class Maze {
 	private ArrayList<ArrayList<Node>> nodes;
@@ -172,5 +174,188 @@ public class Maze {
 		   width++;
 	   }
 	   System.out.print("\n");
+	}
+	
+	public void mazeGenerator() {
+		Stack<Node> explore = new Stack<Node>();
+		ArrayList<Node> visited = new ArrayList<Node>();
+		Random rand = new Random();
+		
+		Node currNode = getNode(0, 0);
+		explore.add(currNode);
+		visited.add(currNode);
+		
+		while(!explore.isEmpty()) {
+			ArrayList<Node> neighbourList = unvisitNeighbour(currNode, visited);
+//			System.out.print("Curren ");
+//			currNode.print();
+			if(!neighbourList.isEmpty()) {
+				int	randomNum = rand.nextInt(neighbourList.size());
+				
+				Node chosen = neighbourList.get(randomNum);
+//				System.out.print("Chosen ");
+//				chosen.print();
+				
+				explore.push(currNode);
+				
+				removeWall(currNode, chosen);
+				currNode = chosen;
+				visited.add(chosen);
+			} else {
+				currNode = explore.pop();
+			}
+		}
+	}
+	
+	private ArrayList<Node> unvisitNeighbour(Node node, ArrayList<Node> visited) {
+		ArrayList<Node> unvisit = new ArrayList<Node>();
+		int x = node.getX();
+		int y = node.getY();
+		
+		// Nodes that are not at the boarder
+		if(x > 0 && x < this.width - 1 && y > 0 && y < this.height - 1) {
+			if(!visited.contains(this.getNode(x, y + 1))) {
+				unvisit.add(this.getNode(x, y + 1));
+			}
+			
+			if(!visited.contains(this.getNode(x, y - 1))) {
+				unvisit.add(this.getNode(x, y - 1));
+			}
+			
+			if(!visited.contains(this.getNode(x - 1, y))) {
+				unvisit.add(this.getNode(x - 1, y));
+			}
+			
+			if(!visited.contains(this.getNode(x + 1, y))) {
+				unvisit.add(this.getNode(x + 1, y));
+			}
+		} else {
+			// Top left node
+			if(x == 0 && y == 0) {
+				if(!visited.contains(this.getNode(x + 1, y))) {
+					unvisit.add(this.getNode(x + 1, y));
+				}
+				
+				if(!visited.contains(this.getNode(x, y + 1))) {
+					unvisit.add(this.getNode(x, y + 1));
+				}
+			} 
+			
+			// Top right node
+			else if(x == this.width - 1 && y == 0) {
+				if(!visited.contains(this.getNode(x - 1, y))) {
+					unvisit.add(this.getNode(x - 1, y));
+				}
+				
+				if(!visited.contains(this.getNode(x, y + 1))) {
+					unvisit.add(this.getNode(x, y + 1));
+				}
+			} 
+			
+			// Bottom left node
+			else if(x == 0 && y == height - 1){
+				if(!visited.contains(this.getNode(x, y - 1))) {
+					unvisit.add(this.getNode(x, y - 1));
+				}
+				
+				if(!visited.contains(this.getNode(x + 1, y))) {
+					unvisit.add(this.getNode(x + 1, y));
+				}
+			} 
+			
+			// Bottom right node
+			else if(x == width - 1 && y == height - 1) {
+				if(!visited.contains(this.getNode(x, y - 1))) {
+					unvisit.add(this.getNode(x, y - 1));
+				}
+				
+				if(!visited.contains(this.getNode(x - 1, y))) {
+					unvisit.add(this.getNode(x - 1, y));
+				}
+			} else {
+				// Nodes at the left boarder excluding the corner ones
+				if(x == 0){
+					if(!visited.contains(this.getNode(x, y - 1))) {
+						unvisit.add(this.getNode(x, y - 1));
+					}
+					
+					if(!visited.contains(this.getNode(x + 1, y))) {
+						unvisit.add(this.getNode(x + 1, y));
+					}
+					
+					if(!visited.contains(this.getNode(x, y + 1))) {
+						unvisit.add(this.getNode(x, y + 1));
+					}
+				} 
+				
+				// Nodes at the right boarder excluding the corner ones
+				else if(x == width - 1) {
+					if(!visited.contains(this.getNode(x, y - 1))) {
+						unvisit.add(this.getNode(x, y - 1));
+					}
+					
+					if(!visited.contains(this.getNode(x - 1, y))) {
+						unvisit.add(this.getNode(x - 1, y));
+					}
+					
+					if(!visited.contains(this.getNode(x, y + 1))) {
+						unvisit.add(this.getNode(x, y + 1));
+					}
+				} 
+				
+				// Nodes at the top boarder excluding the corner ones
+				else if(y == 0) {
+					if(!visited.contains(this.getNode(x - 1, y))) {
+						unvisit.add(this.getNode(x - 1, y));
+					}
+					
+					if(!visited.contains(this.getNode(x, y + 1))) {
+						unvisit.add(this.getNode(x, y + 1));
+					}
+					
+					if(!visited.contains(this.getNode(x + 1, y))) {
+						unvisit.add(this.getNode(x + 1, y));
+					}
+				} 
+				
+				// Nodes at the bottom boarder excluding the corner ones
+				else if(y == height - 1) {
+					if(!visited.contains(this.getNode(x - 1, y))) {
+						unvisit.add(this.getNode(x - 1, y));
+					}
+					
+					if(!visited.contains(this.getNode(x, y - 1))) {
+						unvisit.add(this.getNode(x, y - 1));
+					}
+					
+					if(!visited.contains(this.getNode(x + 1, y))) {
+						unvisit.add(this.getNode(x + 1, y));
+					}
+				}
+			}
+		}
+		
+		return unvisit;
+	}
+	
+	private void removeWall(Node nodeA, Node nodeB) {
+		int xA = nodeA.getX();
+		int yA = nodeA.getY();
+		int xB = nodeB.getX();
+		int yB = nodeB.getY();
+		
+		if(xA == xB && yA == yB - 1) {
+			nodeA.setDown(nodeB);
+			nodeB.setUp(nodeA);
+		} else if(xA == xB && yA == yB + 1) {
+			nodeA.setUp(nodeB);
+			nodeB.setDown(nodeA);
+		} else if(xA == xB - 1 && yA == yB) {
+			nodeA.setRight(nodeB);
+			nodeB.setLeft(nodeA);
+		} else if(xA == xB + 1 && yA == yB) {
+			nodeA.setLeft(nodeB);
+			nodeB.setRight(nodeA);
+		}
 	}
 }
