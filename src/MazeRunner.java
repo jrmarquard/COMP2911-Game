@@ -26,26 +26,30 @@ public class MazeRunner {
 		move = input.next().charAt(0);
 		while (endGame != true){
 			if (move == 'a'){
-				if (player.getPosition().getLeft() != null && player.getPosition().getLeft() != maze.getStart()){
+				Node position = player.getPosition().getLeft();
+				if (position != null && !position.equals(maze.getStart())){
 					player.setPosition(player.getPosition().getLeft());
 					maze.printMaze(player);
 				}
 			}
 			if (move == 's'){
-				if (player.getPosition().getDown() != null && player.getPosition().getDown() != maze.getStart()){
+				Node position = player.getPosition().getDown();
+				if (position != null && !position.equals(maze.getStart())){
 					player.setPosition(player.getPosition().getDown());
 					maze.printMaze(player);
 				}
 				
 			}
 			if (move == 'd'){
-				if (player.getPosition().getRight() != null && player.getPosition().getRight() != maze.getStart()){
+				Node position = player.getPosition().getRight();
+				if (position != null && !position.equals(maze.getStart())){
 					player.setPosition(player.getPosition().getRight());
 					maze.printMaze(player);
 				}
 			}
 			if (move == 'w'){
-				if (player.getPosition().getUp() != null && player.getPosition().getUp() != maze.getStart()){
+				Node position = player.getPosition().getUp();
+				if (position != null && !position.equals(maze.getStart())){
 					player.setPosition(player.getPosition().getUp());
 					maze.printMaze(player);
 				}
