@@ -110,7 +110,7 @@ public class Maze {
 		}
 	}
 	
-	public void printMaze() {
+	public void printMaze(Player player) {
 	   int width = 0;
 	   int height = 0;
 	   System.out.print("  ");
@@ -138,7 +138,9 @@ public class Maze {
 		   }
 		   
 		   while (width < this.width) {
-			   if (this.getNode(width, height).getDown() == null) {
+			   if (player.getX() == width && player.getY() == height){				//added to print location of player (Tyler)
+				   System.out.print("@");
+			   } else if (this.getNode(width, height).getDown() == null) {
 				   System.out.print("_");
 			   } else {
 				   System.out.print(" ");
