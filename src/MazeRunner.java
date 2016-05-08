@@ -10,7 +10,8 @@ public class MazeRunner {
 		Scanner input = new Scanner(System.in);
 
 		System.out.println(System.lineSeparator() + "	    A-MAZE-ING MAZE GAME" + System.lineSeparator());
-		System.out.println("  use WASD to move, R to reset and Q to quit" + System.lineSeparator());
+		System.out.println("  Use WASD to move, R to re-start, Q to quit," + System.lineSeparator());
+		System.out.println("	and N to generate a new maze." + System.lineSeparator());
 		System.out.println("please enter the maze size (n*n) then press ENTER" + System.lineSeparator());
 		
 		int n = Integer.parseInt(input.next());
@@ -55,6 +56,12 @@ public class MazeRunner {
 				
 			}
 			if (move == 'r'){
+				player = new Player(maze.getNode(0, 0));
+				maze.printMaze(player);
+			}
+			if (move == 'n'){
+				System.out.println("	Enter a new maze size.");
+				n = Integer.parseInt(input.next());
 				maze = new Maze(n, n);
 				maze.mazeGenerator();
 				maze.setStart(-1, 0);
@@ -67,8 +74,8 @@ public class MazeRunner {
 				System.out.println("	Quitting. Thanks for playing!");
 			}
 			if (player.getPosition().equals(maze.getFinish())){
-				System.out.println("	Congratulations!!! Press any key to play again.");
-				move = input.next().charAt(0);
+				System.out.println("	Congratulations!!! Enter a new maze size to play again.");
+				n = Integer.parseInt(input.next());
 				maze = new Maze(n, n);
 				maze.mazeGenerator();
 				maze.setStart(-1, 0);
