@@ -4,7 +4,6 @@ import java.util.Scanner;
 public class MazeRunner {
 
 	public static void main (String[] args) {
-		Maze maze = new Maze(10, 10);
 		char move;
 		boolean endGame = false;
 		
@@ -16,7 +15,7 @@ public class MazeRunner {
 		
 		int n = Integer.parseInt(input.next());
 		
-		maze = new Maze(n, n);
+		Maze maze = new Maze(n, n);
 		maze.mazeGenerator();
 		maze.setStart(-1, 0);
 		maze.setFinish(n, n-1);
