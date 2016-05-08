@@ -26,7 +26,9 @@ public class MazeRunner {
 		move = input.next().charAt(0);
 		while (endGame != true){
 			if (move == 'a'){
-				if (maze.getNode(player.getX(), player.getY()).getLeft() != null){
+				Node node = maze.getNode(player.getX(), player.getY());
+				
+				if (node.getLeft() != null && node.getLeft().getX() >= 0){
 					player.setX(player.getX() - 1);
 					maze.printMaze(player);
 				}
@@ -74,6 +76,10 @@ public class MazeRunner {
 				maze.printMaze(player);
 			}
 			move = input.next().charAt(0);			
-		}	
+		}
+		
+		if(input != null) {
+			input.close();
+		}
 	}
 }
