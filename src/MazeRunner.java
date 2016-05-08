@@ -20,35 +20,33 @@ public class MazeRunner {
 		maze.mazeGenerator();
 		maze.setStart(-1, 0);
 		maze.setFinish(n, n-1);
-		Player player = new Player(0, 0);
+		Player player = new Player(maze.getNode(0, 0));
 		maze.printMaze(player);
 		
 		move = input.next().charAt(0);
 		while (endGame != true){
 			if (move == 'a'){
-				Node node = maze.getNode(player.getX(), player.getY());
-				
-				if (node.getLeft() != null && node.getLeft().getX() >= 0){
-					player.setX(player.getX() - 1);
+				if (player.getPosition().getLeft() != null && player.getPosition().getLeft() != maze.getStart()){
+					player.setPosition(player.getPosition().getLeft());
 					maze.printMaze(player);
 				}
 			}
 			if (move == 's'){
-				if (maze.getNode(player.getX(), player.getY()).getDown() != null){
-					player.setY(player.getY() + 1);
+				if (player.getPosition().getDown() != null && player.getPosition().getDown() != maze.getStart()){
+					player.setPosition(player.getPosition().getDown());
 					maze.printMaze(player);
 				}
 				
 			}
 			if (move == 'd'){
-				if (maze.getNode(player.getX(), player.getY()).getRight() != null){
-					player.setX(player.getX() + 1);
+				if (player.getPosition().getRight() != null && player.getPosition().getRight() != maze.getStart()){
+					player.setPosition(player.getPosition().getRight());
 					maze.printMaze(player);
 				}
 			}
 			if (move == 'w'){
-				if (maze.getNode(player.getX(), player.getY()).getUp() != null){
-					player.setY(player.getY() - 1);
+				if (player.getPosition().getUp() != null && player.getPosition().getUp() != maze.getStart()){
+					player.setPosition(player.getPosition().getUp());
 					maze.printMaze(player);
 				}
 				
@@ -58,27 +56,26 @@ public class MazeRunner {
 				maze.mazeGenerator();
 				maze.setStart(-1, 0);
 				maze.setFinish(n, n-1);
-				player = new Player(0, 0);
+				player = new Player(maze.getNode(0, 0));
 				maze.printMaze(player);
 			}
 			if (move == 'q'){
 				endGame = true;
-				System.out.println("	Quiting. Thanks for playing!");
+				System.out.println("	Quitting. Thanks for playing!");
 			}
-			if (player.getX() == maze.getFinish().getX() && player.getY() == maze.getFinish().getY()){
+			if (player.getPosition().equals(maze.getFinish())){
 				System.out.println("	Congratulations!!! Press any key to play again.");
 				move = input.next().charAt(0);
 				maze = new Maze(n, n);
 				maze.mazeGenerator();
 				maze.setStart(-1, 0);
 				maze.setFinish(n, n-1);
-				player = new Player(0, 0);
+				player = new Player(maze.getNode(0, 0));
 				maze.printMaze(player);
 			}
 			move = input.next().charAt(0);			
 		}
-		
-		if(input != null) {
+		if (input != null){
 			input.close();
 		}
 	}

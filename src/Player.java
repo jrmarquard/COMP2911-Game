@@ -1,27 +1,26 @@
 
 public class Player {
 
-	private int x, y;
+	private Node position;
 	
 	public Player(int x, int y){
-		this.x = x;
-		this.y = y;
+		this.position = new Node(x ,y);
 	}
-
-	public int getX() {
-		return x;
+	
+	public Player(Node node){
+		this.position = node;
 	}
-
-	public void setX(int x) {
-		this.x = x;
+	
+	public Node getPosition(){
+		return this.position;
 	}
-
-	public int getY() {
-		return y;
+	
+	public void setPosition(int x, int y){
+		this.position = new Node(x, y);
 	}
-
-	public void setY(int y) {
-		this.y = y;
+	
+	public void setPosition(Node position){
+		this.position = position;
 	}
 	
 }
