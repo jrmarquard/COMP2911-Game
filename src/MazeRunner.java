@@ -29,14 +29,12 @@ public class MazeRunner {
 				if (maze.getNode(player.getX(), player.getY()).getLeft() != null){
 					player.setX(player.getX() - 1);
 					maze.printMaze(player);
-					System.out.println(player.getX() + " " + player.getY());
 				}
 			}
 			if (move == 's'){
 				if (maze.getNode(player.getX(), player.getY()).getDown() != null){
 					player.setY(player.getY() + 1);
 					maze.printMaze(player);
-					System.out.println(player.getX() + " " + player.getY());
 				}
 				
 			}
@@ -44,14 +42,12 @@ public class MazeRunner {
 				if (maze.getNode(player.getX(), player.getY()).getRight() != null){
 					player.setX(player.getX() + 1);
 					maze.printMaze(player);
-					System.out.println(player.getX() + " " + player.getY());
 				}
 			}
 			if (move == 'w'){
 				if (maze.getNode(player.getX(), player.getY()).getUp() != null){
 					player.setY(player.getY() - 1);
 					maze.printMaze(player);
-					System.out.println(player.getX() + " " + player.getY());
 				}
 				
 			}
