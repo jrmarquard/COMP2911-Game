@@ -1,3 +1,5 @@
+import java.awt.EventQueue;
+
 public class MazePuzzleGame {
     
     AppState state;
@@ -12,14 +14,10 @@ public class MazePuzzleGame {
     
     
 	public static void main(String[] args) {
-		
-	    MazePuzzleGame game = new MazePuzzleGame();
+    
+	    DisplayInterface disp = new GUI();
+        disp.update(null);
 	    
-	    
-	    
-	    
-	    
-	}
-	
-	
+	    //MazePuzzleGame game = new MazePuzzleGame();
+    }	
 }

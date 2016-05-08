@@ -1,10 +1,7 @@
 
 public class CLI implements DisplayInterface {
-    public void draw() {
-    }
-
     @Override
-    public void draw(MazeWorld m) {
+    public void update(MazeWorld m) {
         // TODO Auto-generated method stub
         
     }
