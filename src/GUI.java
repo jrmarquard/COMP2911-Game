@@ -70,49 +70,72 @@ public class GUI extends JFrame implements DisplayInterface {
     
     private JPanel createGamePanel() {
         
-        JPanel middlePanel = new JPanel();
-        GroupLayout gl = new GroupLayout(middlePanel);
-        middlePanel.setLayout(gl);
+        JPanel middlePanel = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        
+        int rows = 5;
+        int cols = 5;
+        
+        for (int x = 0; x < 10; x++) {
+            for (int y = 0; y < 10; y++) {
+                JPanel jp1 = new JPanel();
+                if (x%2 == 0) {
+                    jp1.setBackground(Color.black);
+                } else {
+                    jp1.setBackground(Color.white);
+                }
+                c.fill = GridBagConstraints.BOTH;
+                c.weightx = 0.5;
+                c.weighty = 3;
+                c.gridx = x;
+                c.gridy = 0;
+                middlePanel.add(jp1, c);
+            }
+        }
+        
+        
         
         JPanel jp1 = new JPanel();
-        jp1.setSize(new Dimension(10,10));
         jp1.setBackground(Color.black);
+        c.fill = GridBagConstraints.BOTH;
+        c.weightx = 0.5;
+        c.weighty = 3;
+        c.gridx = 0;
+        c.gridy = 1;
+        middlePanel.add(jp1, c);
 
+        
         JPanel jp2 = new JPanel();
-        jp2.setSize(new Dimension(10,10));
         jp2.setBackground(Color.white);
+        c.fill = GridBagConstraints.BOTH;
+        c.weightx = 0.5;
+        c.weighty = 1;
+        c.gridx = 1;
+        c.gridy = 1;
+        middlePanel.add(jp2, c);
+        
         JPanel jp3 = new JPanel();
-        jp3.setSize(new Dimension(10,10));
         jp3.setBackground(Color.yellow);
+        c.fill = GridBagConstraints.BOTH;
+        c.weightx = 2;
+        c.weighty = 1;
+        c.gridx = 2;
+        c.gridy = 1;
+        middlePanel.add(jp3, c);
+        
         JPanel jp4 = new JPanel();
-        jp4.setSize(new Dimension(10,10));
         jp4.setBackground(Color.green);
+        c.fill = GridBagConstraints.BOTH;
+        c.weightx = 1;
+        c.weighty = 3;
+        c.gridx = 2;
+        c.gridy = 2;
+        middlePanel.add(jp4, c);
         
-        
-        gl.setAutoCreateContainerGaps(false);
-
-        gl.setHorizontalGroup(
-                gl.createSequentialGroup()
-                   .addGroup(gl.createParallelGroup(GroupLayout.Alignment.LEADING)
-                       .addComponent(jp1)
-                       .addComponent(jp2))
-                   .addGroup(gl.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(jp3)
-                        .addComponent(jp4))
-             );
-        gl.setVerticalGroup(
-                gl.createSequentialGroup()
-                   .addGroup(gl.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(jp1)
-                        .addComponent(jp3))
-                    .addGroup(gl.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(jp2)
-                        .addComponent(jp4))
-             );
         
         middlePanel.setBackground(Color.red);
         middlePanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-       
+        
         /*
         for (int x = 0; x < 10; x++) {
             JPanel jp = new JPanel();
