@@ -33,9 +33,10 @@ In this assignment, the aim is to construct an interactive maze puzzle game that
 #### Goals and their developers
 - Unassigned
     - Working on graphical designs and ideas
-    - backend and how it interfaces with each component
+    - 'Design doc' outlining design ideas, could cover graphics+audio
 - John
     - Implementing a graphical front end 
+    - backend and how it interfaces with each component
 - Joshua
     - maze generation
 - Patrick
