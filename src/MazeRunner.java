@@ -79,6 +79,13 @@ public class MazeRunner {
 				width = Integer.parseInt(input.next());
 				height = Integer.parseInt(input.next());
 				
+				if(width <= 1 || height <= 1) {
+					if(input != null) {
+						input.close();
+					}
+					throw new Exception("Invalid width or height");
+				}
+				
 				maze = new Maze(width, height);
 				maze.mazeGenerator();
 				maze.setStart(-1, 0);
