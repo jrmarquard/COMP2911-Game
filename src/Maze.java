@@ -53,6 +53,35 @@ public class Maze {
 	public Node getNode(int x, int y) {
 		return this.nodes.get(x).get(y);
 	}
+	public boolean isAdjacent(int x1, int y1, int x2, int y2) {
+	    return getNode(x1,y1).isAdjacent(getNode(x2,y2));
+	}
+	public boolean isDown(int x, int y) {
+        if (getNode(x,y).getDown() != null) return true;
+        return false;
+	}
+	public boolean isUp(int x, int y) {
+	    if (getNode(x,y).getUp() != null) return true;
+	    return false;
+	}
+
+    public boolean isRight(int x, int y) {
+        if (getNode(x,y).getRight() != null) return true;
+        return false;
+    }
+
+    public boolean isLeft(int x, int y) {
+        if (getNode(x,y).getLeft() != null) return true;
+        return false;
+    }
+	
+	public boolean isStart(int x, int y) {
+	    return getStart().equals(new Node(x,y));
+	}
+
+    public boolean isFinish(int x, int y) {
+        return getFinish().equals(new Node(x,y));
+    }
 	
 	public void makePath(int xA, int yA, int xB, int yB) {
 		if (xA == xB || yA == yB) {
@@ -203,6 +232,9 @@ public class Maze {
 				currNode = explore.pop();
 			}
 		}
+		
+		start = new Node(0,-1);
+		finish = new Node (width, height-1);
 	}
 	
 	/**

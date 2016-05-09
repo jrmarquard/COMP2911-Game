@@ -1,250 +1,231 @@
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
 
-public class GUI extends JFrame implements DisplayInterface {  
-    public GUI () {
+import java.util.Queue;
+
+public class GUI extends JFrame implements DisplayInterface {
+    
+    AppState state;
+    MazeWorld world;
+    Queue<Command> commands;
+    
+    JPanel windowPanel;
+    JPanel titlePanel;
+    JPanel gamePanel;
+    JPanel menuPanel;
+    
+    public GUI (AppState state, MazeWorld world, Queue<Command> commands) {
+        this.state = state;
+        this.world = world;
+        this.commands = commands;
         initUI();
     }
 
-    @Override
-    public void update(MazeWorld m) {
-        setVisible(true);
+    public void update() {
+        drawTitlePanel();
+        drawGamePanel();
+        drawMenuPanel();
+        pack();
     }
     
     private void initUI() {
+        /* Any layout information that should never be changed
+         * should be contained in here. Anything that can be redrawn
+         * must be added into the draw*() functions. 
+         */
         
-        JPanel basic = new JPanel();
-        basic.setLayout(new BoxLayout(basic, BoxLayout.Y_AXIS));
-        add(basic);
+        // Define layout for windowPanel and add it this object (JFrame)
+        windowPanel = new JPanel();
+        windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
+        this.add(windowPanel);
         
-        // The top panel
-        JPanel topPanel = new JPanel(new BorderLayout(0, 0));
-        topPanel.setBackground(Color.blue);
-        topPanel.setMaximumSize(new Dimension(450, 0));
+        // Define Layouts for each panel
+        titlePanel = new JPanel(new GridBagLayout());
+        gamePanel = new JPanel(new GridBagLayout());
+        gamePanel.setPreferredSize(new Dimension(400, 400));
+        menuPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         
-        JLabel title = new JLabel("MazeRunner");
-        title.setBorder(BorderFactory.createEmptyBorder(0, 25, 0, 0));
-        topPanel.add(title, BorderLayout.CENTER);
-
-        basic.add(topPanel);
+        // Add children panels to the parent windowPanel
+        windowPanel.add(titlePanel);
+        windowPanel.add(gamePanel);
+        windowPanel.add(menuPanel);
         
-        // Graphics Panel - temporarily a text panel
-        
-
-        createGamePanel();
-        
-        basic.add(createGamePanel());
-        
-        // Bottom panel
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        bottomPanel.setBackground(Color.pink);
-
-        JButton ntip = new JButton("Play");
-        ntip.setMnemonic(KeyEvent.VK_N);
-        JButton close = new JButton("Exit");
-        close.setMnemonic(KeyEvent.VK_C);
-        close.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                System.exit(0);
-            }
-        });
-
-        bottomPanel.add(ntip);
-        bottomPanel.add(close);
-        basic.add(bottomPanel);
-        
-        // Sets the title of the window
-        setTitle("Maze Runner");
-        
-        // Sets the size of the window
-        setSize(400, 300);
-        
-        // Sets the location of the window to the middle of the screen
+        // Set more information
+        setTitle(state.getAppName());
         setLocationRelativeTo(null);
+        pack();
+        setVisible(true);
         
-        // Sets the window to EXIT_ON_CLOSE when the system closes the window
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        
+        // Register a keystroke
+        this.addKeyListener(new KeyListener() {
+            public void keyPressed(KeyEvent e) {
+                addCommand(new Command(Command.commandID.KEYSTROKE, e));
+            }
+            public void keyReleased(KeyEvent arg0) {}
+            public void keyTyped(KeyEvent arg0) {}
+        });
+        
+        // Not really necessary I think, but it's clear
+        this.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent windowEvent){
+                addCommand(new Command(Command.commandID.EXIT));
+            }
+        });
     }
     
-    private JPanel createGamePanel() {
+    private void addCommand(Command c) {
+        commands.add(c);
+    }
+    
+    
+    private void drawGamePanel() {
+        // Need to fix this later as to not break encapsulation
+        Maze m = world.getMaze();
         
-        JPanel middlePanel = new JPanel(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
+        gamePanel.removeAll();
         
-        int rows = 5;
-        int cols = 5;
+        gamePanel.setBorder(null);
         
-        for (int x = 0; x < 10; x++) {
-            for (int y = 0; y < 10; y++) {
-                JPanel jp1 = new JPanel();
-                if (x%2 == 0) {
-                    jp1.setBackground(Color.black);
-                } else {
-                    jp1.setBackground(Color.white);
+        int cols = m.getWidth()*2;
+        int rows = m.getHeight()*2;
+        
+        Color wallColour = state.getColour("wallColour");
+        Color floorColour = state.getColour("floorColour");
+        Color startColour = state.getColour("startColour");
+        Color finishColour = state.getColour("finishColour");
+
+        // Adjusts each panel's constraints
+        GridBagConstraints panelConstraints = new GridBagConstraints();
+        
+        // Iterate over the columns
+        for (int col = 0; col <= cols; col++) {
+            // Iterate over the rows
+            for (int row = 0; row <= rows; row++) {
+                JPanel panel = new JPanel();
+
+                // Defaults for a floor tile
+                panel.setBackground(floorColour);
+                panelConstraints.weightx = 1;
+                panelConstraints.weighty = 1;
+                
+                // If on a wall column
+                if (col%2 == 0) {
+                    panelConstraints.weightx = 0.1;
                 }
-                c.fill = GridBagConstraints.BOTH;
-                c.weightx = 0.5;
-                c.weighty = 3;
-                c.gridx = x;
-                c.gridy = 0;
-                middlePanel.add(jp1, c);
+                
+                // If on a wall row
+                if (row%2 == 0) {
+                    panelConstraints.weighty = 0.1;
+                }
+                
+                // If there is a wall intersection
+                if (col%2 == 0 && row%2 == 0) {
+                    // Wall intersection
+                    panel.setBackground(wallColour);                    
+                } else if (col == 0 || col == cols || row == 0 || row == rows) {
+                    
+                    panel.setBackground(wallColour);
+                    // Check the left side
+                    if (col == 0) {
+                        if (m.isStart(col-1, (row-1)/2)) {
+                            panel.setBackground(startColour);
+                        } else if (m.isFinish(col-1, (row-1)/2)) {
+                            panel.setBackground(finishColour);
+                        }
+                    } // Check the top
+                    else if (row == 0) {
+                        if (m.isStart((col-1)/2, row-1)) {
+                            panel.setBackground(startColour);
+                        } else if (m.isFinish((col-1)/2, row-1)) {
+                            panel.setBackground(finishColour);
+                        }
+                    } // Check the right side
+                    else if (col == cols) {
+                        if (m.isStart((cols/2), (row-1)/2)) {
+                            panel.setBackground(startColour);
+                        } else if (m.isFinish((cols/2), (row-1)/2)) {
+                            panel.setBackground(finishColour);
+                        }
+                    } // Check the bottom
+                    else if (row == rows) {
+                        if (m.isStart((col-1)/2, row/2)) {
+                            panel.setBackground(startColour);
+                        } else if (m.isFinish((col-1)/2, row/2)) {
+                            panel.setBackground(finishColour);
+                        }
+                    }
+                } else {
+                    // Vertical walls
+                    if (row%2 == 0) {
+                        // Check if the wall exists
+                        if (!m.isAdjacent((col-1)/2, (row/2)-1, (col-1)/2, (row/2))){
+                            panel.setBackground(wallColour);
+                        }
+                    } // Horizontal walls
+                    else if (col%2 == 0) {
+                        if (!m.isAdjacent((col/2)-1, (row-1)/2, col/2, (row-1)/2)){
+                            panel.setBackground(wallColour);
+                        }
+                    }
+                }
+                
+                // Tile blocks
+                if (col%2 != 0 && row%2 != 0) {
+                    if (world.isChatacterHere((col-1)/2, (row-1)/2)) {
+                        panel.setLayout(new GridBagLayout());
+                        JLabel title = new JLabel(world.getCharacterName());
+                        panel.add(title);
+                    } 
+                    if (world.characterAtFinish()) {
+                        System.out.println("winner");
+                    }
+                }
+                // fill space available
+                panelConstraints.fill = GridBagConstraints.BOTH;
+                
+                panelConstraints.gridx = col;
+                panelConstraints.gridy = row;
+                gamePanel.add(panel, panelConstraints);
             }
         }
-        
-        
-        
-        JPanel jp1 = new JPanel();
-        jp1.setBackground(Color.black);
-        c.fill = GridBagConstraints.BOTH;
-        c.weightx = 0.5;
-        c.weighty = 3;
-        c.gridx = 0;
-        c.gridy = 1;
-        middlePanel.add(jp1, c);
-
-        
-        JPanel jp2 = new JPanel();
-        jp2.setBackground(Color.white);
-        c.fill = GridBagConstraints.BOTH;
-        c.weightx = 0.5;
-        c.weighty = 1;
-        c.gridx = 1;
-        c.gridy = 1;
-        middlePanel.add(jp2, c);
-        
-        JPanel jp3 = new JPanel();
-        jp3.setBackground(Color.yellow);
-        c.fill = GridBagConstraints.BOTH;
-        c.weightx = 2;
-        c.weighty = 1;
-        c.gridx = 2;
-        c.gridy = 1;
-        middlePanel.add(jp3, c);
-        
-        JPanel jp4 = new JPanel();
-        jp4.setBackground(Color.green);
-        c.fill = GridBagConstraints.BOTH;
-        c.weightx = 1;
-        c.weighty = 3;
-        c.gridx = 2;
-        c.gridy = 2;
-        middlePanel.add(jp4, c);
-        
-        
-        middlePanel.setBackground(Color.red);
-        middlePanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        
-        /*
-        for (int x = 0; x < 10; x++) {
-            JPanel jp = new JPanel();
-            jp.setSize(10, 10);
-            middlePanel.add(jp);
-        }
-        
-        
-        middlePanel.add(new JButton("Button 1"));
-        middlePanel.add(new JButton("Button 2"));
-        middlePanel.add(new JButton("Button 3"));
-        middlePanel.add(new JButton("Long-Named Button 4"));
-        middlePanel.add(new JButton("5"));
-        middlePanel.add(new JButton("Button 1"));
-        middlePanel.add(new JButton("Button 1"));
-        middlePanel.add(new JButton("Button 1"));
-        middlePanel.add(new JButton("Button 1"));
-        middlePanel.add(new JButton("Button 1"));
-        middlePanel.add(new JButton("Button 1"));
-        middlePanel.add(new JButton("Button 1"));
-        */
-        return middlePanel;
-        
+        gamePanel.setPreferredSize(gamePanel.getSize());
     }
 
-    private void createLayout(JComponent... arg) {
-        JPanel pane = (JPanel) getContentPane();
-        GroupLayout gl = new GroupLayout(pane);
-        pane.setLayout(gl);
+    public void drawTitlePanel() {
+        titlePanel.removeAll();
+        titlePanel.setBackground(state.getColour("titleColour"));
+        titlePanel.setPreferredSize(new Dimension(150, 50));
+        titlePanel.setMaximumSize(new Dimension(9999, 50));
         
-        gl.setAutoCreateContainerGaps(true);
-        pane.setToolTipText("Content pane");        
-        
-        gl.setAutoCreateContainerGaps(true);
-        
-        gl.setHorizontalGroup(gl.createParallelGroup()
-                .addComponent(arg[0], GroupLayout.DEFAULT_SIZE, 
-                        GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(arg[1], GroupLayout.DEFAULT_SIZE, 
-                        GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-
-        gl.setVerticalGroup(gl.createSequentialGroup()
-                .addComponent(arg[0])
-                .addComponent(arg[1])
-        );
+        JLabel title = new JLabel(state.getAppName());
+        titlePanel.add(title);
     }
-    
-    private void createMenuBar(JComponent... arg) {
+    public void drawMenuPanel() {
+        menuPanel.removeAll();
+        menuPanel.setBackground(state.getColour("menuColour"));
 
-        JMenuBar menubar = new JMenuBar();
-
-        JMenu gameMenu = new JMenu("Game");
-        JMenu fileMenu = new JMenu("File");
-        
-        gameMenu.setMnemonic(KeyEvent.VK_G);
-        fileMenu.setMnemonic(KeyEvent.VK_F);
-        
-        JMenuItem PlayMi = new JMenuItem(new MenuItemAction("Play", KeyEvent.VK_P));
-        JMenuItem LoadMapMi = new JMenuItem(new MenuItemAction("Load Map", KeyEvent.VK_L));
-        JMenuItem newMi = new JMenuItem(new MenuItemAction("New", KeyEvent.VK_N));
-        
-        JMenuItem aboutMi = new JMenuItem(new MenuItemAction("About", KeyEvent.VK_A));
-        
-        JMenuItem exitMi = new JMenuItem("Exit");
-        exitMi.setMnemonic(KeyEvent.VK_E);
-        exitMi.setToolTipText("Exit application");
-        exitMi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, ActionEvent.CTRL_MASK));
-
-        exitMi.addActionListener(new ActionListener() {
+        JButton playButton = new JButton("New Maze");
+        playButton.setMnemonic(KeyEvent.VK_N);
+        playButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                System.exit(0);
+                addCommand(new Command(Command.commandID.NEW_MAP));
             }
         });
-
-        fileMenu.add(gameMenu);
-        gameMenu.add(newMi);
-        gameMenu.add(PlayMi);
-        gameMenu.add(LoadMapMi);
-        fileMenu.addSeparator();
-        fileMenu.add(aboutMi);
-        fileMenu.add(exitMi);
-        
-        menubar.add(fileMenu);
-        setJMenuBar(menubar);
-        
-
-        JCheckBoxMenuItem sbarMi = new JCheckBoxMenuItem("Show statubar");
-        sbarMi.setMnemonic(KeyEvent.VK_S);
-        sbarMi.setDisplayedMnemonicIndex(5);
-        sbarMi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, ActionEvent.CTRL_MASK));
-        sbarMi.setSelected(true);
-        
-        sbarMi.addItemListener(new ItemListener() {
-
+        JButton closeButton = new JButton("Exit");
+        closeButton.setMnemonic(KeyEvent.VK_W);
+        closeButton.addActionListener(new ActionListener() {
             @Override
-            public void itemStateChanged(ItemEvent e) {
-                
-//                if (e.getStateChange() == ItemEvent.SELECTED) {
-//                    statusbar.setVisible(true);
-//                } else {
-//                    statusbar.setVisible(false);
-//                }
-                
+            public void actionPerformed(ActionEvent e) {
+                addCommand(new Command(Command.commandID.EXIT));
             }
-
         });
-        fileMenu.add(sbarMi);
+
+        menuPanel.add(playButton);
+        menuPanel.add(closeButton);
     }
     
     private class MenuItemAction extends AbstractAction {
@@ -255,7 +236,12 @@ public class GUI extends JFrame implements DisplayInterface {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            System.out.println(e.getActionCommand());
+            String s = e.getActionCommand();
+            addCommand(new Command(Command.commandID.EXIT));
         }
+    }
+    
+    public void close() {
+        this.dispose();
     }
 }

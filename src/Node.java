@@ -61,6 +61,14 @@ public class Node {
 		System.out.println("Node: " + this.x + " " + this.y);
 	}
 	
+	public boolean isAdjacent(Node n) {
+	    if (this.up == n || this.right == n || this.down == n || this.left == n) {
+	        return true;
+	    } else {
+	        return false;
+	    }
+	}
+	
 	@Override
 	public boolean equals(Object o) {
 		if(o == null || !(o instanceof Node)) {
