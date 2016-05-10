@@ -39,7 +39,7 @@ public class MazePuzzleGame {
 	        if (c==null) continue;
 	        
 	        switch (c.getCommandID()) {
-	            case NEW_MAP:      game.newMap();	                   break;
+	            case NEW_MAP:      game.newMap(c);           break;
 	            case DRAW:         game.refreshDisplay();              break;
 	            case EXIT:         game.close();	                   break;
 	            case MOVE_DOWN:    game.moveCharacterDown();           break;
@@ -67,8 +67,12 @@ public class MazePuzzleGame {
         addCommand(new Command(Com.DRAW));
     }
 
-    private void newMap() {
-        world.generateMap(5, 5);
+    private void newMap(Command o) {
+        CommandMap c =(CommandMap)o;
+        int width = c.getWidth();
+        int height = c.getHeight();
+        
+        world.generateMap(width, height);
         world.setWinStatus(false);
         addCommand(new Command(Com.DRAW));
     }

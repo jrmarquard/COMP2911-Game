@@ -213,13 +213,28 @@ public class GUI extends JFrame implements DisplayInterface {
     public void drawMenuPanel() {
         menuPanel.removeAll();
         menuPanel.setBackground(state.getColour("menuColour"));
+        
+        Integer[] sizes = new Integer[]{4,5,6,7,8,9,10};
 
+        JComboBox<Integer> widthSelect;
+        widthSelect= new JComboBox<>(sizes);
+
+        JComboBox<Integer> heightSelect;
+        heightSelect = new JComboBox<>(sizes);
+        
         JButton playButton = new JButton("New Maze");
         playButton.setMnemonic(KeyEvent.VK_N);
         playButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                addCommand(new Command(Com.NEW_MAP));
+                
+                JComboBox<Integer> box = (JComboBox<Integer>)menuPanel.getComponent(1);
+                int width = (int)box.getSelectedItem();
+
+                box = (JComboBox<Integer>)menuPanel.getComponent(3);
+                int height = (int)box.getSelectedItem();
+                
+                addCommand(new CommandMap(Com.NEW_MAP, width, height));
             }
         });
         JButton closeButton = new JButton("Exit");
@@ -230,7 +245,10 @@ public class GUI extends JFrame implements DisplayInterface {
                 addCommand(new Command(Com.EXIT));
             }
         });
-
+        menuPanel.add(new JLabel("Width"));
+        menuPanel.add(widthSelect);
+        menuPanel.add(new JLabel("Height"));
+        menuPanel.add(heightSelect);
         menuPanel.add(playButton);
         menuPanel.add(closeButton);
     }

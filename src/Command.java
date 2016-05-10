@@ -29,6 +29,4 @@ public class Command {
     public void setEvent(EventObject e) {
         this.event = e;
     }
-    
-    
 }
