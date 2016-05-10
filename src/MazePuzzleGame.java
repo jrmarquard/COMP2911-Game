@@ -9,8 +9,8 @@ public class MazePuzzleGame {
     MazeWorld world;
     Queue<Command> commands;
     
-    public MazePuzzleGame(String settingsLocation) {
-        this.state = new AppState(settingsLocation);
+    public MazePuzzleGame() {
+        this.state = new AppState();
         this.commands = new LinkedList<Command>();
         this.world = new MazeWorld(5, 5, commands);
         this.disp = new GUI(this.state, this.world, this.commands);
@@ -25,7 +25,7 @@ public class MazePuzzleGame {
 
 	public static void main(String[] args) {
 	    
-	    MazePuzzleGame game = new MazePuzzleGame(null);
+	    MazePuzzleGame game = new MazePuzzleGame();
         
 	    game.addCommand(new Command(Com.DRAW, null));
 	    
