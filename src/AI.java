@@ -18,8 +18,8 @@ public class AI {
 		
 		ArrayList<Node> path = new ArrayList<Node>();
 		
-		Queue<Node> q = new LinkedList();
-		Queue<Node> visited = new LinkedList();
+		Queue<Node> q = new LinkedList<Node>();
+		Queue<Node> visited = new LinkedList<Node>();
 		
 		q.add(start);
 		while (!q.isEmpty()){

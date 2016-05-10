@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Random;
 import java.util.Stack;
 
@@ -205,6 +207,28 @@ public class Maze {
 		ArrayList<Node> visited = new ArrayList<Node>();
 		Random rand = new Random();
 		
+		Node currNode = getRandomStartNode(rand);
+		explore.add(currNode);
+		visited.add(currNode);
+		
+		while(!explore.isEmpty()) {
+			ArrayList<Node> neighbourList = unvisitNeighbour(currNode, visited);
+			
+			if(!neighbourList.isEmpty()) {
+				int	randomNum = rand.nextInt(neighbourList.size());
+				Node chosen = neighbourList.get(randomNum);
+				
+				explore.push(currNode);
+				connectNodes(currNode, chosen);
+				currNode = chosen;
+				visited.add(chosen);
+			} else {
+				currNode = explore.pop();
+			}
+		}
+	}
+	
+	private Node getRandomStartNode(Random rand) {
 		int chosenEdge = rand.nextInt(4);
 		int x = 0;
 		int y = 0;
@@ -241,25 +265,48 @@ public class Maze {
 			this.setFinish(this.width, this.height - 1);
 		}
 		
-		Node currNode = getNode(x, y);
-		explore.add(currNode);
-		visited.add(currNode);
+		Queue<Node> explore = new LinkedList<Node>();
+		LinkedList<Node> visited = new LinkedList<Node>();
 		
-		while(!explore.isEmpty()) {
-			ArrayList<Node> neighbourList = unvisitNeighbour(currNode, visited);
+		explore.add(start);
+		while (!explore.isEmpty()){
+			Node n = explore.remove();
+			visited.add(n);
 			
-			if(!neighbourList.isEmpty()) {
-				int	randomNum = rand.nextInt(neighbourList.size());
-				Node chosen = neighbourList.get(randomNum);
+			ArrayList<Node> reachable = new ArrayList<Node>();
+			if (n.getLeft() != null) reachable.add(n.getLeft());
+			if (n.getDown() != null) reachable.add(n.getDown());
+			if (n.getRight() != null) reachable.add(n.getRight());
+			if (n.getUp() != null) reachable.add(n.getUp());
+			
+			int i = 0;
+			while(i != reachable.size()){
+				Node neighbour = reachable.get(i);
 				
-				explore.push(currNode);
-				connectNodes(currNode, chosen);
-				currNode = chosen;
-				visited.add(chosen);
-			} else {
-				currNode = explore.pop();
+				if (!visited.contains(neighbour)){
+					explore.add(neighbour);
+				}
+				i++;
 			}
 		}
+		
+		Node node = visited.getLast();
+		int lastX = node.getX();
+		int lastY = node.getY();
+		System.out.println(lastX);
+		System.out.println(lastY);
+		if(lastX < 0) {
+			lastX = 0;
+		} else if(x == this.getWidth()) {
+			lastX -= 1;
+		} else if(lastY < 0) {
+			lastY = 0;
+		} else if(y == this.getHeight()) {
+			lastY -= 1;
+		}
+		this.setFinish(lastX, lastY);
+		
+		return this.getNode(x, y);
 	}
 	
 	/**
