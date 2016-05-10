@@ -205,7 +205,43 @@ public class Maze {
 		ArrayList<Node> visited = new ArrayList<Node>();
 		Random rand = new Random();
 		
-		Node currNode = getNode(0, 0);
+		int chosenEdge = rand.nextInt(4);
+		int x = 0;
+		int y = 0;
+		
+		// Left edge
+		if(chosenEdge == 0) {
+			x = 0;
+			y = rand.nextInt(this.height);
+			this.setStart(-1, y);
+			this.setFinish(this.width, this.height - 1);
+		} 
+		
+		// Upper edge
+		else if(chosenEdge == 1) {
+			x = rand.nextInt(this.width);
+			y = 0;
+			this.setStart(x, -1);
+			this.setFinish(this.width, this.height - 1);
+		} 
+		
+		// Right edge
+		else if(chosenEdge == 2) {
+			x = this.width - 1;
+			y = rand.nextInt(this.height);
+			this.setStart(width, y);
+			this.setFinish(this.width, this.height - 1);
+		} 
+		
+		// Lower edge
+		else if(chosenEdge == 3) {
+			x = rand.nextInt(this.width);
+			y = this.height - 1;
+			this.setStart(x, height);
+			this.setFinish(this.width, this.height - 1);
+		}
+		
+		Node currNode = getNode(x, y);
 		explore.add(currNode);
 		visited.add(currNode);
 		
