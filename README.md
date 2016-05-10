@@ -30,10 +30,17 @@ In this assignment, the aim is to construct an interactive maze puzzle game that
 - User needs to be able to play against different mazes
 - User needs to have different game modes, such as solving it individually, against a timer, with enemies, against another player, ... etc
 
-#### Goals and their developers
+#### TBF Goals and their developers
 - Unassigned
     - Working on graphical designs and ideas
     - 'Design doc' outlining design ideas, could cover graphics+audio
+    - Secondary objectives/challenges
+    - different game types (multiple exits, teleporting tiles that transfer players from one spot to another etc.)
+    - multiplayer
+    - different difficulties
+    - Sound
+    - hints for users when they are stuck (ie a maze solving algorithm)
+    - enemies in the maze to avoid
 - John
     - Implementing a graphical front end 
     - backend and how it interfaces with each component
@@ -45,3 +52,8 @@ In this assignment, the aim is to construct an interactive maze puzzle game that
     - maze implementation
 - Tyler
     - AI implementation
+
+#### Completed Goals
+- Basic GUI
+- Basic Game Mode
+- Maze genration with different sizes
