@@ -70,8 +70,8 @@ public class MazeRunner {
 			}
 			if (move == 'n'){ 
 				System.out.println("	Please Enter a new maze size.");
-				System.out.println("Please enter the width of the maze and press ENTER,");
-				System.out.println("Followed by the height of the maze and press ENTER.");
+				System.out.println("    Please enter the width of the maze and press ENTER,");
+				System.out.println("    Followed by the height of the maze and press ENTER.");
 				
 				width = Integer.parseInt(input.next());
 				height = Integer.parseInt(input.next());

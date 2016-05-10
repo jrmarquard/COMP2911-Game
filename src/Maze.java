@@ -260,10 +260,7 @@ public class Maze {
 		Node node = getLastEdgeNode(newVisited);
 		int lastX = node.getX();
 		int lastY = node.getY();
-		System.out.println(this.width);
-		System.out.println(this.height);
-		System.out.println("x " + lastX);
-		System.out.println("y " + lastY);
+
 		if(lastX == 0) {
 			lastX = -1;
 		} else if(lastX == this.width - 1) {
@@ -274,8 +271,6 @@ public class Maze {
 			lastY += 1;
 		}
 		
-		System.out.println("x " + lastX);
-		System.out.println("y " + lastY);
 		this.setFinish(lastX, lastY);
 	}
 	
