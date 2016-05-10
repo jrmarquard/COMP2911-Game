@@ -4,6 +4,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import java.util.Queue;
+import java.util.Random;
 
 @SuppressWarnings("serial")
 public class GUI extends JFrame implements DisplayInterface {
@@ -58,7 +59,7 @@ public class GUI extends JFrame implements DisplayInterface {
         windowPanel.add(menuPanel);
         
         // Set more information
-        setTitle(state.getAppName());
+        setTitle(state.getText("appName"));
         setLocationRelativeTo(null);
         pack();
         setVisible(true);
@@ -94,6 +95,7 @@ public class GUI extends JFrame implements DisplayInterface {
         Maze m = world.getMaze();
         
         gamePanel.removeAll();
+        gamePanel.setBackground(state.getColour("tileColour"));
         
         gamePanel.setBorder(null);
         
@@ -101,7 +103,7 @@ public class GUI extends JFrame implements DisplayInterface {
         int rows = m.getHeight()*2;
         
         Color wallColour = state.getColour("wallColour");
-        Color floorColour = state.getColour("floorColour");
+        Color floorColour = state.getColour("tileColour");
         Color startColour = state.getColour("startColour");
         Color finishColour = state.getColour("finishColour");
 
@@ -116,8 +118,11 @@ public class GUI extends JFrame implements DisplayInterface {
 
                 // Defaults for a floor tile
                 panel.setBackground(floorColour);
+                panelConstraints.fill = GridBagConstraints.BOTH;
                 panelConstraints.weightx = 1;
                 panelConstraints.weighty = 1;
+                panelConstraints.gridx = col;
+                panelConstraints.gridy = row;
                 
                 // If on a wall column
                 if (col%2 == 0) {
@@ -183,19 +188,10 @@ public class GUI extends JFrame implements DisplayInterface {
                 // Tile blocks
                 if (col%2 != 0 && row%2 != 0) {
                     if (world.isChatacterHere((col-1)/2, (row-1)/2)) {
-                        panel.setLayout(new GridBagLayout());
-                        JLabel title = new JLabel(world.getCharacterName());
-                        panel.add(title);
-                    } 
-                    if (world.characterAtFinish()) {
-                        System.out.println("winner");
+                        panel.setBackground(state.getColour("playerColour"));
+                        panelConstraints.fill = GridBagConstraints.BOTH;
                     }
                 }
-                // fill space available
-                panelConstraints.fill = GridBagConstraints.BOTH;
-                
-                panelConstraints.gridx = col;
-                panelConstraints.gridy = row;
                 gamePanel.add(panel, panelConstraints);
             }
         }
@@ -204,11 +200,14 @@ public class GUI extends JFrame implements DisplayInterface {
 
     public void drawTitlePanel() {
         titlePanel.removeAll();
-        titlePanel.setBackground(state.getColour("titleColour"));
-        titlePanel.setPreferredSize(new Dimension(150, 50));
-        titlePanel.setMaximumSize(new Dimension(9999, 50));
+        titlePanel.setBackground(state.getColour("titleDefaultColour"));
+        titlePanel.setPreferredSize(new Dimension(300, 50));
         
-        JLabel title = new JLabel(state.getAppName());
+        JLabel title = new JLabel();
+        if (world.getWinStatus()) {
+            titlePanel.setBackground(state.getColour("titleWinColour"));
+            title.setText(state.getText("winMessage"));
+        }
         titlePanel.add(title);
     }
     public void drawMenuPanel() {
@@ -254,4 +253,41 @@ public class GUI extends JFrame implements DisplayInterface {
         }
     }
     */
+}
+
+@SuppressWarnings("serial")
+class DrawPanel extends JPanel {
+
+    private void doDrawing(Graphics g) {
+
+        Graphics2D g2d = (Graphics2D) g;
+
+        g2d.setColor(Color.blue);
+        
+        g2d.setColor(Color.black);
+        g2d.drawRect(0, 0, 15, 15);
+        g2d.fillRect(0, 0, 10, 10);
+        
+        /*
+        for (int i = 0; i <= 1000; i++) {  
+            Dimension size = getSize();
+            Insets insets = getInsets();
+
+            int w = size.width - insets.left - insets.right;
+            int h = size.height - insets.top - insets.bottom;
+
+            Random r = new Random();
+            int x = Math.abs(r.nextInt()) % w;
+            int y = Math.abs(r.nextInt()) % h;
+            g2d.drawLine(x, y, x, y);
+        }
+        */
+    }
+
+    @Override
+    public void paintComponent(Graphics g) {
+        
+        super.paintComponent(g);
+        doDrawing(g);
+    }
 }

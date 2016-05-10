@@ -42,14 +42,15 @@ public class MazePuzzleGame {
 	            case NEW_MAP:      game.newMap();	                   break;
 	            case DRAW:         game.refreshDisplay();              break;
 	            case EXIT:         game.close();	                   break;
-	            case MOVE_DOWN:    game.moveCharacterDown();          break;
-	            case MOVE_LEFT:    game.moveCharacterLeft();          break;
-	            case MOVE_RIGHT:   game.moveCharacterRight();         break;
-	            case MOVE_UP:      game.moveCharacterUp();            break;  
+	            case MOVE_DOWN:    game.moveCharacterDown();           break;
+	            case MOVE_LEFT:    game.moveCharacterLeft();           break;
+	            case MOVE_RIGHT:   game.moveCharacterRight();          break;
+	            case MOVE_UP:      game.moveCharacterUp();             break;
 	        }
 	    }
 	}
-	private void moveCharacterUp() {
+
+    private void moveCharacterUp() {
 	    world.moveCharacterUp();
         addCommand(new Command(Com.DRAW));
 	}
@@ -68,6 +69,7 @@ public class MazePuzzleGame {
 
     private void newMap() {
         world.generateMap(5, 5);
+        world.setWinStatus(false);
         addCommand(new Command(Com.DRAW));
     }
 
