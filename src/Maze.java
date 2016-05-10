@@ -9,6 +9,7 @@ public class Maze {
 	
 	private Node start;
 	private Node finish;
+	private Node playerStart;
 	
 	private int width;
 	private int height;
@@ -31,6 +32,7 @@ public class Maze {
 		
 		this.start = null;
 		this.finish = null;
+		this.playerStart = null;
 		
 		this.width = width;
 		this.height = height;
@@ -42,6 +44,10 @@ public class Maze {
 	
 	public Node getFinish() {
 		return this.finish;
+	}
+	
+	public Node getPlayerStart() {
+		return this.playerStart;
 	}
 	
 	public int getWidth() {
@@ -207,7 +213,10 @@ public class Maze {
 		ArrayList<Node> visited = new ArrayList<Node>();
 		Random rand = new Random();
 		
-		Node currNode = getRandomStartNode(rand);
+		setRandomStartNode(rand);
+		Node currNode = this.playerStart;
+		int x = currNode.getX();
+		int y = currNode.getY();
 		explore.add(currNode);
 		visited.add(currNode);
 		
@@ -226,9 +235,51 @@ public class Maze {
 				currNode = explore.pop();
 			}
 		}
+		
+		Queue<Node> newExplore = new LinkedList<Node>();
+		LinkedList<Node> newVisited = new LinkedList<Node>();
+		
+		newExplore.add(this.getNode(x, y));
+		while (!newExplore.isEmpty()){
+			Node n = newExplore.remove();
+			newVisited.add(n);
+			
+			ArrayList<Node> reachable = new ArrayList<Node>();
+			if (n.getLeft() != null) reachable.add(n.getLeft());
+			if (n.getDown() != null) reachable.add(n.getDown());
+			if (n.getRight() != null) reachable.add(n.getRight());
+			if (n.getUp() != null) reachable.add(n.getUp());
+			
+			for(Node neighbour: reachable){
+				if (!newVisited.contains(neighbour)){
+					newExplore.add(neighbour);
+				}
+			}
+		}
+		
+		Node node = getLastEdgeNode(newVisited);
+		int lastX = node.getX();
+		int lastY = node.getY();
+		System.out.println(this.width);
+		System.out.println(this.height);
+		System.out.println("x " + lastX);
+		System.out.println("y " + lastY);
+		if(lastX == 0) {
+			lastX = -1;
+		} else if(lastX == this.width - 1) {
+			lastX += 1;
+		} else if(lastY == 0) {
+			lastY = -1;
+		} else if(lastY == this.height - 1) {
+			lastY += 1;
+		}
+		
+		System.out.println("x " + lastX);
+		System.out.println("y " + lastY);
+		this.setFinish(lastX, lastY);
 	}
 	
-	private Node getRandomStartNode(Random rand) {
+	private void setRandomStartNode(Random rand) {
 		int chosenEdge = rand.nextInt(4);
 		int x = 0;
 		int y = 0;
@@ -238,7 +289,6 @@ public class Maze {
 			x = 0;
 			y = rand.nextInt(this.height);
 			this.setStart(-1, y);
-			this.setFinish(this.width, this.height - 1);
 		} 
 		
 		// Upper edge
@@ -246,7 +296,6 @@ public class Maze {
 			x = rand.nextInt(this.width);
 			y = 0;
 			this.setStart(x, -1);
-			this.setFinish(this.width, this.height - 1);
 		} 
 		
 		// Right edge
@@ -254,7 +303,6 @@ public class Maze {
 			x = this.width - 1;
 			y = rand.nextInt(this.height);
 			this.setStart(width, y);
-			this.setFinish(this.width, this.height - 1);
 		} 
 		
 		// Lower edge
@@ -262,51 +310,24 @@ public class Maze {
 			x = rand.nextInt(this.width);
 			y = this.height - 1;
 			this.setStart(x, height);
-			this.setFinish(this.width, this.height - 1);
 		}
 		
-		Queue<Node> explore = new LinkedList<Node>();
-		LinkedList<Node> visited = new LinkedList<Node>();
+		this.playerStart = this.getNode(x, y);
+	}
+	
+	private Node getLastEdgeNode(LinkedList<Node> visited) {
+		Node foundNode = null;
 		
-		explore.add(start);
-		while (!explore.isEmpty()){
-			Node n = explore.remove();
-			visited.add(n);
-			
-			ArrayList<Node> reachable = new ArrayList<Node>();
-			if (n.getLeft() != null) reachable.add(n.getLeft());
-			if (n.getDown() != null) reachable.add(n.getDown());
-			if (n.getRight() != null) reachable.add(n.getRight());
-			if (n.getUp() != null) reachable.add(n.getUp());
-			
-			int i = 0;
-			while(i != reachable.size()){
-				Node neighbour = reachable.get(i);
-				
-				if (!visited.contains(neighbour)){
-					explore.add(neighbour);
-				}
-				i++;
+		for(Node node: visited) {
+			if((node.getX() == 0 && node.getY() >= 0 && node.getY() < this.height) ||
+					(node.getX() == this.width - 1 && node.getY() >= 0 && node.getY() < this.height) ||
+					(node.getY() == 0 && node.getX() >= 0 && node.getX() < this.width) ||
+					(node.getY() == this.height - 1 && node.getX() >= 0 && node.getX() < this.width)){
+				foundNode = node;
 			}
 		}
 		
-		Node node = visited.getLast();
-		int lastX = node.getX();
-		int lastY = node.getY();
-		System.out.println(lastX);
-		System.out.println(lastY);
-		if(lastX < 0) {
-			lastX = 0;
-		} else if(x == this.getWidth()) {
-			lastX -= 1;
-		} else if(lastY < 0) {
-			lastY = 0;
-		} else if(y == this.getHeight()) {
-			lastY -= 1;
-		}
-		this.setFinish(lastX, lastY);
-		
-		return this.getNode(x, y);
+		return foundNode;
 	}
 	
 	/**
