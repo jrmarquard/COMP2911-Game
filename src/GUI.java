@@ -21,6 +21,9 @@ public class GUI extends JFrame implements DisplayInterface {
         this.state = state;
         this.world = world;
         this.commands = commands;
+    }
+    
+    public void initGUI() {
         initUI();
     }
 
@@ -82,7 +85,6 @@ public class GUI extends JFrame implements DisplayInterface {
     }
     
     private void addCommand(Command c) {
-        System.out.println("key added");
         commands.add(c);
     }
     

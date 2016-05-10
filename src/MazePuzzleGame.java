@@ -1,3 +1,4 @@
+import java.awt.EventQueue;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -13,6 +14,13 @@ public class MazePuzzleGame {
         this.commands = new LinkedList<Command>();
         this.world = new MazeWorld(5, 5, commands);
         this.disp = new GUI(this.state, this.world, this.commands);
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                disp.initGUI();
+            }
+        });
+        
     }
 
 	public static void main(String[] args) {
@@ -58,7 +66,12 @@ public class MazePuzzleGame {
     }
 
     public void refreshDisplay() {
-	    disp.update();
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                disp.update();
+            }
+        });
 	}
 	public boolean isCommandsEmpty() {
 	    return commands.isEmpty();
