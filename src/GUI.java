@@ -227,7 +227,6 @@ public class GUI extends JFrame implements DisplayInterface {
         playButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                
                 JComboBox<Integer> box = (JComboBox<Integer>)menuPanel.getComponent(1);
                 int width = (int)box.getSelectedItem();
 

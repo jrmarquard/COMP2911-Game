@@ -39,7 +39,7 @@ public class MazePuzzleGame {
 	        if (c==null) continue;
 	        
 	        switch (c.getCommandID()) {
-	            case NEW_MAP:      game.newMap(c);           break;
+	            case NEW_MAP:      game.newMap(c);                     break;
 	            case DRAW:         game.refreshDisplay();              break;
 	            case EXIT:         game.close();	                   break;
 	            case MOVE_DOWN:    game.moveCharacterDown();           break;

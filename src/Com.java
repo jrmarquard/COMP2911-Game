@@ -5,6 +5,5 @@ public enum Com {
     MOVE_DOWN, 
     MOVE_UP, 
     MOVE_LEFT, 
-    MOVE_RIGHT,
-    WIN
+    MOVE_RIGHT
 }
