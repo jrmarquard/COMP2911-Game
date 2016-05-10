@@ -2,29 +2,24 @@ import java.util.EventObject;
 
 
 public class Command {
-    public enum commandID {
-        NEW_MAP, DRAW, EXIT, KEYSTROKE
-    }
-    
-    
-    private commandID id;
+    private Com id;
     private EventObject event; 
     
-    public Command (commandID id, EventObject event) {
+    public Command (Com id, EventObject event) {
         this.id = id;
         this.event = event;
     }
-    public Command (commandID id) {
+    public Command (Com id) {
         this.id = id;
         this.event = null;
     }
 
-    public commandID getCommandID() {
+    public Com getCommandID() {
         return id;
     }
 
-    public void setCommandID(commandID commandID) {
-        this.id = commandID;
+    public void setCommandID(Com Com) {
+        this.id = Com;
     }
 
     public EventObject getEvent() {

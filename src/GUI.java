@@ -27,6 +27,7 @@ public class GUI extends JFrame implements DisplayInterface {
         drawTitlePanel();
         drawGamePanel();
         drawMenuPanel();
+        setFocusable(true);
         pack();
     }
     
@@ -62,7 +63,7 @@ public class GUI extends JFrame implements DisplayInterface {
         // Register a keystroke
         this.addKeyListener(new KeyListener() {
             public void keyPressed(KeyEvent e) {
-                addCommand(new Command(Command.commandID.KEYSTROKE, e));
+                addCommand(new Command(Com.KEYSTROKE, e));
             }
             public void keyReleased(KeyEvent arg0) {}
             public void keyTyped(KeyEvent arg0) {}
@@ -71,7 +72,7 @@ public class GUI extends JFrame implements DisplayInterface {
         // Not really necessary I think, but it's clear
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent windowEvent){
-                addCommand(new Command(Command.commandID.EXIT));
+                addCommand(new Command(Com.EXIT));
             }
         });
     }
@@ -212,7 +213,7 @@ public class GUI extends JFrame implements DisplayInterface {
         playButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                addCommand(new Command(Command.commandID.NEW_MAP));
+                addCommand(new Command(Com.NEW_MAP));
             }
         });
         JButton closeButton = new JButton("Exit");
@@ -220,7 +221,7 @@ public class GUI extends JFrame implements DisplayInterface {
         closeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                addCommand(new Command(Command.commandID.EXIT));
+                addCommand(new Command(Com.EXIT));
             }
         });
 
@@ -237,7 +238,7 @@ public class GUI extends JFrame implements DisplayInterface {
         @Override
         public void actionPerformed(ActionEvent e) {
             String s = e.getActionCommand();
-            addCommand(new Command(Command.commandID.EXIT));
+            addCommand(new Command(Com.EXIT));
         }
     }
     

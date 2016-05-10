@@ -22,7 +22,7 @@ public class MazePuzzleGame {
 	    
 	    MazePuzzleGame game = new MazePuzzleGame(null);
         
-	    game.addCommand(new Command(Command.commandID.DRAW, null));
+	    game.addCommand(new Command(Com.DRAW, null));
 	    
 	    for (Command c = null; ; c = game.pollCommands()) {
 	        if (c==null) continue;
@@ -31,10 +31,26 @@ public class MazePuzzleGame {
 	            case NEW_MAP:      game.newMap();	                   break;
 	            case DRAW:         game.refreshDisplay();              break;
 	            case EXIT:         game.close();	                   break;
-	            case KEYSTROKE:    game.keystroke(c.getEvent());       break;
+	            case KEYSTROKE:    game.keystroke(c.getEvent());       break; 
+	            case MOVE_DOWN:    game.moveCharacterDown();          break;
+	            case MOVE_LEFT:    game.moveCharacterLeft();          break;
+	            case MOVE_RIGHT:   game.moveCharacterRight();         break;
+	            case MOVE_UP:      game.moveCharacterUp();            break;  
 	        }
 	    }
 	}
+	private void moveCharacterUp() {
+	    world.moveCharacterUp();
+	}
+    private void moveCharacterLeft() {
+        world.moveCharacterLeft();
+    }
+    private void moveCharacterRight() {
+        world.moveCharacterRight();
+    }
+    private void moveCharacterDown() {
+        world.moveCharacterDown();
+    }
 	
 	private void keystroke(EventObject o) {
 	    KeyEvent e = (KeyEvent) o;
@@ -50,12 +66,12 @@ public class MazePuzzleGame {
             System.out.println("winnrder");
         }
         
-        addCommand(new Command(Command.commandID.DRAW));
+        addCommand(new Command(Com.DRAW));
     }
 
     private void newMap() {
         world.generateMap(5, 5);
-        addCommand(new Command(Command.commandID.DRAW));
+        addCommand(new Command(Com.DRAW));
     }
 
     public void refreshDisplay() {
