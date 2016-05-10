@@ -2,6 +2,8 @@
 public class TestHardCodedMaze {
 
 	public static void main(String[] args) {
+		Player player = new Player(0, 0);
+		
 		Maze maze1 = new Maze(5, 6);
 		
 		maze1.setStart(-1, 1);
@@ -36,7 +38,7 @@ public class TestHardCodedMaze {
 		maze1.makePath(2, 5, 3, 5);
 		maze1.makePath(3, 5, 4, 5);
 		
-		maze1.printMaze();
+		maze1.printMaze(player);
 		
 		System.out.print("\n");
 		
@@ -109,7 +111,7 @@ public class TestHardCodedMaze {
 		maze1.makePath(4, 7, 5, 7);
 		maze1.makePath(6, 7, 7, 7);
 		
-		maze1.printMaze();
+		maze1.printMaze(player);
 	}
 
 }

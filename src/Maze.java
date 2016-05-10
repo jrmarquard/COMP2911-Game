@@ -110,17 +110,17 @@ public class Maze {
 		}
 	}
 	
-	public void printMaze() {
+	public void printMaze(Player player) {
 	   int width = 0;
 	   int height = 0;
 	   System.out.print("  ");
 	   while (width < this.width) {
 		   if (this.getNode(width, height).getUp() == null) {
-			   System.out.print("_ ");
+			   System.out.print("___ ");
 		   } else if (this.getNode(width, height).getUp() == this.getFinish()){
-			   System.out.print("F ");
+			   System.out.print(" F  ");
 		   } else if (this.getNode(width, height).getUp() == this.getStart()){
-			   System.out.print("S ");
+			   System.out.print(" S  ");
 		   }
 		   width++;
 	   }
@@ -136,12 +136,38 @@ public class Maze {
 		   } else if (this.getNode(width, height).getLeft() == this.getStart()){
 			   System.out.print("S ");
 		   }
+		   while (width < this.width) {
+			   if (player.getPosition().equals(this.getNode(width, height))) {
+				   System.out.print(" @ ");
+			   } else {
+				   System.out.print("   ");
+			   }
+			   if (this.getNode(width, height).getRight() == null) {
+				   System.out.print("|");
+			   } else {
+				   System.out.print(" ");
+			   }
+			   width++;
+	   	   }
+		   width--;
+		   if (this.getNode(width, height).getRight() == this.getFinish()){
+			   System.out.print("F ");
+		   } else if (this.getNode(width, height).getRight() == this.getStart()){
+			   System.out.print("S ");
+		   }
+		   System.out.print("\n");
+		   width = 0;
+		   if (this.getNode(width, height).getLeft() == null) {
+			   System.out.print(" |");
+		   } else {
+			   System.out.print("  ");
+		   }
 		   
 		   while (width < this.width) {
 			   if (this.getNode(width, height).getDown() == null) {
-				   System.out.print("_");
+				   System.out.print("___");
 			   } else {
-				   System.out.print(" ");
+				   System.out.print("   ");
 			   }
 			   if (this.getNode(width, height).getRight() == null) {
 				   System.out.print("|");
@@ -151,25 +177,20 @@ public class Maze {
 			   
 			   width++;
 		   }
-		   if (this.getNode(width - 1, height).getRight() == this.getFinish()) {
-			   System.out.print("F");
-		   } else if (this.getNode(width - 1, height).getRight() == this.getStart()) {
-			   System.out.print("S");
-		   }
 		   
 		   System.out.print("\n");
 		   height++;
 	   }
 	   height--;
 	   width = 0;
-	   System.out.print("  ");
+	   System.out.print("   ");
 	   while (width < this.width) {
 		   if (this.getNode(width, height).getDown() == this.getFinish()) {
-			   System.out.print("F ");
+			   System.out.print("F   ");
 		   } else if (this.getNode(width, height).getDown() == this.getStart()) {
-			   System.out.print("S ");
+			   System.out.print("S   ");
 		   } else {
-			   System.out.print("  ");
+			   System.out.print("    ");
 		   }
 		   width++;
 	   }
