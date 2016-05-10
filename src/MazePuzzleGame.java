@@ -14,13 +14,13 @@ public class MazePuzzleGame {
         this.commands = new LinkedList<Command>();
         this.world = new MazeWorld(5, 5, commands);
         this.disp = new GUI(this.state, this.world, this.commands);
+        
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
                 disp.initGUI();
             }
         });
-        
     }
 
 	public static void main(String[] args) {
@@ -30,6 +30,12 @@ public class MazePuzzleGame {
 	    game.addCommand(new Command(Com.DRAW, null));
 	    
 	    for (Command c = null; ; c = game.pollCommands()) {
+	        try {
+	            Thread.sleep(0);
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	        
 	        if (c==null) continue;
 	        
 	        switch (c.getCommandID()) {
