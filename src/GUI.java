@@ -5,6 +5,7 @@ import javax.swing.*;
 
 import java.util.Queue;
 
+@SuppressWarnings("serial")
 public class GUI extends JFrame implements DisplayInterface {
     
     AppState state;
@@ -61,12 +62,15 @@ public class GUI extends JFrame implements DisplayInterface {
         
         
         // Register a keystroke
-        this.addKeyListener(new KeyListener() {
+        this.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
-                addCommand(new Command(Com.KEYSTROKE, e));
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_DOWN: addCommand(new Command(Com.MOVE_DOWN)); break;
+                    case KeyEvent.VK_LEFT: addCommand(new Command(Com.MOVE_LEFT)); break;
+                    case KeyEvent.VK_RIGHT: addCommand(new Command(Com.MOVE_RIGHT));  break;
+                    case KeyEvent.VK_UP: addCommand(new Command(Com.MOVE_UP));  break;
+                }
             }
-            public void keyReleased(KeyEvent arg0) {}
-            public void keyTyped(KeyEvent arg0) {}
         });
         
         // Not really necessary I think, but it's clear
@@ -78,6 +82,7 @@ public class GUI extends JFrame implements DisplayInterface {
     }
     
     private void addCommand(Command c) {
+        System.out.println("key added");
         commands.add(c);
     }
     
@@ -229,6 +234,11 @@ public class GUI extends JFrame implements DisplayInterface {
         menuPanel.add(closeButton);
     }
     
+    public void close() {
+        this.dispose();
+    }
+    
+    /*
     private class MenuItemAction extends AbstractAction {
         public MenuItemAction(String text, Integer mnemonic) {
             super(text);
@@ -241,8 +251,5 @@ public class GUI extends JFrame implements DisplayInterface {
             addCommand(new Command(Com.EXIT));
         }
     }
-    
-    public void close() {
-        this.dispose();
-    }
+    */
 }

@@ -1,6 +1,3 @@
-import java.awt.EventQueue;
-import java.awt.event.KeyEvent;
-import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -31,7 +28,6 @@ public class MazePuzzleGame {
 	            case NEW_MAP:      game.newMap();	                   break;
 	            case DRAW:         game.refreshDisplay();              break;
 	            case EXIT:         game.close();	                   break;
-	            case KEYSTROKE:    game.keystroke(c.getEvent());       break; 
 	            case MOVE_DOWN:    game.moveCharacterDown();          break;
 	            case MOVE_LEFT:    game.moveCharacterLeft();          break;
 	            case MOVE_RIGHT:   game.moveCharacterRight();         break;
@@ -41,31 +37,18 @@ public class MazePuzzleGame {
 	}
 	private void moveCharacterUp() {
 	    world.moveCharacterUp();
+        addCommand(new Command(Com.DRAW));
 	}
     private void moveCharacterLeft() {
         world.moveCharacterLeft();
+        addCommand(new Command(Com.DRAW));
     }
     private void moveCharacterRight() {
         world.moveCharacterRight();
+        addCommand(new Command(Com.DRAW));
     }
     private void moveCharacterDown() {
         world.moveCharacterDown();
-    }
-	
-	private void keystroke(EventObject o) {
-	    KeyEvent e = (KeyEvent) o;
-	    
-        switch (e.getKeyCode()) {
-            case KeyEvent.VK_DOWN: world.moveCharacterDown(); break;
-            case KeyEvent.VK_LEFT: world.moveCharacterLeft(); break;
-            case KeyEvent.VK_RIGHT: world.moveCharacterRight();  break;
-            case KeyEvent.VK_UP: world.moveCharacterUp();  break;
-        }
-        
-        if (world.characterAtFinish()) {
-            System.out.println("winnrder");
-        }
-        
         addCommand(new Command(Com.DRAW));
     }
 
