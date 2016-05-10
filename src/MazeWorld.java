@@ -10,8 +10,8 @@ public class MazeWorld {
     public MazeWorld (int x, int y, Queue<Command> commands) {
         this.commands = commands;
         this.maze = new Maze(x, y);        
-        maze.mazeGenerator();
-        c = new Character(0, 0, "@");
+        this.maze.mazeGenerator();
+        this.c = new Character(0, 0, "@");
         this.winStatus = false;
     }
 

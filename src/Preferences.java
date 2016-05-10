@@ -5,15 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-public class AppState {
-
+public class Preferences {
     private Map<String, Color> GUIcolours;
     private Map<String, String> appText;
     
-    
-    
-    // TODO: Load settings from a file
-    public AppState () {
+    public Preferences () {
         this.GUIcolours = new HashMap<String,Color>();
         this.appText = new HashMap<String,String>();
         this.loadPreferences();
@@ -29,7 +25,7 @@ public class AppState {
     public void loadPreferences() {
         Scanner sc = null;
         try {
-            sc = new Scanner(new FileReader("settings.properties"));
+            sc = new Scanner(new FileReader("pref.properties"));
 
             for( ; true == sc.hasNextLine() ; ) {
                 // Split the command into arguments
@@ -43,26 +39,11 @@ public class AppState {
             }
         }
         catch (FileNotFoundException e) {
-            System.out.println("Cannot find settings.properties");
+            System.out.println("Cannot find pref.properties");
             System.out.println(e.getMessage());
         }
         finally {
             if (sc != null) sc.close();
         }
-//        
-//        
-//        // Text
-//        this.appText.put("appName", "Maze Runner");
-//        this.appText.put("winMessage", "You won!");
-//        
-//        // Colours
-//        this.GUIcolours.put("wallColour", Color.black);
-//        this.GUIcolours.put("tileDefaultColour", Color.white);
-//        this.GUIcolours.put("startColour", Color.green);
-//        this.GUIcolours.put("finishColour", Color.red);
-//        this.GUIcolours.put("titleDefaultColour", Color.blue);
-//        this.GUIcolours.put("titleWinColour", Color.green);
-//        this.GUIcolours.put("menuColour", Color.gray);
-//        this.GUIcolours.put("playerColour", Color.pink);
     }
 }

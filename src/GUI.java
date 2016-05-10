@@ -9,7 +9,7 @@ import java.util.Random;
 @SuppressWarnings("serial")
 public class GUI extends JFrame implements DisplayInterface {
     
-    AppState state;
+    Preferences pref;
     MazeWorld world;
     Queue<Command> commands;
     
@@ -18,10 +18,17 @@ public class GUI extends JFrame implements DisplayInterface {
     JPanel gamePanel;
     JPanel menuPanel;
     
-    public GUI (AppState state, MazeWorld world, Queue<Command> commands) {
-        this.state = state;
+    public GUI (Preferences pref, MazeWorld world, Queue<Command> commands) {
+        this.pref = pref;
         this.world = world;
         this.commands = commands;
+        
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                initUI();
+            }
+        });
     }
     
     public void initGUI() {
@@ -59,9 +66,9 @@ public class GUI extends JFrame implements DisplayInterface {
         windowPanel.add(menuPanel);
         
         // Set more information
-        setTitle(state.getText("appName"));
-        setLocationRelativeTo(null);
+        setTitle(pref.getText("appName"));
         pack();
+        setLocationRelativeTo(null);
         setVisible(true);
         
         
@@ -95,17 +102,17 @@ public class GUI extends JFrame implements DisplayInterface {
         Maze m = world.getMaze();
         
         gamePanel.removeAll();
-        gamePanel.setBackground(state.getColour("tileColour"));
+        gamePanel.setBackground(pref.getColour("tileColour"));
         
         gamePanel.setBorder(null);
         
         int cols = m.getWidth()*2;
         int rows = m.getHeight()*2;
         
-        Color wallColour = state.getColour("wallColour");
-        Color floorColour = state.getColour("tileColour");
-        Color startColour = state.getColour("startColour");
-        Color finishColour = state.getColour("finishColour");
+        Color wallColour = pref.getColour("wallColour");
+        Color floorColour = pref.getColour("tileColour");
+        Color startColour = pref.getColour("startColour");
+        Color finishColour = pref.getColour("finishColour");
 
         // Adjusts each panel's constraints
         GridBagConstraints panelConstraints = new GridBagConstraints();
@@ -188,7 +195,7 @@ public class GUI extends JFrame implements DisplayInterface {
                 // Tile blocks
                 if (col%2 != 0 && row%2 != 0) {
                     if (world.isChatacterHere((col-1)/2, (row-1)/2)) {
-                        panel.setBackground(state.getColour("playerColour"));
+                        panel.setBackground(pref.getColour("playerColour"));
                         panelConstraints.fill = GridBagConstraints.BOTH;
                     }
                 }
@@ -200,19 +207,19 @@ public class GUI extends JFrame implements DisplayInterface {
 
     public void drawTitlePanel() {
         titlePanel.removeAll();
-        titlePanel.setBackground(state.getColour("titleDefaultColour"));
+        titlePanel.setBackground(pref.getColour("titleDefaultColour"));
         titlePanel.setPreferredSize(new Dimension(300, 50));
         
         JLabel title = new JLabel();
         if (world.getWinStatus()) {
-            titlePanel.setBackground(state.getColour("titleWinColour"));
-            title.setText(state.getText("winMessage"));
+            titlePanel.setBackground(pref.getColour("titleWinColour"));
+            title.setText(pref.getText("winMessage"));
         }
         titlePanel.add(title);
     }
     public void drawMenuPanel() {
         menuPanel.removeAll();
-        menuPanel.setBackground(state.getColour("menuColour"));
+        menuPanel.setBackground(pref.getColour("menuColour"));
         
         Integer[] sizes = new Integer[]{4,5,6,7,8,9,10};
 
