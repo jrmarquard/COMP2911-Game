@@ -112,36 +112,10 @@ public class Maze {
 	
 	public void setStart(int x, int y) {
 		this.start = new Node(x, y);
-		if (x == -1) {
-			this.start.setRight(this.getNode(0, y));
-			this.getNode(0, y).setLeft(this.start);
-		} else if (y == -1) {
-			this.start.setDown(this.getNode(x, 0));
-			this.getNode(x, 0).setUp(this.start);
-		} else if (x == this.width) {
-			this.start.setLeft(this.getNode(x - 1, y));
-			this.getNode(x - 1, y).setRight(this.start);
-		} else if (y == this.height) {
-			this.start.setUp(this.getNode(x, y - 1));
-			this.getNode(x, y - 1).setDown(this.start);
-		}
 	}
 	
 	public void setFinish(int x, int y) {
 		this.finish = new Node(x, y);
-		if (x == -1) {
-			this.finish.setRight(this.getNode(0, y));
-			this.getNode(0, y).setLeft(this.finish);
-		} else if (y == -1) {
-			this.finish.setDown(this.getNode(x, 0));
-			this.getNode(x, 0).setUp(this.finish);
-		} else if (x == this.width) {
-			this.finish.setLeft(this.getNode(x - 1, y));
-			this.getNode(x - 1, y).setRight(this.finish);
-		} else if (y == this.height) {
-			this.finish.setUp(this.getNode(x, y - 1));
-			this.getNode(x, y - 1).setDown(this.finish);
-		}
 	}
 	
 	public void printMaze(Player player) {
@@ -264,47 +238,6 @@ public class Maze {
 			}
 		}
 		this.findAndSetFinish();
-		System.out.println(this.finish.getX());
-		System.out.println(this.finish.getY());
-	}
-	
-	private void setRandomStartNode(Random rand) {
-		int x = rand.nextInt(this.width);
-		int y = rand.nextInt(this.height);
-		this.setStart(x, y);
-		
-		/*
-		int chosenEdge = rand.nextInt(4);
-		int x = 0;
-		int y = 0;
-		
-		// Left edge
-		if(chosenEdge == 0) {
-			x = 0;
-			y = rand.nextInt(this.height);
-			this.setStart(-1, y);
-		} 
-		
-		// Upper edge
-		else if(chosenEdge == 1) {
-			x = rand.nextInt(this.width);
-			y = 0;
-			this.setStart(x, -1);
-		} 
-		
-		// Right edge
-		else if(chosenEdge == 2) {
-			x = this.width - 1;
-			y = rand.nextInt(this.height);
-			this.setStart(width, y);
-		} 
-		
-		// Lower edge
-		else if(chosenEdge == 3) {
-			x = rand.nextInt(this.width);
-			y = this.height - 1;
-			this.setStart(x, height);
-		}*/
 	}
 	
 	private void findAndSetFinish() {
@@ -331,36 +264,6 @@ public class Maze {
 		
 		Node node = newVisited.getLast();
 		this.setFinish(node.getX(), node.getY());
-		/*
-		Node node = getLastEdgeNode(newVisited);
-		int x = node.getX();
-		int y = node.getY();
-
-		if(x == 0) {
-			x = -1;
-		} else if(x == this.width - 1) {
-			x += 1;
-		} else if(y == 0) {
-			y = -1;
-		} else if(y == this.height - 1) {
-			y += 1;
-		}
-		
-		this.setFinish(x, y);*/
-	}
-	
-	private Node getLastEdgeNode(LinkedList<Node> visited) {
-		Node foundNode = null;
-		
-		for(Node node: visited) {
-			if((node.getX() == 0 && node.getY() >= 0 && node.getY() < this.height) ||
-					(node.getX() == this.width - 1 && node.getY() >= 0 && node.getY() < this.height) ||
-					(node.getY() == 0 && node.getX() >= 0 && node.getX() < this.width) ||
-					(node.getY() == this.height - 1 && node.getX() >= 0 && node.getX() < this.width)){
-				foundNode = node;
-			}
-		}
-		return foundNode;
 	}
 	
 	/**
