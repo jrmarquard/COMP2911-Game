@@ -11,14 +11,16 @@ public class MazeWorld {
         this.commands = commands;
         this.maze = new Maze(x, y);        
         this.maze.mazeGenerator();
-        this.c = new Character(0, 0, "@");
+        this.c = new Character(this.maze.getPlayerStart().getX(), 
+        		this.maze.getPlayerStart().getY(), "@");
         this.winStatus = false;
     }
 
     public void generateMap(int x, int y) {
         maze = new Maze(x, y);
-        c = new Character(0,0,"@");
         maze.mazeGenerator();
+        c = new Character(this.maze.getPlayerStart().getX(), 
+        		this.maze.getPlayerStart().getY(), "@");
     }
 
     public Maze getMaze() {

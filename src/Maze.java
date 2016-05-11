@@ -267,7 +267,6 @@ public class Maze {
 			}
 		}
 		
-<<<<<<< HEAD
 		this.findAndSetFinish();
 	}
 	
@@ -359,10 +358,6 @@ public class Maze {
 		}
 		
 		return foundNode;
-=======
-		start = new Node(0,-1);
-		finish = new Node (width, height-1);
->>>>>>> refs/remotes/origin/master
 	}
 	
 	/**
