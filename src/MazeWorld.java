@@ -16,7 +16,6 @@ public class MazeWorld {
         maze = new Maze(x, y);
         maze.mazeGenerator();
         player = new Character(maze.getNodeNextToStart().getX(), maze.getNodeNextToStart().getY(), "@");
-        System.out.println("Start: "+maze.getStart().getX()+", "+maze.getStart().getY()+"Node next to start: "+maze.getNodeNextToStart().getX()+", "+maze.getNodeNextToStart().getY());
         winStatus = false;
     }
 

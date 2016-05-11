@@ -9,7 +9,6 @@ public class Maze {
 	
 	private Node start;
 	private Node finish;
-	private Node playerStart;
 	
 	private int width;
 	private int height;
@@ -32,7 +31,6 @@ public class Maze {
 		
 		this.start = null;
 		this.finish = null;
-		this.playerStart = null;
 		
 		this.width = width;
 		this.height = height;
@@ -44,10 +42,6 @@ public class Maze {
 	
 	public Node getFinish() {
 		return this.finish;
-	}
-	
-	public Node getPlayerStart() {
-		return this.playerStart;
 	}
 	
 	public int getWidth() {
@@ -286,7 +280,7 @@ public class Maze {
 		Random rand = new Random();
 		
 		setRandomStartNode(rand);
-		Node currNode = this.playerStart;
+		Node currNode = this.getNodeNextToStart();
 		explore.add(currNode);
 		visited.add(currNode);
 		
@@ -340,15 +334,13 @@ public class Maze {
 			y = this.height - 1;
 			this.setStart(x, height);
 		}
-		
-		this.playerStart = this.getNode(x, y);
 	}
 	
 	private void findAndSetFinish() {
 		Queue<Node> newExplore = new LinkedList<Node>();
 		LinkedList<Node> newVisited = new LinkedList<Node>();
 		
-		newExplore.add(this.playerStart);
+		newExplore.add(this.getNodeNextToStart());
 		while (!newExplore.isEmpty()){
 			Node n = newExplore.remove();
 			newVisited.add(n);

@@ -31,7 +31,7 @@ public class MazeRunner {
 		
 		Maze maze = new Maze(width, height);
 		maze.mazeGenerator();
-		Player player = new Player(maze.getPlayerStart());
+		Player player = new Player(maze.getNodeNextToStart());
 		maze.printMaze(player);
 		
 		move = input.next().charAt(0);
@@ -65,7 +65,7 @@ public class MazeRunner {
 				maze.printMaze(player);
 			}
 			if (move == 'r'){
-				player = new Player(maze.getPlayerStart());
+				player = new Player(maze.getNodeNextToStart());
 				maze.printMaze(player);
 			}
 			if (move == 'n'){ 
@@ -85,7 +85,7 @@ public class MazeRunner {
 				
 				maze = new Maze(width, height);
 				maze.mazeGenerator();
-				player = new Player(maze.getPlayerStart());
+				player = new Player(maze.getNodeNextToStart());
 				maze.printMaze(player);
 			}
 			if (move == 'q'){
@@ -124,7 +124,7 @@ public class MazeRunner {
 				
 				maze = new Maze(width, height);
 				maze.mazeGenerator();
-				player = new Player(maze.getPlayerStart());
+				player = new Player(maze.getNodeNextToStart());
 				maze.printMaze(player);
 			}
 			move = input.next().charAt(0);			
