@@ -12,7 +12,6 @@ public class MazeRunner {
 
 		System.out.println(System.lineSeparator() + "	    A-MAZE-ING MAZE GAME" + System.lineSeparator());
 		System.out.println("  Use WASD to move, R to re-start, Q to quit," + System.lineSeparator());
-		System.out.println("             Z to solve the maze," + System.lineSeparator());
 		System.out.println("	and N to generate a new maze." + System.lineSeparator());
 		System.out.println("Please enter the width of the maze and press ENTER," + System.lineSeparator());
 		System.out.println("Followed by the height of the maze and press ENTER." + System.lineSeparator());
@@ -31,7 +30,9 @@ public class MazeRunner {
 		
 		Maze maze = new Maze(width, height);
 		maze.mazeGenerator();
-		Player player = new Player(maze.getPlayerStart());
+		maze.setStart(-1, 0);
+		maze.setFinish(width, height - 1);
+		Player player = new Player(maze.getNode(0, 0));
 		maze.printMaze(player);
 		
 		move = input.next().charAt(0);
@@ -40,38 +41,40 @@ public class MazeRunner {
 				Node position = player.getPosition().getLeft();
 				if (position != null && !position.equals(maze.getStart())){
 					player.setPosition(player.getPosition().getLeft());
+					maze.printMaze(player);
 				}
-				maze.printMaze(player);
 			}
 			if (move == 's'){
 				Node position = player.getPosition().getDown();
 				if (position != null && !position.equals(maze.getStart())){
 					player.setPosition(player.getPosition().getDown());
+					maze.printMaze(player);
 				}
-				maze.printMaze(player);
+				
 			}
 			if (move == 'd'){
 				Node position = player.getPosition().getRight();
 				if (position != null && !position.equals(maze.getStart())){
 					player.setPosition(player.getPosition().getRight());
+					maze.printMaze(player);
 				}
-				maze.printMaze(player);
 			}
 			if (move == 'w'){
 				Node position = player.getPosition().getUp();
 				if (position != null && !position.equals(maze.getStart())){
 					player.setPosition(player.getPosition().getUp());
+					maze.printMaze(player);
 				}
-				maze.printMaze(player);
+				
 			}
 			if (move == 'r'){
-				player = new Player(maze.getPlayerStart());
+				player = new Player(maze.getNode(0, 0));
 				maze.printMaze(player);
 			}
 			if (move == 'n'){ 
 				System.out.println("	Please Enter a new maze size.");
-				System.out.println("    Please enter the width of the maze and press ENTER,");
-				System.out.println("    Followed by the height of the maze and press ENTER.");
+				System.out.println("Please enter the width of the maze and press ENTER,");
+				System.out.println("Followed by the height of the maze and press ENTER.");
 				
 				width = Integer.parseInt(input.next());
 				height = Integer.parseInt(input.next());
@@ -85,7 +88,9 @@ public class MazeRunner {
 				
 				maze = new Maze(width, height);
 				maze.mazeGenerator();
-				player = new Player(maze.getPlayerStart());
+				maze.setStart(-1, 0);
+				maze.setFinish(width, height - 1);
+				player = new Player(maze.getNode(0, 0));
 				maze.printMaze(player);
 			}
 			if (move == 'q'){
@@ -124,7 +129,9 @@ public class MazeRunner {
 				
 				maze = new Maze(width, height);
 				maze.mazeGenerator();
-				player = new Player(maze.getPlayerStart());
+				maze.setStart(-1, 0);
+				maze.setFinish(width, height - 1);
+				player = new Player(maze.getNode(0, 0));
 				maze.printMaze(player);
 			}
 			move = input.next().charAt(0);			
