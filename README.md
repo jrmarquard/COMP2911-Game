@@ -29,6 +29,21 @@ In this assignment, the aim is to construct an interactive maze puzzle game that
 - User needs to be able to change AI difficulty, and other options
 - User needs to be able to play against different mazes
 - User needs to have different game modes, such as solving it individually, against a timer, with enemies, against another player, ... etc
+- 
+
+#### Week 10 Discussion of medium range game:
+- Menu on startup (after a "splash screen")
+- Easy, Medium, Hard, Custom (sizes)
+- Ratio restriction (with columns to adjust window size)
+- AI which doesnt update
+- Viewing limitations (dark everywhere else)
+- Step counter
+- My first enemy
+- Fix start and finish locations (on the maze)
+- Change default size (it changes after a new maze)
+- More randomisation for start and finish locations
+- Investigate threading and the communication between threads (What the hell is a thread?)
+
 
 #### TBF Goals and their developers
 - Unassigned
