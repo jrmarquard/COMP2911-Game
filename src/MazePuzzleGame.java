@@ -68,9 +68,6 @@ public class MazePuzzleGame {
 	    }
 	}
 
-    private void solveCharacter() {
-        world.solveCharacter();
-    }
 
     /**
      * Executed when the display needs to be refreshed.
@@ -94,7 +91,7 @@ public class MazePuzzleGame {
         CommandMap c = (CommandMap)o;
         int width = c.getWidth();
         int height = c.getHeight();
-        world.generateMap(width, height);
+        world.generateWorld(width, height);
          
         addCommand(new Command(Com.DRAW));
     }
@@ -136,6 +133,15 @@ public class MazePuzzleGame {
      */
     private void moveCharacterDown() {
         world.moveCharacterDown();
+        addCommand(new Command(Com.DRAW));
+    }
+    
+    /**
+     * Moves the player once and checks if it has finished
+     */
+    private void solveCharacter() {
+        // Move the character 1 spot and redraw
+        world.solveCharacter();
         addCommand(new Command(Com.DRAW));
     }
     

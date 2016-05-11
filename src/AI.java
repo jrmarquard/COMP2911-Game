@@ -4,10 +4,15 @@ import java.util.Queue;
 
 public class AI {
 
+    private Queue<Command> commands;
 	private ArrayList<Node> shortestPath;
 	
-	public AI(){
+	public AI() {
+        this.shortestPath = new ArrayList<Node>();
+    }
+	public AI(Queue<Command> commands) {
 		this.shortestPath = new ArrayList<Node>();
+		this.commands = commands;
 	}
 	
 	public ArrayList<Node> getShortestPath(){
@@ -61,5 +66,30 @@ public class AI {
 		} else {
 			return processPath(maze, path, start, source);
 		}
+	}
+	
+	public void makeMove() {
+        Node previous = shortestPath.remove(0);
+        Node next = shortestPath.get(0);
+
+        if (previous.isLeft(next)) {
+            if (shortestPath.size() == 1) shortestPath.remove(0);
+            commands.add(new Command(Com.MOVE_LEFT));
+        } else if (previous.isUp(next)) {
+            if (shortestPath.size() == 1) shortestPath.remove(0);
+            commands.add(new Command(Com.MOVE_UP));
+        } else if (previous.isRight(next)) {
+            if (shortestPath.size() == 1) shortestPath.remove(0);
+            commands.add(new Command(Com.MOVE_RIGHT));
+        } else if (previous.isDown(next)) {
+            if (shortestPath.size() == 1) shortestPath.remove(0);
+            commands.add(new Command(Com.MOVE_DOWN));
+        } else {
+            System.out.println("invalid");
+        }
+    }
+	
+	public boolean isFinished() {
+	    return shortestPath.isEmpty();
 	}
 }

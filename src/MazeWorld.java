@@ -6,17 +6,19 @@ public class MazeWorld {
     private Queue<Command> commands;
     private Maze maze;
     private Character player;
+    private AI ai;
     private boolean lockPlayerControl;
     private boolean winStatus;
     private boolean updated;
     
     public MazeWorld (int x, int y, Queue<Command> commands) {
         this.commands = commands;
-        generateMap(x,y);
+        generateWorld(x,y);
     }
 
-    public void generateMap(int x, int y) {
+    public void generateWorld(int x, int y) {
         maze = new Maze(x, y);
+        ai = new AI(commands);
         maze.mazeGenerator();
         player = new Character(maze.getNodeNextToStart().getX(), maze.getNodeNextToStart().getY(), "@");
         winStatus = false;
@@ -90,67 +92,34 @@ public class MazeWorld {
     }
     
     public void solveCharacter() {
-        // Creates new AI
-        AI ai = new AI();
+        // where is the player right now?
+        Node currentPosition = maze.getNode(player.getX(), player.getY());
         
-        // start node is the player's position
-        Node previous = maze.getNode(player.getX(), player.getY());
+        // find shortest path from where it currently is
+        ai.traverseMaze(maze, currentPosition);
         
-        // get the path to be traversed
-        ArrayList<Node> path = ai.traverseMaze(maze, previous);
+        // ai requests a move
+        ai.makeMove();
         
-        // temp solution. just get first move.
-//        previous = path.remove(0);
-//        Node next = path.remove(0);
-//        
-//        previous.print();
-//        next.print();
-//        
-//        if (previous.isLeft(next)) {
-//            moveCharacterLeft();
-//        } else if (previous.isUp(next)) {
-//            moveCharacterUp();
-//        } else if (previous.isRight(next)) {
-//            moveCharacterRight();
-//        } else if (previous.isDown(next)) {
-//            moveCharacterDown();
-//        } else {
-//            System.out.println("invalid");
-//        }
+
+        currentPosition = maze.getNode(player.getX(), player.getY());
         
-        
-        // removes the first node (where the path starts??)
-        Node next = path.remove(0);
-        while(!path.isEmpty()){
-            previous = next;
-            next = path.remove(0);
-            
-            // get direction of movement
-            if (previous.isLeft(next)) {
-                moveCharacterLeft();
-            } else if (previous.isUp(next)) {
-                moveCharacterUp();
-            } else if (previous.isRight(next)) {
-                moveCharacterRight();
-            } else if (previous.isDown(next)) {
-                moveCharacterDown();
-            } else {
-                System.out.println("invalid");
-            }
-            
-            // update maze to show movement
-            update();
-            
-            // wait
+        // check if they character has reached the end
+        if (currentPosition.equals(maze.getNodeNextToFinish())) {
+            // if the character is in the last tile
+            return;
+        } else {
+            // if the character isn't in the last tile
+            // wait, and issue another command
             try {
                 Thread.sleep(50);
             } catch(InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
+            update();         
+            addCommand(new Command(Com.SOLVE));
         }
-
-        updated = true;
-        update();
+        
     }
 }
 
