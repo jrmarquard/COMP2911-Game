@@ -7,7 +7,7 @@ import java.util.Queue;
  * game, allowing for easy communication between the user interface and the 
  * game data.
  * 
- * @author John Marquard, Joshua Tang, Patrick Su, Tim Myers, Tyler Matheson
+ * @author John, Joshua, Patrick, Tim, Tyler
  *
  */
 public class MazePuzzleGame {

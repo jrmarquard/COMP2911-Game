@@ -4,21 +4,21 @@ import java.util.Queue;
 public class MazeWorld {
     Queue<Command> commands;
     Maze maze;
-    Character c;
+    Character player;
     private boolean winStatus;
     
     public MazeWorld (int x, int y, Queue<Command> commands) {
         this.commands = commands;
-        this.maze = new Maze(x, y);        
-        this.maze.mazeGenerator();
-        this.c = new Character(0, 0, "@");
-        this.winStatus = false;
+        generateMap(x,y);
     }
 
     public void generateMap(int x, int y) {
         maze = new Maze(x, y);
-        c = new Character(0,0,"@");
         maze.mazeGenerator();
+        player = new Character(maze.getNodeNextToStart().getX(), maze.getNodeNextToStart().getY(), "@");
+        System.out.println("Start: "+maze.getStart().getX()+", "+maze.getStart().getY()+"Node next to start: "+maze.getNodeNextToStart().getX()+", "+maze.getNodeNextToStart().getY());
+
+        winStatus = false;
     }
 
     public Maze getMaze() {
@@ -43,52 +43,43 @@ public class MazeWorld {
     }
     
     public int getCharacterPosX () {
-        return c.getX();
+        return player.getX();
     }
     public int getCharacterPosY () {
-        return c.getY();
+        return player.getY();
     }
     public String getCharacterName() {
-        return c.getName();
+        return player.getName();
     }
     public boolean isChatacterHere (int x, int y) {
-        return x == c.getX() && y == c.getY();
+        return x == player.getX() && y == player.getY();
     }
     public void moveCharacterDown() {
-        if (maze.isDown(c.getX(), c.getY())) c.setY(c.getY()+1);
+        if (maze.isDown(player.getX(), player.getY())) player.setY(player.getY()+1);
         update();
     }
     public void moveCharacterLeft() {
-        if (maze.isLeft(c.getX(), c.getY())) c.setX(c.getX()-1);
+        if (maze.isLeft(player.getX(), player.getY())) player.setX(player.getX()-1);
         update();
     }
     public void moveCharacterRight() {
-        if (maze.isRight(c.getX(), c.getY())) c.setX(c.getX()+1);
+        if (maze.isRight(player.getX(), player.getY())) player.setX(player.getX()+1);
         update();
     }
     public void moveCharacterUp() {
-        if (maze.isUp(c.getX(), c.getY())) c.setY(c.getY()-1);
+        if (maze.isUp(player.getX(), player.getY())) player.setY(player.getY()-1);
         update();
     }
 
     public boolean hasCharacterWon() {
         // TODO Auto-generated method stub
-        int characterX = c.getX();
-        int characterY = c.getY();
+        int characterX = player.getX();
+        int characterY = player.getY();
         
-        int finishX = maze.getFinish().getX();
-        int finishY = maze.getFinish().getY();
+        int finishX = maze.getNodeNextToFinish().getX();
+        int finishY = maze.getNodeNextToFinish().getY();
         
-        if (characterY == finishY) {
-            if (characterX == -1 || characterX+1 == maze.getWidth()) {
-                return true;
-            }
-        } else if (characterX == finishX) {
-            if (characterY == -1 || characterY+1 == maze.getHeight()) {
-                return true;
-            }
-        }
-        return false;
+        return characterX == finishX && characterY == finishY;
     }
     public void addCommand (Command c) {
         commands.add(c);

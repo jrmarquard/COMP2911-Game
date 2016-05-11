@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Random;
 import java.util.Stack;
 
@@ -7,6 +9,7 @@ public class Maze {
 	
 	private Node start;
 	private Node finish;
+	private Node playerStart;
 	
 	private int width;
 	private int height;
@@ -29,6 +32,7 @@ public class Maze {
 		
 		this.start = null;
 		this.finish = null;
+		this.playerStart = null;
 		
 		this.width = width;
 		this.height = height;
@@ -42,6 +46,10 @@ public class Maze {
 		return this.finish;
 	}
 	
+	public Node getPlayerStart() {
+		return this.playerStart;
+	}
+	
 	public int getWidth() {
 		return this.width;
 	}
@@ -53,26 +61,37 @@ public class Maze {
 	public Node getNode(int x, int y) {
 		return this.nodes.get(x).get(y);
 	}
+	
 	public boolean isAdjacent(int x1, int y1, int x2, int y2) {
 	    return getNode(x1,y1).isAdjacent(getNode(x2,y2));
 	}
+	
 	public boolean isDown(int x, int y) {
-        if (getNode(x,y).getDown() != null) return true;
-        return false;
+        if (getNode(x,y).getDown() == null) return false;
+        if (getNode(x,y).getDown().equals(start)) return false;
+        if (getNode(x,y).getDown().equals(finish)) return false;
+        return true;
 	}
+	
 	public boolean isUp(int x, int y) {
-	    if (getNode(x,y).getUp() != null) return true;
-	    return false;
+        if (getNode(x,y).getUp() == null) return false;
+        if (getNode(x,y).getUp().equals(start)) return false;
+        if (getNode(x,y).getUp().equals(finish)) return false;
+        return true;
 	}
 
     public boolean isRight(int x, int y) {
-        if (getNode(x,y).getRight() != null) return true;
-        return false;
+        if (getNode(x,y).getRight() == null) return false;
+        if (getNode(x,y).getRight().equals(start)) return false;
+        if (getNode(x,y).getRight().equals(finish)) return false;
+        return true;
     }
 
     public boolean isLeft(int x, int y) {
-        if (getNode(x,y).getLeft() != null) return true;
-        return false;
+        if (getNode(x,y).getLeft() == null) return false;
+        if (getNode(x,y).getLeft().equals(start)) return false;
+        if (getNode(x,y).getLeft().equals(finish)) return false;
+        return true;
     }
 	
 	public boolean isStart(int x, int y) {
@@ -81,6 +100,34 @@ public class Maze {
 
     public boolean isFinish(int x, int y) {
         return getFinish().equals(new Node(x,y));
+    }
+    
+    public Node getNodeNextToStart() {
+        Node n = getStart();
+        if (n.getRight()!=null) {
+            return n.getRight();
+        } else if (n.getLeft()!=null) {
+            return n.getLeft();
+        } else if (n.getUp()!=null) {
+            return n.getUp();
+        } else if (n.getDown()!=null) {
+            return n.getDown();
+        }
+        return null;
+    }
+    
+    public Node getNodeNextToFinish() {
+        Node n = getFinish();
+        if (n.getRight()!=null) {
+            return n.getRight();
+        } else if (n.getLeft()!=null) {
+            return n.getLeft();
+        } else if (n.getUp()!=null) {
+            return n.getUp();
+        } else if (n.getDown()!=null) {
+            return n.getDown();
+        }
+        return null;
     }
 	
 	public void makePath(int xA, int yA, int xB, int yB) {
@@ -165,6 +212,7 @@ public class Maze {
 		   } else if (this.getNode(width, height).getLeft() == this.getStart()){
 			   System.out.print("S ");
 		   }
+		   
 		   while (width < this.width) {
 			   if (player.getPosition().equals(this.getNode(width, height))) {
 				   System.out.print(" @ ");
@@ -179,6 +227,7 @@ public class Maze {
 			   width++;
 	   	   }
 		   width--;
+		   
 		   if (this.getNode(width, height).getRight() == this.getFinish()){
 			   System.out.print("F ");
 		   } else if (this.getNode(width, height).getRight() == this.getStart()){
@@ -186,6 +235,7 @@ public class Maze {
 		   }
 		   System.out.print("\n");
 		   width = 0;
+		   
 		   if (this.getNode(width, height).getLeft() == null) {
 			   System.out.print(" |");
 		   } else {
@@ -213,6 +263,7 @@ public class Maze {
 	   height--;
 	   width = 0;
 	   System.out.print("   ");
+	   
 	   while (width < this.width) {
 		   if (this.getNode(width, height).getDown() == this.getFinish()) {
 			   System.out.print("F   ");
@@ -234,7 +285,8 @@ public class Maze {
 		ArrayList<Node> visited = new ArrayList<Node>();
 		Random rand = new Random();
 		
-		Node currNode = getNode(0, 0);
+		setRandomStartNode(rand);
+		Node currNode = this.playerStart;
 		explore.add(currNode);
 		visited.add(currNode);
 		
@@ -253,9 +305,97 @@ public class Maze {
 				currNode = explore.pop();
 			}
 		}
+		this.findAndSetFinish();
+	}
+	
+	private void setRandomStartNode(Random rand) {
+		int chosenEdge = rand.nextInt(4);
+		int x = 0;
+		int y = 0;
 		
-		start = new Node(0,-1);
-		finish = new Node (width, height-1);
+		// Left edge
+		if(chosenEdge == 0) {
+			x = 0;
+			y = rand.nextInt(this.height);
+			this.setStart(-1, y);
+		} 
+		
+		// Upper edge
+		else if(chosenEdge == 1) {
+			x = rand.nextInt(this.width);
+			y = 0;
+			this.setStart(x, -1);
+		} 
+		
+		// Right edge
+		else if(chosenEdge == 2) {
+			x = this.width - 1;
+			y = rand.nextInt(this.height);
+			this.setStart(width, y);
+		} 
+		
+		// Lower edge
+		else if(chosenEdge == 3) {
+			x = rand.nextInt(this.width);
+			y = this.height - 1;
+			this.setStart(x, height);
+		}
+		
+		this.playerStart = this.getNode(x, y);
+	}
+	
+	private void findAndSetFinish() {
+		Queue<Node> newExplore = new LinkedList<Node>();
+		LinkedList<Node> newVisited = new LinkedList<Node>();
+		
+		newExplore.add(this.playerStart);
+		while (!newExplore.isEmpty()){
+			Node n = newExplore.remove();
+			newVisited.add(n);
+			
+			ArrayList<Node> reachable = new ArrayList<Node>();
+			if (n.getLeft() != null) reachable.add(n.getLeft());
+			if (n.getDown() != null) reachable.add(n.getDown());
+			if (n.getRight() != null) reachable.add(n.getRight());
+			if (n.getUp() != null) reachable.add(n.getUp());
+			
+			for(Node neighbour: reachable){
+				if (!newVisited.contains(neighbour)){
+					newExplore.add(neighbour);
+				}
+			}
+		}
+		
+		Node node = getLastEdgeNode(newVisited);
+		int x = node.getX();
+		int y = node.getY();
+
+		if(x == 0) {
+			x = -1;
+		} else if(x == this.width - 1) {
+			x += 1;
+		} else if(y == 0) {
+			y = -1;
+		} else if(y == this.height - 1) {
+			y += 1;
+		}
+		
+		this.setFinish(x, y);
+	}
+	
+	private Node getLastEdgeNode(LinkedList<Node> visited) {
+		Node foundNode = null;
+		
+		for(Node node: visited) {
+			if((node.getX() == 0 && node.getY() >= 0 && node.getY() < this.height) ||
+					(node.getX() == this.width - 1 && node.getY() >= 0 && node.getY() < this.height) ||
+					(node.getY() == 0 && node.getX() >= 0 && node.getX() < this.width) ||
+					(node.getY() == this.height - 1 && node.getX() >= 0 && node.getX() < this.width)){
+				foundNode = node;
+			}
+		}
+		
+		return foundNode;
 	}
 	
 	/**
