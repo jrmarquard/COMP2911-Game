@@ -279,8 +279,8 @@ public class Maze {
 		ArrayList<Node> visited = new ArrayList<Node>();
 		Random rand = new Random();
 		
-		setRandomStartNode(rand);
-		Node currNode = this.getNodeNextToStart();
+		this.start = this.getNode(rand.nextInt(this.width), rand.nextInt(this.height));
+		Node currNode = this.getStart();
 		explore.add(currNode);
 		visited.add(currNode);
 		
@@ -300,9 +300,16 @@ public class Maze {
 			}
 		}
 		this.findAndSetFinish();
+		System.out.println(this.finish.getX());
+		System.out.println(this.finish.getY());
 	}
 	
 	private void setRandomStartNode(Random rand) {
+		int x = rand.nextInt(this.width);
+		int y = rand.nextInt(this.height);
+		this.setStart(x, y);
+		
+		/*
 		int chosenEdge = rand.nextInt(4);
 		int x = 0;
 		int y = 0;
@@ -333,7 +340,7 @@ public class Maze {
 			x = rand.nextInt(this.width);
 			y = this.height - 1;
 			this.setStart(x, height);
-		}
+		}*/
 	}
 	
 	private void findAndSetFinish() {
@@ -358,6 +365,9 @@ public class Maze {
 			}
 		}
 		
+		Node node = newVisited.getLast();
+		this.setFinish(node.getX(), node.getY());
+		/*
 		Node node = getLastEdgeNode(newVisited);
 		int x = node.getX();
 		int y = node.getY();
@@ -372,7 +382,7 @@ public class Maze {
 			y += 1;
 		}
 		
-		this.setFinish(x, y);
+		this.setFinish(x, y);*/
 	}
 	
 	private Node getLastEdgeNode(LinkedList<Node> visited) {
