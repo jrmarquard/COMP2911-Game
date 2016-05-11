@@ -15,9 +15,21 @@ public class MazeWorld {
         this.commands = commands;
         generateWorld(x,y);
     }
-
-    public void generateWorld(int x, int y) {
-        maze = new Maze(x, y);
+    
+    /**
+     * generatWorld resets the mazeWorld. It needs to intiliase everything: 
+     * - create a new maze
+     * - creates new entities
+     *    - player
+     *    - coins
+     *    - enemies .. etc
+     * - sets flags to defaults
+     *  
+     * @param height height of the maze to be generated
+     * @param width width of the maze to be generated
+     */
+    public void generateWorld(int width, int height) {
+        maze = new Maze(width, height);
         ai = new AI(commands);
         maze.mazeGenerator();
         player = new Character(maze.getStart().getX(), maze.getStart().getY(), "@");
@@ -26,13 +38,34 @@ public class MazeWorld {
         updated = false;
     }
 
+    /**
+     * gets the maze
+     * 
+     * @return the maze
+     */
     public Maze getMaze() {
         return maze;
     }
+    
+    /**
+     * Returns true if the game has been won.
+     * 
+     * @return the winStatus boolean
+     */
     public boolean getWinStatus () {
         return winStatus;
     }
     
+    /**
+     * Run this after any changes in the maze. It checks for anything
+     * that needs to be updated. This includes:
+     * - win conditions
+     * - entity collisions
+     *     - player picks up coins
+     *     - player dies
+     *     
+     * If something has happened, ask the GUI to redraw the world.
+     */
     public void update() {
         // Things the mazeWorld needs to do/check
         if (hasCharacterWon()) {
@@ -44,18 +77,44 @@ public class MazeWorld {
         if (updated) addCommand(new Command(Com.DRAW));
     }
     
+    /**
+     * Return the x coordinate of the player
+     * 
+     * @return x coordinate of the player
+     */
     public int getCharacterPosX () {
         return player.getX();
     }
+
+    /**
+     * Return the y coordinate of the player
+     * 
+     * @return y coordinate of the player
+     */
     public int getCharacterPosY () {
         return player.getY();
     }
+    
+    /**
+     * Gets the name of the character
+     * 
+     * @return character's name
+     */
     public String getCharacterName() {
         return player.getName();
     }
+    
+    /**
+     * 
+     * 
+     * @param x
+     * @param y
+     * @return
+     */
     public boolean isChatacterHere (int x, int y) {
         return x == player.getX() && y == player.getY();
     }
+    
     public void moveCharacterDown() {
         if (lockPlayerControl) return;
         if (maze.isDown(player.getX(), player.getY())) player.setY(player.getY()+1);
@@ -90,6 +149,7 @@ public class MazeWorld {
     public void addCommand (Command c) {
         commands.add(c);
     }
+    
     
     public void solveCharacter() {
         // where is the player right now?

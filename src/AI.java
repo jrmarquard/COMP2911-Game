@@ -43,7 +43,7 @@ public class AI {
 				path.add(neighbour);
 				path.add(n);
 				if (neighbour.equals(maze.getFinish())){
-					return processPath(maze, path, start, maze.getFinish());
+					return processPath(path, start, maze.getFinish());
 	
 				} else if (!visited.contains(neighbour)){
 					q.add(neighbour);
@@ -54,7 +54,7 @@ public class AI {
 		return null;
 	}
 	
-	private ArrayList<Node> processPath(Maze maze, ArrayList<Node> path, Node start, Node dest){
+	private ArrayList<Node> processPath(ArrayList<Node> path, Node start, Node dest){
 		int i = path.indexOf(dest);
 		Node source = path.get(i + 1);
 		
@@ -64,7 +64,7 @@ public class AI {
 			shortestPath.add(0, start);
 			return shortestPath;
 		} else {
-			return processPath(maze, path, start, source);
+			return processPath(path, start, source);
 		}
 	}
 	

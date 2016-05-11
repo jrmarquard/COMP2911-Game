@@ -81,6 +81,15 @@ public class GUI extends JFrame implements DisplayInterface {
                     case KeyEvent.VK_RIGHT: addCommand(new Command(Com.MOVE_RIGHT));    break;
                     case KeyEvent.VK_UP:    addCommand(new Command(Com.MOVE_UP));       break;
                     case KeyEvent.VK_C:     addCommand(new Command(Com.SOLVE));         break;
+                    case KeyEvent.VK_N: 
+                        JComboBox<Integer> box = (JComboBox<Integer>)menuPanel.getComponent(1);
+                        int width = (int)box.getSelectedItem();
+
+                        box = (JComboBox<Integer>)menuPanel.getComponent(3);
+                        int height = (int)box.getSelectedItem();
+                        
+                        addCommand(new CommandMap(Com.NEW_MAP, width, height));         
+                        break;
                 }
             }
         });
@@ -195,25 +204,32 @@ public class GUI extends JFrame implements DisplayInterface {
     public void drawMenuPanel() {
         menuPanel.removeAll();
         menuPanel.setBackground(pref.getColour("menuColour"));
-        
-        Integer[] sizes = new Integer[]{4,5,6,7,8,9,10};
 
-        JComboBox<Integer> widthSelect;
-        widthSelect= new JComboBox<>(sizes);
+        JFormattedTextField widthSize = new JFormattedTextField();
+        widthSize.setValue(Integer.toString(pref.getValue("defaultMapWidth")));
+        widthSize.setColumns(2);
+        JFormattedTextField heightSize = new JFormattedTextField();
+        heightSize.setValue(Integer.toString(pref.getValue("defaultMapHeight")));
+        heightSize.setColumns(2);
 
-        JComboBox<Integer> heightSelect;
-        heightSelect = new JComboBox<>(sizes);
-        
         JButton playButton = new JButton("New Maze");
         playButton.setMnemonic(KeyEvent.VK_N);
         playButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                JComboBox<Integer> box = (JComboBox<Integer>)menuPanel.getComponent(1);
-                int width = (int)box.getSelectedItem();
-
-                box = (JComboBox<Integer>)menuPanel.getComponent(3);
-                int height = (int)box.getSelectedItem();
+                JFormattedTextField box = (JFormattedTextField)menuPanel.getComponent(1);
+                int width = Integer.parseInt(box.getText());
+                
+                box = (JFormattedTextField)menuPanel.getComponent(3);
+                int height = Integer.parseInt(box.getText());
+                
+                int maxSize = pref.getValue("maxMazeSize");
+                if (height>maxSize) height=maxSize;
+                if (width>maxSize) width=maxSize;
+                
+                pref.setPreference("value.defaultMapWidth="+width);
+                pref.setPreference("value.defaultMapHeight="+height);
+                
                 
                 addCommand(new CommandMap(Com.NEW_MAP, width, height));
             }
@@ -235,9 +251,9 @@ public class GUI extends JFrame implements DisplayInterface {
             }
         });
         menuPanel.add(new JLabel("Width"));
-        menuPanel.add(widthSelect);
+        menuPanel.add(widthSize);
         menuPanel.add(new JLabel("Height"));
-        menuPanel.add(heightSelect);
+        menuPanel.add(heightSize);
         menuPanel.add(solveButton);
         menuPanel.add(playButton);
         menuPanel.add(closeButton);

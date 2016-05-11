@@ -8,10 +8,12 @@ import java.util.Scanner;
 public class Preferences {
     private Map<String, Color> GUIcolours;
     private Map<String, String> appText;
+    private Map<String, Integer> values;
     
     public Preferences () {
         this.GUIcolours = new HashMap<String,Color>();
         this.appText = new HashMap<String,String>();
+        this.values = new HashMap<String,Integer>();
         this.loadPreferences();
     }
     
@@ -21,6 +23,21 @@ public class Preferences {
     public String getText (String s) {
         return appText.get(s);
     }
+    public int getValue (String s) {
+        return values.get(s);
+    }
+    
+    public void setPreference (String s) {
+        // Of the format mapName.setting=value
+        String[] line = s.split("=");
+        String[] setting = line[0].split("\\.");
+
+        switch (setting[0]) {
+            case "text":    this.appText.put(setting[1],line[1]); break;
+            case "colour":  this.GUIcolours.put(setting[1],new Color(Integer.parseInt(line[1], 16)));   break;
+            case "value":  this.values.put(setting[1],Integer.parseInt(line[1])); break;
+        }
+    }
     
     public void loadPreferences() {
         Scanner sc = null;
@@ -28,14 +45,7 @@ public class Preferences {
             sc = new Scanner(new FileReader("pref.properties"));
 
             for( ; true == sc.hasNextLine() ; ) {
-                // Split the command into arguments
-                String[] line = sc.nextLine().split("=");
-                String[] setting = line[0].split("\\.");
-                
-                switch (setting[0]) {
-                    case "text":    this.appText.put(setting[1],line[1]);   break;
-                    case "colour":  this.GUIcolours.put(setting[1],new Color(Integer.parseInt(line[1], 16)));   break;
-                }
+                setPreference(sc.nextLine());
             }
         }
         catch (FileNotFoundException e) {
