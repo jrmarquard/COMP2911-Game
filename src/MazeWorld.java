@@ -20,7 +20,7 @@ public class MazeWorld {
         maze = new Maze(x, y);
         ai = new AI(commands);
         maze.mazeGenerator();
-        player = new Character(maze.getNodeNextToStart().getX(), maze.getNodeNextToStart().getY(), "@");
+        player = new Character(maze.getStart().getX(), maze.getStart().getY(), "@");
         winStatus = false;
         lockPlayerControl = false;
         updated = false;
@@ -82,8 +82,8 @@ public class MazeWorld {
         int characterX = player.getX();
         int characterY = player.getY();
         
-        int finishX = maze.getNodeNextToFinish().getX();
-        int finishY = maze.getNodeNextToFinish().getY();
+        int finishX = maze.getFinish().getX();
+        int finishY = maze.getFinish().getY();
         
         return characterX == finishX && characterY == finishY;
     }
@@ -105,7 +105,7 @@ public class MazeWorld {
         currentPosition = maze.getNode(player.getX(), player.getY());
         
         // check if they character has reached the end
-        if (currentPosition.equals(maze.getNodeNextToFinish())) {
+        if (currentPosition.equals(maze.getFinish())) {
             // if the character is in the last tile
             return;
         } else {

@@ -147,37 +147,8 @@ public class GUI extends JFrame implements DisplayInterface {
                     // Wall intersection
                     panel.setBackground(wallColour);                    
                 } else if (col == 0 || col == cols || row == 0 || row == rows) {
-                    
+                    //top, bottom, left, right boundaries
                     panel.setBackground(wallColour);
-                    // Check the left side
-                    if (col == 0) {
-                        if (m.isStart(col-1, (row-1)/2)) {
-                            panel.setBackground(startColour);
-                        } else if (m.isFinish(col-1, (row-1)/2)) {
-                            panel.setBackground(finishColour);
-                        }
-                    } // Check the top
-                    else if (row == 0) {
-                        if (m.isStart((col-1)/2, row-1)) {
-                            panel.setBackground(startColour);
-                        } else if (m.isFinish((col-1)/2, row-1)) {
-                            panel.setBackground(finishColour);
-                        }
-                    } // Check the right side
-                    else if (col == cols) {
-                        if (m.isStart((cols/2), (row-1)/2)) {
-                            panel.setBackground(startColour);
-                        } else if (m.isFinish((cols/2), (row-1)/2)) {
-                            panel.setBackground(finishColour);
-                        }
-                    } // Check the bottom
-                    else if (row == rows) {
-                        if (m.isStart((col-1)/2, row/2)) {
-                            panel.setBackground(startColour);
-                        } else if (m.isFinish((col-1)/2, row/2)) {
-                            panel.setBackground(finishColour);
-                        }
-                    }
                 } else {
                     // Vertical walls
                     if (row%2 == 0) {
@@ -197,7 +168,10 @@ public class GUI extends JFrame implements DisplayInterface {
                 if (col%2 != 0 && row%2 != 0) {
                     if (world.isChatacterHere((col-1)/2, (row-1)/2)) {
                         panel.setBackground(pref.getColour("playerColour"));
-                        panelConstraints.fill = GridBagConstraints.BOTH;
+                    } else if (m.isStart((col-1)/2, (row-1)/2)) {
+                        panel.setBackground(pref.getColour("startColour"));
+                    } else if (m.isFinish((col-1)/2, (row-1)/2)) {
+                        panel.setBackground(pref.getColour("finishColour"));
                     }
                 }
                 gamePanel.add(panel, panelConstraints);
