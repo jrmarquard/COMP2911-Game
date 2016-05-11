@@ -88,34 +88,6 @@ public class Maze {
         return getFinish().equals(new Node(x,y));
     }
     
-//    public Node getNodeNextToStart() {
-//        Node n = getStart();
-//        if (n.getRight()!=null) {
-//            return n.getRight();
-//        } else if (n.getLeft()!=null) {
-//            return n.getLeft();
-//        } else if (n.getUp()!=null) {
-//            return n.getUp();
-//        } else if (n.getDown()!=null) {
-//            return n.getDown();
-//        }
-//        return null;
-//    }
-    
-//    public Node getNodeNextToFinish() {
-//        Node n = getFinish();
-//        if (n.getRight()!=null) {
-//            return n.getRight();
-//        } else if (n.getLeft()!=null) {
-//            return n.getLeft();
-//        } else if (n.getUp()!=null) {
-//            return n.getUp();
-//        } else if (n.getDown()!=null) {
-//            return n.getDown();
-//        }
-//        return null;
-//    }
-	
 	public void makePath(int xA, int yA, int xB, int yB) {
 		if (xA == xB || yA == yB) {
 			if ((xA + 1) == xB) {
