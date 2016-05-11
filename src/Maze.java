@@ -394,7 +394,6 @@ public class Maze {
 				foundNode = node;
 			}
 		}
-		
 		return foundNode;
 	}
 	
