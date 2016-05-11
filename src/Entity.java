@@ -1,7 +1,7 @@
 
 public class Entity {
+
     
-    // Coordinates of entity.
     private int x;
     private int y;
     

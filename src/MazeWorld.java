@@ -7,6 +7,7 @@ public class MazeWorld {
     private Maze maze;
     private Character player;
     private AI ai;
+    private Coins coins;
     private boolean lockPlayerControl;
     private boolean winStatus;
     private boolean updated;
@@ -33,6 +34,7 @@ public class MazeWorld {
         ai = new AI(commands);
         maze.mazeGenerator();
         player = new Character(maze.getStart().getX(), maze.getStart().getY(), "@");
+        coins = new Coins(0,0,50);
         winStatus = false;
         lockPlayerControl = false;
         updated = false;
@@ -73,10 +75,18 @@ public class MazeWorld {
             lockPlayerControl = true;
             updated = true;
         }
+        if(isPlayerAtCoins()) {
+            player.addCoins(coins.getValue());
+            updated = true;
+        }
         
         if (updated) addCommand(new Command(Com.DRAW));
     }
     
+    private boolean isPlayerAtCoins() {
+        return isChatacterHere(coins.getX(), coins.getY());
+    }
+
     /**
      * Return the x coordinate of the player
      * 
@@ -180,6 +190,14 @@ public class MazeWorld {
             addCommand(new Command(Com.SOLVE));
         }
         
+    }
+
+    public int getPlayerCoins() {
+        return player.getCoins();
+    }
+
+    public boolean isCoins(int x, int y) {
+        return coins.getX() == x && coins.getY() == y;
     }
 }
 

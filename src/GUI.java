@@ -56,13 +56,12 @@ public class GUI extends JFrame implements DisplayInterface {
         
         // Define Layouts for each panel
         titlePanel = new JPanel(new GridBagLayout());
-        titlePanel.setMinimumSize(new Dimension(300, 50));
         gamePanel = new JPanel(new GridBagLayout());
         gamePanel.setPreferredSize(new Dimension(600, 600));
         menuPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         
         // Add children panels to the parent windowPanel
-     //   windowPanel.add(titlePanel);
+        windowPanel.add(titlePanel);
         windowPanel.add(gamePanel);
         windowPanel.add(menuPanel);
         
@@ -165,8 +164,6 @@ public class GUI extends JFrame implements DisplayInterface {
         };
         innerGamePanel.setLayout(new GridBagLayout());
 
-        gamePanel.setBackground(tileColour);
-
         GridBagConstraints panelConstraints = new GridBagConstraints();
         
         int cols = m.getWidth()*2;
@@ -228,25 +225,33 @@ public class GUI extends JFrame implements DisplayInterface {
                         panel.setBackground(startColour);
                     } else if (m.isFinish((col-1)/2, (row-1)/2)) {
                         panel.setBackground(finishColour);
+                    } else if (world.isCoins((col-1)/2, (row-1)/2)) {
+                        panel.setBackground(Color.yellow);
                     }
                 }
                 innerGamePanel.add(panel, panelConstraints);
             }
         }
+        
         gamePanel.add(innerGamePanel);
+        gamePanel.setBackground(tileColour);
         gamePanel.setPreferredSize(gamePanel.getSize());
     }
 
     public void drawTitlePanel() {
         titlePanel.removeAll();
-        titlePanel.setBackground(pref.getColour("titleDefaultColour"));
         
-        JLabel title = new JLabel();
         if (world.getWinStatus()) {
             titlePanel.setBackground(pref.getColour("titleWinColour"));
-            title.setText(pref.getText("winMessage"));
+        } else {
+            titlePanel.setBackground(pref.getColour("titleDefaultColour"));
         }
+        
+        JLabel title = new JLabel();
+        title.setText("Coins: "+world.getPlayerCoins());
+
         titlePanel.add(title);
+        
     }
     public void drawMenuPanel() {
         menuPanel.removeAll();
