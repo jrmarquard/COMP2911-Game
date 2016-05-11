@@ -63,9 +63,14 @@ public class MazePuzzleGame {
 	            case MOVE_LEFT:    game.moveCharacterLeft();           break;
 	            case MOVE_RIGHT:   game.moveCharacterRight();          break;
 	            case MOVE_UP:      game.moveCharacterUp();             break;
+	            case SOLVE:        game.solveCharacter();              break;
 	        }
 	    }
 	}
+
+    private void solveCharacter() {
+        world.solveCharacter();
+    }
 
     /**
      * Executed when the display needs to be refreshed.
@@ -89,9 +94,8 @@ public class MazePuzzleGame {
         CommandMap c = (CommandMap)o;
         int width = c.getWidth();
         int height = c.getHeight();
-        
         world.generateMap(width, height);
-        world.setWinStatus(false);
+         
         addCommand(new Command(Com.DRAW));
     }
     

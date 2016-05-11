@@ -76,10 +76,11 @@ public class GUI extends JFrame implements DisplayInterface {
         this.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 switch (e.getKeyCode()) {
-                    case KeyEvent.VK_DOWN: addCommand(new Command(Com.MOVE_DOWN)); break;
-                    case KeyEvent.VK_LEFT: addCommand(new Command(Com.MOVE_LEFT)); break;
-                    case KeyEvent.VK_RIGHT: addCommand(new Command(Com.MOVE_RIGHT));  break;
-                    case KeyEvent.VK_UP: addCommand(new Command(Com.MOVE_UP));  break;
+                    case KeyEvent.VK_DOWN:  addCommand(new Command(Com.MOVE_DOWN));     break;
+                    case KeyEvent.VK_LEFT:  addCommand(new Command(Com.MOVE_LEFT));     break;
+                    case KeyEvent.VK_RIGHT: addCommand(new Command(Com.MOVE_RIGHT));    break;
+                    case KeyEvent.VK_UP:    addCommand(new Command(Com.MOVE_UP));       break;
+                    case KeyEvent.VK_C:     addCommand(new Command(Com.SOLVE));         break;
                 }
             }
         });
@@ -251,10 +252,19 @@ public class GUI extends JFrame implements DisplayInterface {
                 addCommand(new Command(Com.EXIT));
             }
         });
+        JButton solveButton = new JButton("Solve");
+        solveButton.setMnemonic(KeyEvent.VK_S);
+        solveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                addCommand(new Command(Com.SOLVE));
+            }
+        });
         menuPanel.add(new JLabel("Width"));
         menuPanel.add(widthSelect);
         menuPanel.add(new JLabel("Height"));
         menuPanel.add(heightSelect);
+        menuPanel.add(solveButton);
         menuPanel.add(playButton);
         menuPanel.add(closeButton);
     }

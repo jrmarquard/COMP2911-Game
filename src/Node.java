@@ -56,6 +56,29 @@ public class Node {
 	public void setLeft(Node left) {
 		this.left = left;
 	}
+
+	/**
+	 * Checks if the node n is underneath this node
+	 * 
+	 * @param n query node
+	 * @return returns true if n is beneath node
+	 */
+	public boolean isDown(Node n) {
+        if (this.getDown() == null) return false;
+	    return this.getDown().equals(n);
+	}
+    public boolean isUp(Node n) {
+        if (this.getUp() == null) return false;
+        return this.getUp().equals(n);
+    }
+    public boolean isLeft(Node n) {
+        if (this.getLeft() == null) return false;
+        return this.getLeft().equals(n);
+    }
+    public boolean isRight(Node n) {
+        if (this.getRight() == null) return false;
+        return this.getRight().equals(n);
+    }
 	
 	public void print() {
 		System.out.println("Node: " + this.x + " " + this.y);
