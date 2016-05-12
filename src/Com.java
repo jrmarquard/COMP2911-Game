@@ -6,5 +6,6 @@ public enum Com {
     MOVE_UP, 
     MOVE_LEFT, 
     MOVE_RIGHT, 
-    SOLVE
+    IDLE,
+    SOLVE, 
 }
