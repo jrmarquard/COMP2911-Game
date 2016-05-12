@@ -55,9 +55,9 @@ public class GUI extends JFrame implements DisplayInterface {
         this.add(windowPanel);
         
         // Define Layouts for each panel
-        titlePanel = new JPanel(new GridBagLayout());
+        titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
         gamePanel = new JPanel(new GridBagLayout());
-        gamePanel.setPreferredSize(new Dimension(400, 400));
+        gamePanel.setPreferredSize(new Dimension(600, 600));
         menuPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         
         // Add children panels to the parent windowPanel
@@ -81,6 +81,22 @@ public class GUI extends JFrame implements DisplayInterface {
                     case KeyEvent.VK_RIGHT: addCommand(new Command(Com.MOVE_RIGHT));    break;
                     case KeyEvent.VK_UP:    addCommand(new Command(Com.MOVE_UP));       break;
                     case KeyEvent.VK_C:     addCommand(new Command(Com.SOLVE));         break;
+                    case KeyEvent.VK_N: 
+                        JFormattedTextField box = (JFormattedTextField)menuPanel.getComponent(1);
+                        int width = Integer.parseInt(box.getText());
+                        
+                        box = (JFormattedTextField)menuPanel.getComponent(3);
+                        int height = Integer.parseInt(box.getText());
+                        
+                        int maxSize = pref.getValue("maxMazeSize");
+                        if (height>maxSize) height=maxSize;
+                        if (width>maxSize) width=maxSize;
+                        
+                        pref.setPreference("value.defaultMapWidth="+width);
+                        pref.setPreference("value.defaultMapHeight="+height);
+                        
+                        addCommand(new CommandMap(Com.NEW_MAP, width, height));         
+                        break;
                 }
             }
         });
@@ -101,22 +117,57 @@ public class GUI extends JFrame implements DisplayInterface {
     private void drawGamePanel() {
         // Need to fix this later as to not break encapsulation
         Maze m = world.getMaze();
-        
-        gamePanel.removeAll();
-        gamePanel.setBackground(pref.getColour("tileColour"));
-        
-        gamePanel.setBorder(null);
-        
-        int cols = m.getWidth()*2;
-        int rows = m.getHeight()*2;
-        
+
         Color wallColour = pref.getColour("wallColour");
         Color floorColour = pref.getColour("tileColour");
         Color startColour = pref.getColour("startColour");
         Color finishColour = pref.getColour("finishColour");
+        Color playerColour = pref.getColour("playerColour");
+        Color tileColour = pref.getColour("tileColor");
+        
+        gamePanel.removeAll();
+        
+        /*
+         * This creates a new JPanel with the gePreferredSize() method
+         * @Overriden by the code inside. This code is called when java builds
+         * the swing interface (I think).
+         * This method relies on the JPanel being the only component inside
+         * the parent container.
+         */
+        JPanel innerGamePanel = new JPanel() {
+            @Override
+            public Dimension getPreferredSize() {
+                // Get the dimensions of the parent
+                Dimension d = this.getParent().getSize();
+                
+                Maze m = world.getMaze();
+                double height = m.getHeight();
+                double width = m.getWidth();
+                
+                double windowHeight = d.height;
+                double windowWidth = d.width;
 
-        // Adjusts each panel's constraints
+                // if < 1, there should be extra space on the left/right
+                // if > 1, there should be extra space on the top/bottom
+                // do the maths yourself, it just works (tm)
+                double magic = (windowWidth/windowHeight) * (height/width);
+                if (magic <= 1) {
+                    int returnHeight = (int) (windowWidth*(height/width));
+                    int returnWidth = (int) windowWidth;
+                    return new Dimension(returnWidth,returnHeight);
+                } else {
+                    int returnHeight = (int) windowHeight;
+                    int returnWidth = (int) (windowHeight*(width/height));
+                    return new Dimension(returnWidth,returnHeight);
+                }
+            }
+        };
+        innerGamePanel.setLayout(new GridBagLayout());
+
         GridBagConstraints panelConstraints = new GridBagConstraints();
+        
+        int cols = m.getWidth()*2;
+        int rows = m.getHeight()*2;
         
         // Iterate over the columns
         for (int col = 0; col <= cols; col++) {
@@ -166,54 +217,70 @@ public class GUI extends JFrame implements DisplayInterface {
                 
                 // Tile blocks
                 if (col%2 != 0 && row%2 != 0) {
+                    innerGamePanel.setBackground(tileColour);
+                    
                     if (world.isChatacterHere((col-1)/2, (row-1)/2)) {
-                        panel.setBackground(pref.getColour("playerColour"));
+                        panel.setBackground(playerColour);
                     } else if (m.isStart((col-1)/2, (row-1)/2)) {
-                        panel.setBackground(pref.getColour("startColour"));
+                        panel.setBackground(startColour);
                     } else if (m.isFinish((col-1)/2, (row-1)/2)) {
-                        panel.setBackground(pref.getColour("finishColour"));
+                        panel.setBackground(finishColour);
+                    } else if (world.isCoins((col-1)/2, (row-1)/2)) {
+                        panel.setBackground(Color.yellow);
                     }
                 }
-                gamePanel.add(panel, panelConstraints);
+                innerGamePanel.add(panel, panelConstraints);
             }
         }
+        
+        gamePanel.add(innerGamePanel);
+        gamePanel.setBackground(tileColour);
         gamePanel.setPreferredSize(gamePanel.getSize());
     }
 
     public void drawTitlePanel() {
         titlePanel.removeAll();
-        titlePanel.setBackground(pref.getColour("titleDefaultColour"));
-        titlePanel.setPreferredSize(new Dimension(300, 50));
         
-        JLabel title = new JLabel();
         if (world.getWinStatus()) {
             titlePanel.setBackground(pref.getColour("titleWinColour"));
-            title.setText(pref.getText("winMessage"));
+        } else {
+            titlePanel.setBackground(pref.getColour("titleDefaultColour"));
         }
+        
+        JLabel title = new JLabel();
+        title.setText("Coins: "+world.getPlayerCoins());
+
         titlePanel.add(title);
+        
     }
     public void drawMenuPanel() {
         menuPanel.removeAll();
         menuPanel.setBackground(pref.getColour("menuColour"));
-        
-        Integer[] sizes = new Integer[]{4,5,6,7,8,9,10};
 
-        JComboBox<Integer> widthSelect;
-        widthSelect= new JComboBox<>(sizes);
+        JFormattedTextField widthSize = new JFormattedTextField();
+        widthSize.setValue(Integer.toString(pref.getValue("defaultMapWidth")));
+        widthSize.setColumns(2);
+        JFormattedTextField heightSize = new JFormattedTextField();
+        heightSize.setValue(Integer.toString(pref.getValue("defaultMapHeight")));
+        heightSize.setColumns(2);
 
-        JComboBox<Integer> heightSelect;
-        heightSelect = new JComboBox<>(sizes);
-        
         JButton playButton = new JButton("New Maze");
         playButton.setMnemonic(KeyEvent.VK_N);
         playButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                JComboBox<Integer> box = (JComboBox<Integer>)menuPanel.getComponent(1);
-                int width = (int)box.getSelectedItem();
-
-                box = (JComboBox<Integer>)menuPanel.getComponent(3);
-                int height = (int)box.getSelectedItem();
+                JFormattedTextField box = (JFormattedTextField)menuPanel.getComponent(1);
+                int width = Integer.parseInt(box.getText());
+                
+                box = (JFormattedTextField)menuPanel.getComponent(3);
+                int height = Integer.parseInt(box.getText());
+                
+                int maxSize = pref.getValue("maxMazeSize");
+                if (height>maxSize) height=maxSize;
+                if (width>maxSize) width=maxSize;
+                
+                pref.setPreference("value.defaultMapWidth="+width);
+                pref.setPreference("value.defaultMapHeight="+height);
                 
                 addCommand(new CommandMap(Com.NEW_MAP, width, height));
             }
@@ -235,9 +302,9 @@ public class GUI extends JFrame implements DisplayInterface {
             }
         });
         menuPanel.add(new JLabel("Width"));
-        menuPanel.add(widthSelect);
+        menuPanel.add(widthSize);
         menuPanel.add(new JLabel("Height"));
-        menuPanel.add(heightSelect);
+        menuPanel.add(heightSize);
         menuPanel.add(solveButton);
         menuPanel.add(playButton);
         menuPanel.add(closeButton);
