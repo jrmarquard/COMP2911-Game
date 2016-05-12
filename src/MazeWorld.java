@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Queue;
 
 
@@ -7,7 +8,8 @@ public class MazeWorld {
     private Maze maze;
     private Character player;
     private AI ai;
-    private Coins coins;
+    // private Coins coins;
+    private ArrayList<Entity> entities;
     private boolean lockPlayerControl;
     private boolean winStatus;
     private boolean updated;
@@ -32,9 +34,13 @@ public class MazeWorld {
     public void generateWorld(int width, int height) {
         maze = new Maze(width, height);
         ai = new AI(commands);
+        entities = new ArrayList<Entity>();
         maze.mazeGenerator();
         player = new Character(maze.getStart().getX(), maze.getStart().getY(), "@");
-        coins = new Coins(0,0,50);
+        Coins coins1 = new Coins(0,0,50);
+        Coins coins2 = new Coins(3,3,150);
+        entities.add(coins1);
+        entities.add(coins2);
         winStatus = false;
         lockPlayerControl = false;
         updated = false;
@@ -75,16 +81,23 @@ public class MazeWorld {
             lockPlayerControl = true;
             updated = true;
         }
-        if(isPlayerAtCoins()) {
-            player.addCoins(coins.getValue());
-            updated = true;
-        }
+        entityCollision();
         
         if (updated) addCommand(new Command(Com.DRAW));
     }
     
-    private boolean isPlayerAtCoins() {
-        return isChatacterHere(coins.getX(), coins.getY());
+    private void entityCollision () {
+        Iterator<Entity> iter = entities.iterator();
+        while (iter.hasNext()) {
+            Entity e = iter.next();
+            if (isChatacterHere(e.getX(), e.getY())) {
+                if (e instanceof Coins) {
+                    player.addCoins(((Coins)e).getValue());
+                    iter.remove();
+                    updated = true;
+                }
+            }
+        }
     }
 
     /**
@@ -197,7 +210,14 @@ public class MazeWorld {
     }
 
     public boolean isCoins(int x, int y) {
-        return coins.getX() == x && coins.getY() == y;
+        for (Entity e : entities) {
+            if (e instanceof Coins) {
+                if (e.getX() == x && e.getY() == y) {
+                    return true;
+                }
+            }
+        }
+        return false;        
     }
 }
 
