@@ -1,10 +1,12 @@
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Queue;
+import java.util.Random;
 
 
 public class MazeWorld {
     private Queue<Command> commands;
+    private Preferences pref;
     private Maze maze;
     private Character player;
     private AI ai;
@@ -14,9 +16,10 @@ public class MazeWorld {
     private boolean winStatus;
     private boolean updated;
     
-    public MazeWorld (int x, int y, Queue<Command> commands) {
+    public MazeWorld (Queue<Command> commands, Preferences pref) {
         this.commands = commands;
-        generateWorld(x,y);
+        this.pref = pref;
+        generateWorld(pref.getValue("defaultMapWidth"), pref.getValue("defaultMapHeight"));
     }
     
     /**
@@ -36,16 +39,43 @@ public class MazeWorld {
         ai = new AI(commands);
         entities = new ArrayList<Entity>();
         maze.mazeGenerator();
-        player = new Character(maze.getStart().getX(), maze.getStart().getY(), "@");
-        Coins coins1 = new Coins(0,0,50);
-        Coins coins2 = new Coins(3,3,150);
-        entities.add(coins1);
-        entities.add(coins2);
+        player = new Character(maze.getStart().getX(), maze.getStart().getY(), pref.getText("playerName"));
+        
+        float h = (float)maze.getHeight();
+        float w = (float)maze.getWidth();
+        float r = (float)pref.getValue("defaultCoinRatio");
+        
+        float numberOfCoins = (h*w)*(r/100);
+        generateCoins((int)numberOfCoins);
         winStatus = false;
         lockPlayerControl = false;
         updated = false;
     }
+    
+    public void generateCoins(int instances) {
 
+        Random rand = new Random();
+        int xC = rand.nextInt(maze.getWidth());
+        int yC = rand.nextInt(maze.getHeight());
+        
+        for (int x = 0; x < instances; x++) {
+            while (!uniqueCoordinates(xC, yC)) {
+                xC = rand.nextInt(maze.getWidth());
+                yC = rand.nextInt(maze.getHeight());
+            }
+            Coins coins = new Coins(xC,yC,50);
+            entities.add(coins);
+        }
+    }
+    
+    public boolean uniqueCoordinates(int x, int y) {
+        if (maze.isStart(x,y)) return false;
+        if (maze.isFinish(x,y)) return false;
+        for (Entity e : entities) {
+            if (e.getX() == x && e.getY() == y) return false;
+        }
+        return true;
+    }
     /**
      * gets the maze
      * 

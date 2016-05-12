@@ -55,7 +55,7 @@ public class GUI extends JFrame implements DisplayInterface {
         this.add(windowPanel);
         
         // Define Layouts for each panel
-        titlePanel = new JPanel(new GridBagLayout());
+        titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
         gamePanel = new JPanel(new GridBagLayout());
         gamePanel.setPreferredSize(new Dimension(600, 600));
         menuPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
