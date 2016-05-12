@@ -12,7 +12,7 @@ In this assignment, the aim is to construct an interactive maze puzzle game that
 ## Project Development
 
 #### Scrum Roles:
-- John Marquard: Developer/Scrum Master/Project Owner
+- John: Developer/Scrum Master/Project Owner
 - Joshua: Developer
 - Partrick: Developer
 - Tim: Developer
