@@ -264,9 +264,9 @@ public class GUI extends JFrame implements DisplayInterface {
         heightSize.setValue(Integer.toString(pref.getValue("defaultMapHeight")));
         heightSize.setColumns(2);
 
-        JButton playButton = new JButton("New Maze");
-        playButton.setMnemonic(KeyEvent.VK_N);
-        playButton.addActionListener(new ActionListener() {
+        JButton newMazeButton = new JButton("New Maze");
+        newMazeButton.setMnemonic(KeyEvent.VK_N);
+        newMazeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
                 JFormattedTextField box = (JFormattedTextField)menuPanel.getComponent(1);
@@ -285,14 +285,19 @@ public class GUI extends JFrame implements DisplayInterface {
                 addCommand(new CommandMap(Com.NEW_MAP, width, height));
             }
         });
-        JButton closeButton = new JButton("Exit");
-        closeButton.setMnemonic(KeyEvent.VK_W);
-        closeButton.addActionListener(new ActionListener() {
+        JCheckBox auto = new JCheckBox("Auto", pref.getBool("autoComplete"));
+        auto.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                addCommand(new Command(Com.EXIT));
+                
+                pref.toggleBool("autoComplete");
+                if (pref.getBool("autoComplete")) {
+                    // if the preference is now on, solve the maze
+                    addCommand(new Command(Com.SOLVE));
+                }
             }
         });
+        
         JButton solveButton = new JButton("Solve");
         solveButton.setMnemonic(KeyEvent.VK_S);
         solveButton.addActionListener(new ActionListener() {
@@ -301,12 +306,21 @@ public class GUI extends JFrame implements DisplayInterface {
                 addCommand(new Command(Com.SOLVE));
             }
         });
+        JButton closeButton = new JButton("Exit");
+        closeButton.setMnemonic(KeyEvent.VK_W);
+        closeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                addCommand(new Command(Com.EXIT));
+            }
+        });
         menuPanel.add(new JLabel("Width"));
         menuPanel.add(widthSize);
         menuPanel.add(new JLabel("Height"));
         menuPanel.add(heightSize);
         menuPanel.add(solveButton);
-        menuPanel.add(playButton);
+        menuPanel.add(auto);
+        menuPanel.add(newMazeButton);
         menuPanel.add(closeButton);
     }
     

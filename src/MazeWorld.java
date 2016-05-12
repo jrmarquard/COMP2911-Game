@@ -9,8 +9,7 @@ public class MazeWorld {
     private Preferences pref;
     private Maze maze;
     private Character player;
-    private AI ai;
-    // private Coins coins;
+    private AIControl ai;
     private ArrayList<Entity> entities;
     private boolean lockPlayerControl;
     private boolean winStatus;
@@ -36,7 +35,7 @@ public class MazeWorld {
      */
     public void generateWorld(int width, int height) {
         maze = new Maze(width, height);
-        ai = new AI(commands);
+        ai = new AI2();
         entities = new ArrayList<Entity>();
         maze.mazeGenerator();
         player = new Character(maze.getStart().getX(), maze.getStart().getY(), pref.getText("playerName"));
@@ -157,13 +156,6 @@ public class MazeWorld {
         return player.getName();
     }
     
-    /**
-     * 
-     * 
-     * @param x
-     * @param y
-     * @return
-     */
     public boolean isChatacterHere (int x, int y) {
         return x == player.getX() && y == player.getY();
     }
@@ -203,35 +195,26 @@ public class MazeWorld {
         commands.add(c);
     }
     
-    
     public void solveCharacter() {
-        // where is the player right now?
-        Node currentPosition = maze.getNode(player.getX(), player.getY());
+        // Ask AI to make a move and add that to the command queue
+        try {
+            addCommand(ai.makeMove(this));
+            Thread.sleep(50);
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
         
-        // find shortest path from where it currently is
-        ai.traverseMaze(maze, currentPosition);
+        // if the player has reached the end
+        if (winStatus) {
+            pref.toggleBool("autoComplete");
+        }
         
-        // ai requests a move
-        ai.makeMove();
-        
-
-        currentPosition = maze.getNode(player.getX(), player.getY());
-        
-        // check if they character has reached the end
-        if (currentPosition.equals(maze.getFinish())) {
-            // if the character is in the last tile
-            return;
-        } else {
-            // if the character isn't in the last tile
-            // wait, and issue another command
-            try {
-                Thread.sleep(50);
-            } catch(InterruptedException ex) {
-                Thread.currentThread().interrupt();
-            }
-            update();         
+        // if the player is set to auto complete, send another solve command
+        if (pref.getBool("autoComplete")) {
             addCommand(new Command(Com.SOLVE));
         }
+        update();
+        return;
         
     }
 
