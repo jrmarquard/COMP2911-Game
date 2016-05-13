@@ -113,128 +113,20 @@ public class GUI extends JFrame implements DisplayInterface {
         commands.add(c);
     }
     
-    
     private void drawGamePanel() {
-        // Need to fix this later as to not break encapsulation
-        Maze m = world.getMaze();
-
-        Color wallColour = pref.getColour("wallColour");
-        Color floorColour = pref.getColour("tileColour");
-        Color startColour = pref.getColour("startColour");
-        Color finishColour = pref.getColour("finishColour");
-        Color playerColour = pref.getColour("playerColour");
-        Color tileColour = pref.getColour("tileColor");
-        
+        // Reset game panels, remove them (hopefully clears memory)
         gamePanel.removeAll();
         
-        /*
-         * This creates a new JPanel with the gePreferredSize() method
-         * @Overriden by the code inside. This code is called when java builds
-         * the swing interface (I think).
-         * This method relies on the JPanel being the only component inside
-         * the parent container.
-         */
-        JPanel innerGamePanel = new JPanel() {
-            @Override
-            public Dimension getPreferredSize() {
-                // Get the dimensions of the parent
-                Dimension d = this.getParent().getSize();
-                
-                Maze m = world.getMaze();
-                double height = m.getHeight();
-                double width = m.getWidth();
-                
-                double windowHeight = d.height;
-                double windowWidth = d.width;
-
-                // if < 1, there should be extra space on the left/right
-                // if > 1, there should be extra space on the top/bottom
-                // do the maths yourself, it just works (tm)
-                double magic = (windowWidth/windowHeight) * (height/width);
-                if (magic <= 1) {
-                    int returnHeight = (int) (windowWidth*(height/width));
-                    int returnWidth = (int) windowWidth;
-                    return new Dimension(returnWidth,returnHeight);
-                } else {
-                    int returnHeight = (int) windowHeight;
-                    int returnWidth = (int) (windowHeight*(width/height));
-                    return new Dimension(returnWidth,returnHeight);
-                }
-            }
-        };
+        GameMap innerGamePanel = new GameMap(world);
         innerGamePanel.setLayout(new GridBagLayout());
-
-        GridBagConstraints panelConstraints = new GridBagConstraints();
-        
-        int cols = m.getWidth()*2;
-        int rows = m.getHeight()*2;
-        
-        // Iterate over the columns
-        for (int col = 0; col <= cols; col++) {
-            // Iterate over the rows
-            for (int row = 0; row <= rows; row++) {
-                JPanel panel = new JPanel();
-
-                // Defaults for a floor tile
-                panel.setBackground(floorColour);
-                panelConstraints.fill = GridBagConstraints.BOTH;
-                panelConstraints.weightx = 1;
-                panelConstraints.weighty = 1;
-                panelConstraints.gridx = col;
-                panelConstraints.gridy = row;
-                
-                // If on a wall column
-                if (col%2 == 0) {
-                    panelConstraints.weightx = 0.1;
-                }
-                
-                // If on a wall row
-                if (row%2 == 0) {
-                    panelConstraints.weighty = 0.1;
-                }
-                
-                // If there is a wall intersection
-                if (col%2 == 0 && row%2 == 0) {
-                    // Wall intersection
-                    panel.setBackground(wallColour);                    
-                } else if (col == 0 || col == cols || row == 0 || row == rows) {
-                    //top, bottom, left, right boundaries
-                    panel.setBackground(wallColour);
-                } else {
-                    // Vertical walls
-                    if (row%2 == 0) {
-                        // Check if the wall exists
-                        if (!m.isAdjacent((col-1)/2, (row/2)-1, (col-1)/2, (row/2))){
-                            panel.setBackground(wallColour);
-                        }
-                    } // Horizontal walls
-                    else if (col%2 == 0) {
-                        if (!m.isAdjacent((col/2)-1, (row-1)/2, col/2, (row-1)/2)){
-                            panel.setBackground(wallColour);
-                        }
-                    }
-                }
-                
-                // Tile blocks
-                if (col%2 != 0 && row%2 != 0) {
-                    innerGamePanel.setBackground(tileColour);
-                    
-                    if (world.isChatacterHere((col-1)/2, (row-1)/2)) {
-                        panel.setBackground(playerColour);
-                    } else if (m.isStart((col-1)/2, (row-1)/2)) {
-                        panel.setBackground(startColour);
-                    } else if (m.isFinish((col-1)/2, (row-1)/2)) {
-                        panel.setBackground(finishColour);
-                    } else if (world.isCoins((col-1)/2, (row-1)/2)) {
-                        panel.setBackground(Color.yellow);
-                    }
-                }
-                innerGamePanel.add(panel, panelConstraints);
-            }
-        }
+        innerGamePanel.setColour("wallColour", pref.getColour("wallColour"));
+        innerGamePanel.setColour("floorColour", pref.getColour("floorColour"));
+        innerGamePanel.setColour("startColour", pref.getColour("startColour"));
+        innerGamePanel.setColour("finishColour", pref.getColour("finishColour"));
+        innerGamePanel.setColour("playerColour", pref.getColour("playerColour"));
+        innerGamePanel.setColour("coinColour", pref.getColour("coinColour"));
         
         gamePanel.add(innerGamePanel);
-        gamePanel.setBackground(tileColour);
         gamePanel.setPreferredSize(gamePanel.getSize());
     }
 
@@ -253,6 +145,7 @@ public class GUI extends JFrame implements DisplayInterface {
         titlePanel.add(title);
         
     }
+    
     public void drawMenuPanel() {
         menuPanel.removeAll();
         menuPanel.setBackground(pref.getColour("menuColour"));
