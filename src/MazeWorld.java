@@ -38,7 +38,7 @@ public class MazeWorld {
         ai = new AI2();
         entities = new ArrayList<Entity>();
         maze.mazeGenerator();
-        player = new Character(maze.getStart().getX(), maze.getStart().getY(), pref.getText("playerName"));
+        player = new Character(new Coordinate(maze.getStart().getX(), maze.getStart().getY()), pref.getText("playerName"));
         
         float h = (float)maze.getHeight();
         float w = (float)maze.getWidth();
@@ -62,7 +62,7 @@ public class MazeWorld {
                 xC = rand.nextInt(maze.getWidth());
                 yC = rand.nextInt(maze.getHeight());
             }
-            Coins coins = new Coins(xC,yC,50);
+            Coins coins = new Coins(new Coordinate(xC,yC),50);
             entities.add(coins);
         }
     }
@@ -119,7 +119,7 @@ public class MazeWorld {
         Iterator<Entity> iter = entities.iterator();
         while (iter.hasNext()) {
             Entity e = iter.next();
-            if (isChatacterHere(e.getX(), e.getY())) {
+            if (isChatacterHere(e.getCoordinate())) {
                 if (e instanceof Coins) {
                     player.addCoins(((Coins)e).getValue());
                     iter.remove();
@@ -128,23 +128,13 @@ public class MazeWorld {
             }
         }
     }
-
     /**
-     * Return the x coordinate of the player
+     * Return the coordinates of the player
      * 
      * @return x coordinate of the player
      */
-    public int getCharacterPosX () {
-        return player.getX();
-    }
-
-    /**
-     * Return the y coordinate of the player
-     * 
-     * @return y coordinate of the player
-     */
-    public int getCharacterPosY () {
-        return player.getY();
+    public Coordinate getPlayerCoordinate () {
+        return player.getCoordinate();
     }
     
     /**
@@ -156,8 +146,8 @@ public class MazeWorld {
         return player.getName();
     }
     
-    public boolean isChatacterHere (int x, int y) {
-        return x == player.getX() && y == player.getY();
+    public boolean isChatacterHere (Coordinate coord) {
+        return player.getCoordinate().equals(coord);
     }
     
     public void moveCharacterDown() {
@@ -182,14 +172,7 @@ public class MazeWorld {
     }
 
     public boolean hasCharacterWon() {
-        // TODO Auto-generated method stub
-        int characterX = player.getX();
-        int characterY = player.getY();
-        
-        int finishX = maze.getFinish().getX();
-        int finishY = maze.getFinish().getY();
-        
-        return characterX == finishX && characterY == finishY;
+        return maze.getFinishCoordinate().equals(getPlayerCoordinate());
     }
     public void addCommand (Command c) {
         commands.add(c);
@@ -222,10 +205,10 @@ public class MazeWorld {
         return player.getCoins();
     }
 
-    public boolean isCoins(int x, int y) {
+    public boolean isCoins(Coordinate coord) {
         for (Entity e : entities) {
             if (e instanceof Coins) {
-                if (e.getX() == x && e.getY() == y) {
+                if (e.getCoordinate().equals(coord)) {
                     return true;
                 }
             }
@@ -236,7 +219,7 @@ public class MazeWorld {
     public ArrayList<Coordinate> getEntityCoordinates() {
         ArrayList<Coordinate> coords = new ArrayList<Coordinate>();
         for (Entity e : entities) {
-            coords.add(new Coordinate(e.getX(),e.getY()));
+            coords.add(e.getCoordinate());
         }
         return coords;
     }

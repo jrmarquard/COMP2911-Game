@@ -117,7 +117,7 @@ public class GUI extends JFrame implements DisplayInterface {
         // Reset game panels, remove them (hopefully clears memory)
         gamePanel.removeAll();
         
-        GameMap innerGamePanel = new GameMap(world);
+        GameMap_2 innerGamePanel = new GameMap_2(world);
         innerGamePanel.setLayout(new GridBagLayout());
         innerGamePanel.setColour("wallColour", pref.getColour("wallColour"));
         innerGamePanel.setColour("floorColour", pref.getColour("floorColour"));

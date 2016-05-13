@@ -12,6 +12,10 @@ public class Maze {
 	
 	private int width;
 	private int height;
+
+    public Coordinate getFinishCoordinate() {
+        return finish.getCoordinate();
+    }
 	
 	public Maze(int width, int height) {
 		this.nodes = new ArrayList<ArrayList<Node>>();
@@ -54,6 +58,11 @@ public class Maze {
 	
 	public Node getNode(int x, int y) {
 		return this.nodes.get(x).get(y);
+	}
+	public Node getNode(Coordinate c) {
+	    int x = c.getX();
+	    int y = c.getY();
+	    return this.nodes.get(x).get(y);
 	}
 	
 	public boolean isAdjacent(int x1, int y1, int x2, int y2) {
@@ -440,4 +449,17 @@ public class Maze {
 			nodeB.setRight(nodeA);
 		}
 	}
+
+    public boolean isNorthWall(Coordinate coord) {
+        return !getNode(coord).isUp();
+    }
+    public boolean isEastWall(Coordinate coord) {
+        return !getNode(coord).isRight();
+    }
+    public boolean isSouthWall(Coordinate coord) {
+        return !getNode(coord).isDown();
+    }
+    public boolean isWestWall(Coordinate coord) {
+        return !getNode(coord).isLeft();
+    }
 }

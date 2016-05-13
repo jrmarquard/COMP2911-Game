@@ -56,7 +56,7 @@ public class AI2 implements AIControl{
 	}
 	
 	public Command makeMove(MazeWorld world) {
-	    Node start = world.getMaze().getNode(world.getCharacterPosX(), world.getCharacterPosY());
+	    Node start = world.getMaze().getNode(world.getPlayerCoordinate());
 	    
 	    // process path
 	    traverseMaze(world.getMaze(), start);

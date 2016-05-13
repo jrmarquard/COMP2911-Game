@@ -11,8 +11,8 @@ public class Coins extends Entity {
         this.value = value;
     }
 
-    public Coins(int x, int y, int value) {
-        super(x, y);
+    public Coins(Coordinate coord, int value) {
+        super(coord);
         this.value = value;
     }
 
