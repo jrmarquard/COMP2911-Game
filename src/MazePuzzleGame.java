@@ -28,7 +28,7 @@ public class MazePuzzleGame {
         this.pref = new Preferences();
         this.commands = new LinkedList<Command>();
         this.world = new MazeWorld(commands, pref);
-        this.disp = new GUI(this.pref, this.world, this.commands);
+        this.disp = new GUI_2(this.pref, this.world, this.commands);
         
         this.addCommand(new Command(Com.DRAW, null));
     }

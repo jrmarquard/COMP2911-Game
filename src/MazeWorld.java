@@ -232,6 +232,14 @@ public class MazeWorld {
         }
         return false;        
     }
+
+    public ArrayList<Coordinate> getEntityCoordinates() {
+        ArrayList<Coordinate> coords = new ArrayList<Coordinate>();
+        for (Entity e : entities) {
+            coords.add(new Coordinate(e.getX(),e.getY()));
+        }
+        return coords;
+    }
 }
 
 
