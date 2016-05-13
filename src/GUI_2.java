@@ -115,13 +115,9 @@ public class GUI_2 extends JFrame implements DisplayInterface {
     
     
     private void drawGamePanel() {
-        // Need to fix this later as to not break encapsulation
-        Maze m = world.getMaze();
-        
         // Reset game panels, remove them (hopefully clears memory)
         gamePanel.removeAll();
         
-        // Adjusts size of game to always fit the window
         GameMap innerGamePanel = new GameMap(world);
         innerGamePanel.setLayout(new GridBagLayout());
         innerGamePanel.setColour("wallColour", pref.getColour("wallColour"));
@@ -130,11 +126,6 @@ public class GUI_2 extends JFrame implements DisplayInterface {
         innerGamePanel.setColour("finishColour", pref.getColour("finishColour"));
         innerGamePanel.setColour("playerColour", pref.getColour("playerColour"));
         innerGamePanel.setColour("coinColour", pref.getColour("coinColour"));
-        
-        // setup to draw the game tiles
-        int cols = m.getWidth()*2;
-        int rows = m.getHeight()*2;
-        GridBagConstraints panelConstraints = new GridBagConstraints();
         
         gamePanel.add(innerGamePanel);
         gamePanel.setPreferredSize(gamePanel.getSize());
@@ -151,7 +142,6 @@ public class GUI_2 extends JFrame implements DisplayInterface {
         
         JLabel title = new JLabel();
         title.setText("Coins: "+world.getPlayerCoins());
-
         titlePanel.add(title);
         
     }

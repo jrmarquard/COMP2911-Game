@@ -2,6 +2,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
@@ -55,6 +57,7 @@ public class GameMap extends JPanel {
         
         System.out.println("Drawing graphics!");
         Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
 
         Dimension d = this.getParent().getSize();
         int windowHeight = d.height;
@@ -124,7 +127,14 @@ public class GameMap extends JPanel {
         int playerX = world.getCharacterPosX() * 2 + 1;
         int playerY = world.getCharacterPosY() * 2 + 1;
         g2d.setColor(playerColour);
-        g2d.fillRect(playerX*wallCornerD, playerY*wallCornerD, wallCornerD, wallCornerD);
+        
+        int circleCentreX = playerX*wallCornerD;
+        int circleCentreY = playerY*wallCornerD;
+        int circleCentreD = wallCornerD;
+        
+        Ellipse2D.Double circle = new Ellipse2D.Double(circleCentreX, circleCentreY, wallCornerD, wallCornerD);
+        g2d.fill(circle);
+        //g2d.fillRect(playerX*wallCornerD, playerY*wallCornerD, wallCornerD, wallCornerD);
         
         
         // Draw on coins
