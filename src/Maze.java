@@ -278,127 +278,31 @@ public class Maze {
 		int x = node.getX();
 		int y = node.getY();
 		
-		// Now looks for neighbors of the given node depending on its position
-		// Nodes that are not at the boarder
-		if(x > 0 && x < this.width - 1 && y > 0 && y < this.height - 1) {
+		// Looks for upper neighbour
+		if(y + 1 < this.height) {
 			if(!visited.contains(this.getNode(x, y + 1))) {
 				unvisit.add(this.getNode(x, y + 1));
 			}
-			
+		}
+		
+		// Looks for lower neighbour
+		if(y - 1 >= 0) {
 			if(!visited.contains(this.getNode(x, y - 1))) {
 				unvisit.add(this.getNode(x, y - 1));
 			}
-			
+		}
+		
+		// Looks for left neighbour
+		if(x - 1 >= 0) {
 			if(!visited.contains(this.getNode(x - 1, y))) {
 				unvisit.add(this.getNode(x - 1, y));
 			}
-			
+		}
+		
+		// Looks for right neighbour
+		if(x + 1 < this.width) {
 			if(!visited.contains(this.getNode(x + 1, y))) {
 				unvisit.add(this.getNode(x + 1, y));
-			}
-		} else {
-			// Top left node
-			if(x == 0 && y == 0) {
-				if(!visited.contains(this.getNode(x + 1, y))) {
-					unvisit.add(this.getNode(x + 1, y));
-				}
-				
-				if(!visited.contains(this.getNode(x, y + 1))) {
-					unvisit.add(this.getNode(x, y + 1));
-				}
-			} 
-			
-			// Top right node
-			else if(x == this.width - 1 && y == 0) {
-				if(!visited.contains(this.getNode(x - 1, y))) {
-					unvisit.add(this.getNode(x - 1, y));
-				}
-				
-				if(!visited.contains(this.getNode(x, y + 1))) {
-					unvisit.add(this.getNode(x, y + 1));
-				}
-			} 
-			
-			// Bottom left node
-			else if(x == 0 && y == height - 1){
-				if(!visited.contains(this.getNode(x, y - 1))) {
-					unvisit.add(this.getNode(x, y - 1));
-				}
-				
-				if(!visited.contains(this.getNode(x + 1, y))) {
-					unvisit.add(this.getNode(x + 1, y));
-				}
-			} 
-			
-			// Bottom right node
-			else if(x == width - 1 && y == height - 1) {
-				if(!visited.contains(this.getNode(x, y - 1))) {
-					unvisit.add(this.getNode(x, y - 1));
-				}
-				
-				if(!visited.contains(this.getNode(x - 1, y))) {
-					unvisit.add(this.getNode(x - 1, y));
-				}
-			} else {
-				// Nodes at the left boarder excluding the corner ones
-				if(x == 0){
-					if(!visited.contains(this.getNode(x, y - 1))) {
-						unvisit.add(this.getNode(x, y - 1));
-					}
-					
-					if(!visited.contains(this.getNode(x + 1, y))) {
-						unvisit.add(this.getNode(x + 1, y));
-					}
-					
-					if(!visited.contains(this.getNode(x, y + 1))) {
-						unvisit.add(this.getNode(x, y + 1));
-					}
-				} 
-				
-				// Nodes at the right boarder excluding the corner ones
-				else if(x == width - 1) {
-					if(!visited.contains(this.getNode(x, y - 1))) {
-						unvisit.add(this.getNode(x, y - 1));
-					}
-					
-					if(!visited.contains(this.getNode(x - 1, y))) {
-						unvisit.add(this.getNode(x - 1, y));
-					}
-					
-					if(!visited.contains(this.getNode(x, y + 1))) {
-						unvisit.add(this.getNode(x, y + 1));
-					}
-				} 
-				
-				// Nodes at the top boarder excluding the corner ones
-				else if(y == 0) {
-					if(!visited.contains(this.getNode(x - 1, y))) {
-						unvisit.add(this.getNode(x - 1, y));
-					}
-					
-					if(!visited.contains(this.getNode(x, y + 1))) {
-						unvisit.add(this.getNode(x, y + 1));
-					}
-					
-					if(!visited.contains(this.getNode(x + 1, y))) {
-						unvisit.add(this.getNode(x + 1, y));
-					}
-				} 
-				
-				// Nodes at the bottom boarder excluding the corner ones
-				else if(y == height - 1) {
-					if(!visited.contains(this.getNode(x - 1, y))) {
-						unvisit.add(this.getNode(x - 1, y));
-					}
-					
-					if(!visited.contains(this.getNode(x, y - 1))) {
-						unvisit.add(this.getNode(x, y - 1));
-					}
-					
-					if(!visited.contains(this.getNode(x + 1, y))) {
-						unvisit.add(this.getNode(x + 1, y));
-					}
-				}
 			}
 		}
 		
