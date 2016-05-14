@@ -54,50 +54,54 @@ public class GameMap_2 extends JPanel {
      * @param g
      */
     private void doDrawing(Graphics g) {
-        
-        System.out.println("Drawing graphics mkII!");
         Graphics2D g2d = (Graphics2D) g;
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
-
+        
+        // Turn on anti-aliasing
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        
+        // Get maze
+        Maze m = world.getMaze();
+        
+        // Get the size of the window to draw into
         Dimension d = this.getParent().getSize();
         int windowHeight = d.height;
         int windowWidth = d.width;
         int windowSize = windowWidth > windowHeight ? windowHeight : windowWidth;
-        
-        // draw the backdrop
+
+        // Draw the background of the maze
         g2d.setColor(floorColour);
         g2d.fillRect(0, 0, windowWidth, windowHeight);
         
-        // draw wall columns
-        int cols = world.getMaze().getWidth();
-        int rows = world.getMaze().getHeight();
+        // Get the number of tiles in each direction of the maze
+        int cols = m.getWidth();
+        int rows = m.getHeight();
         
+        // Find the size of the tile to be drawn        
         float tileSizeF = ((float) windowSize)/((float)rows);
-        
         int tileSize = (int)tileSizeF;
         
-        Maze m = world.getMaze();
-
+        // Set the width of the walls to be drawn
+        int wallWidth = 4;
         
         // Draw on start
-        Node n = m.getStart();
+        Coordinate c = m.getStartCoordinate();
         g2d.setColor(startColour);
-        g2d.fillRect(n.getX()*tileSize, n.getY()*tileSize, tileSize, tileSize);
+        g2d.fillRect(c.getX()*tileSize, c.getY()*tileSize, tileSize, tileSize);
 
         // Draw on finish
-        n = m.getFinish();
+        c = m.getFinishCoordinate();
         g2d.setColor(finishColour);
-        g2d.fillRect(n.getX()*tileSize, n.getY()*tileSize, tileSize, tileSize);
+        g2d.fillRect(c.getX()*tileSize, c.getY()*tileSize, tileSize, tileSize);
 
         // Draw on character
-        Coordinate playerC = world.getPlayerCoordinate();
-        int playerX = playerC.getX();
-        int playerY = playerC.getY();
+        c = world.getPlayerCoordinate();
+        int playerX = c.getX();
+        int playerY = c.getY();
         
-        int circleDivision = 2;
+        // set how big the circle diameter should be relative to the tileSize
+        int diameter = tileSize/3;
         
-        int diameter = tileSize/circleDivision;
-        
+        // find coordinate of where to draw circle from
         int circleCentreX = playerX*tileSize + ((tileSize/2) -(diameter/2));
         int circleCentreY = playerY*tileSize + ((tileSize/2) -(diameter/2));
         
@@ -107,41 +111,36 @@ public class GameMap_2 extends JPanel {
 
         // Draw on coins
         ArrayList<Coordinate> coords = world.getEntityCoordinates();
-        for (Coordinate c : coords) {
+        for (Coordinate s : coords) {
             g2d.setColor(coinColour);
-            int eX = c.getX();
-            int eY = c.getY();
+            int eX = s.getX();
+            int eY = s.getY();
             g2d.fillRect(eX*tileSize, eY*tileSize, tileSize, tileSize);
         }
         
-        // Draw walls
+        // Draw walls on the inside of tiles
         for (int row = 0; row < rows; row++) {
-            // iterate over columns
             for (int col = 0; col < cols; col++) {
-                // draw a wall corner
                 
                 int cellX = col*tileSize;
                 int cellY = row*tileSize;
-
+                
                 // draw cell walls
                 g2d.setColor(wallColour);
                 if (m.isNorthWall(new Coordinate(col,row))) {
-                    g2d.drawLine(cellX, cellY, cellX+tileSize-1, cellY);                  
+                    g2d.fillRect(cellX, cellY, tileSize, wallWidth);                  
                 }
                 if (m.isEastWall(new Coordinate(col,row))) {
-                    g2d.drawLine(cellX+tileSize-1, cellY, cellX+tileSize-1, cellY+tileSize-1);                
+                    g2d.fillRect(cellX+tileSize-wallWidth, cellY, wallWidth, tileSize);                
                 }
                 if (m.isSouthWall(new Coordinate(col,row))) {
-                    g2d.drawLine(cellX, cellY+tileSize-1, cellX+tileSize-1, cellY+tileSize-1);                  
+                    g2d.fillRect(cellX, cellY+tileSize-wallWidth, tileSize, wallWidth);                  
                 }
                 if (m.isWestWall(new Coordinate(col,row))) {
-                    g2d.drawLine(cellX, cellY, cellX, cellY+tileSize-1);                   
+                    g2d.fillRect(cellX, cellY, wallWidth, tileSize);                   
                 }
             }
         }
-        
-        /*
-        */
     }
     
     /*

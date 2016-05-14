@@ -54,7 +54,7 @@ public class GUI extends JFrame implements DisplayInterface {
         windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
         this.add(windowPanel);
         
-        // Define Layouts for each panel
+        // Define Layouts for each child panel
         titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
         gamePanel = new JPanel(new GridBagLayout());
         gamePanel.setPreferredSize(new Dimension(600, 600));
@@ -81,22 +81,7 @@ public class GUI extends JFrame implements DisplayInterface {
                     case KeyEvent.VK_RIGHT: addCommand(new Command(Com.MOVE_RIGHT));    break;
                     case KeyEvent.VK_UP:    addCommand(new Command(Com.MOVE_UP));       break;
                     case KeyEvent.VK_C:     addCommand(new Command(Com.SOLVE));         break;
-                    case KeyEvent.VK_N: 
-                        JFormattedTextField box = (JFormattedTextField)menuPanel.getComponent(1);
-                        int width = Integer.parseInt(box.getText());
-                        
-                        box = (JFormattedTextField)menuPanel.getComponent(3);
-                        int height = Integer.parseInt(box.getText());
-                        
-                        int maxSize = pref.getValue("maxMazeSize");
-                        if (height>maxSize) height=maxSize;
-                        if (width>maxSize) width=maxSize;
-                        
-                        pref.setPreference("value.defaultMapWidth="+width);
-                        pref.setPreference("value.defaultMapHeight="+height);
-                        
-                        addCommand(new CommandMap(Com.NEW_MAP, width, height));         
-                        break;
+                    case KeyEvent.VK_N:     newGame();                                  break;
                 }
             }
         });
@@ -109,6 +94,7 @@ public class GUI extends JFrame implements DisplayInterface {
         });
     }
     
+    
     private void addCommand(Command c) {
         commands.add(c);
     }
@@ -117,7 +103,7 @@ public class GUI extends JFrame implements DisplayInterface {
         // Reset game panels, remove them (hopefully clears memory)
         gamePanel.removeAll();
         
-        GameMap_2 innerGamePanel = new GameMap_2(world);
+        GameMap innerGamePanel = new GameMap(world);
         innerGamePanel.setLayout(new GridBagLayout());
         innerGamePanel.setColour("wallColour", pref.getColour("wallColour"));
         innerGamePanel.setColour("floorColour", pref.getColour("floorColour"));
@@ -143,7 +129,6 @@ public class GUI extends JFrame implements DisplayInterface {
         title.setText("Coins: "+world.getPlayerCoins());
 
         titlePanel.add(title);
-        
     }
     
     public void drawMenuPanel() {
@@ -162,20 +147,7 @@ public class GUI extends JFrame implements DisplayInterface {
         newMazeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                JFormattedTextField box = (JFormattedTextField)menuPanel.getComponent(1);
-                int width = Integer.parseInt(box.getText());
-                
-                box = (JFormattedTextField)menuPanel.getComponent(3);
-                int height = Integer.parseInt(box.getText());
-                
-                int maxSize = pref.getValue("maxMazeSize");
-                if (height>maxSize) height=maxSize;
-                if (width>maxSize) width=maxSize;
-                
-                pref.setPreference("value.defaultMapWidth="+width);
-                pref.setPreference("value.defaultMapHeight="+height);
-                
-                addCommand(new CommandMap(Com.NEW_MAP, width, height));
+                newGame();
             }
         });
         JCheckBox auto = new JCheckBox("Auto", pref.getBool("autoComplete"));
@@ -219,6 +191,22 @@ public class GUI extends JFrame implements DisplayInterface {
     
     public void close() {
         this.dispose();
+    }
+    
+    private void newGame() {JFormattedTextField box = (JFormattedTextField)menuPanel.getComponent(1);
+        int width = Integer.parseInt(box.getText());
+        
+        box = (JFormattedTextField)menuPanel.getComponent(3);
+        int height = Integer.parseInt(box.getText());
+        
+        int maxSize = pref.getValue("maxMazeSize");
+        if (height>maxSize) height=maxSize;
+        if (width>maxSize) width=maxSize;
+        
+        pref.setPreference("value.defaultMapWidth="+width);
+        pref.setPreference("value.defaultMapHeight="+height);
+        
+        addCommand(new CommandMap(Com.NEW_MAP, width, height));
     }
     
     /*
@@ -273,3 +261,4 @@ class DrawPanel extends JPanel {
         doDrawing(g);
     }
 }
+

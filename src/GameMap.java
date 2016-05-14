@@ -54,10 +54,9 @@ public class GameMap extends JPanel {
      * @param g
      */
     private void doDrawing(Graphics g) {
-        
         System.out.println("Drawing graphics!");
         Graphics2D g2d = (Graphics2D) g;
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         Dimension d = this.getParent().getSize();
         int windowHeight = d.height;
@@ -65,44 +64,57 @@ public class GameMap extends JPanel {
         int windowSize = windowWidth > windowHeight ? windowHeight : windowWidth;
         
         // draw the backdrop
-        g2d.setColor(floorColour);
-        g2d.fillRect(0, 0, windowWidth, windowHeight);
         
         // draw wall columns
         int cols = world.getMaze().getWidth()*2;
         int rows = world.getMaze().getHeight()*2;
         
-        float sizeOfWallCorner = ((float) windowSize)/((float)(rows+1));
+        // This is the ratio of tile to wall size. An r of 3 means
+        // that the tile is 4 times bigger. r>0
+        int r = 6;
         
-        int wallCornerD = (int)sizeOfWallCorner;
+        int offset = (windowSize %((r)*cols + 1))/2;
+        
+        while(windowSize %((r)*cols + 1) != 0) {
+            windowSize--;
+        }
+        // should be exactly divisible now
+        int unit = windowSize / ((cols*(r) + 1));
+        
+        int tileSize = unit*(2*r-1);
+        int wallWidth = unit;
         
         Maze m = world.getMaze();
+
+        g2d.setColor(floorColour);
+        g2d.fillRect(offset, offset, (unit*((rows)*(r)+1)), (unit*((cols)*(r)+1)));
+
+        // Draw the boundaries
+        g2d.setColor(wallColour);
+        g2d.fillRect(offset+0, offset+0, unit, (unit*((rows)*(r)+1)));
+        g2d.fillRect(offset+(unit*(cols)*(r)), offset+0, unit, (unit*((rows)*(r)+1)));
+        g2d.fillRect(offset+0, offset+0, (unit*((rows)*(r)+1)), unit);
+        g2d.fillRect(offset+0, offset+(unit*(rows)*(r)), (unit*(rows)*(r)+1), unit);
         
-        // Draw the maze layout first
-        // iterate over rows
+        // Draw the inner walls
         for (int row = 0; row <= rows; row++) {
-            // iterate over columns
             for (int col = 0; col <= cols; col++) {
-                // draw a wall corner
                 if (col%2 == 0 && row%2 == 0) {
-                    g2d.setColor(wallColour);
-                    g2d.fillRect(col*wallCornerD, row*wallCornerD, wallCornerD, wallCornerD);                    
+                    // Wall corners
+                    g2d.fillRect(offset+(col*(r)*unit), offset+(row*(r)*unit), unit, unit);                    
                 } else if (col == 0 || col == cols || row == 0 || row == rows) {
-                    g2d.setColor(wallColour);
-                    g2d.fillRect(col*wallCornerD, row*wallCornerD, wallCornerD, wallCornerD);
+                    
                 } else {
                     // Vertical walls
-                    if (row%2 == 0) {
-                        // Check if the wall exists
-                        if (!m.isAdjacent((col-1)/2, (row/2)-1, (col-1)/2, (row/2))){
-                            g2d.setColor(wallColour);
-                            g2d.fillRect(col*wallCornerD, row*wallCornerD, wallCornerD, wallCornerD);
-                        }
-                    } // Horizontal walls
-                    else if (col%2 == 0) {
+                    if (col%2 == 0) {
                         if (!m.isAdjacent((col/2)-1, (row-1)/2, col/2, (row-1)/2)){
-                            g2d.setColor(wallColour);
-                            g2d.fillRect(col*wallCornerD, row*wallCornerD, wallCornerD, wallCornerD);
+                            g2d.fillRect(offset+(col*(r)*unit), offset+unit+(((row-1)/2)*unit*(2*r)), wallWidth, tileSize);   
+                        }
+                    }
+                    // Horizontal walls
+                    else if (row%2 == 0) {
+                        if (!m.isAdjacent((col-1)/2, (row/2)-1, (col-1)/2, (row/2))){
+                            g2d.fillRect(offset+unit+(((col-1)/2)*unit*(2*r)), offset+(row*(r)*unit), tileSize, wallWidth);
                         }
                     }
                 }
@@ -110,40 +122,29 @@ public class GameMap extends JPanel {
         }
         
         // Draw on start
-        Node start = m.getStart();
-        int startX = start.getX() * 2 + 1;
-        int startY = start.getY() * 2 + 1;
+        Node n = m.getStart();
         g2d.setColor(startColour);
-        g2d.fillRect(startX*wallCornerD, startY*wallCornerD, wallCornerD, wallCornerD);
+        g2d.fillRect(offset+unit+(n.getX()*(wallWidth+tileSize)), offset+unit+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
         
-        // Draw on finish
-        Node finish = m.getFinish();
-        int finishX = finish.getX() * 2 + 1;
-        int finishY = finish.getY() * 2 + 1;
+
+        // Draw on start
+        n = m.getFinish();
         g2d.setColor(finishColour);
-        g2d.fillRect(finishX*wallCornerD, finishY*wallCornerD, wallCornerD, wallCornerD);
+        g2d.fillRect(offset+unit+(n.getX()*(wallWidth+tileSize)), offset+unit+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
+
         
         // Draw on character
-        Coordinate playerC = world.getPlayerCoordinate();
-        int playerX = playerC.getX() * 2 + 1;
-        int playerY = playerC.getY() * 2 + 1;
+        Coordinate pC = world.getPlayerCoordinate();
         g2d.setColor(playerColour);
-        
-        int circleCentreX = playerX*wallCornerD;
-        int circleCentreY = playerY*wallCornerD;
-        
-        Ellipse2D.Double circle = new Ellipse2D.Double(circleCentreX, circleCentreY, wallCornerD, wallCornerD);
-        g2d.fill(circle);
-        //g2d.fillRect(playerX*wallCornerD, playerY*wallCornerD, wallCornerD, wallCornerD);
-        
+        g2d.fill(new Ellipse2D.Double(offset+unit+(pC.getX()*(wallWidth+tileSize)), offset+unit+(pC.getY()*(wallWidth+tileSize)), tileSize, tileSize));
         
         // Draw on coins
         ArrayList<Coordinate> coords = world.getEntityCoordinates();
         for (Coordinate c : coords) {
             g2d.setColor(coinColour);
-            int eX = c.getX() * 2 + 1;
-            int eY = c.getY() * 2 + 1;
-            g2d.fillRect(eX*wallCornerD, eY*wallCornerD, wallCornerD, wallCornerD);
+            int eX = c.getX();
+            int eY = c.getY();
+            g2d.fillRect(offset+unit+(eX*unit*(2*r)), offset+unit+(eY*unit*(2*r)), tileSize, tileSize);
         }
     }
     

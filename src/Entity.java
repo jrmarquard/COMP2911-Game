@@ -27,6 +27,4 @@ public class Entity {
     public void setY(int y) {
         coord.setY(y);
     }
-
-
 }
