@@ -200,10 +200,6 @@ public class GUI extends JFrame implements DisplayInterface {
         if (height>maxSize) height=maxSize;
         if (width>maxSize) width=maxSize;
         
-        Random rand = new Random();
-        width = 3+ rand.nextInt(7);
-        height = 3+ rand.nextInt(7);
-        
         pref.setPreference("value.defaultMapWidth="+width);
         pref.setPreference("value.defaultMapHeight="+height);
         
@@ -225,41 +221,3 @@ public class GUI extends JFrame implements DisplayInterface {
     }
     */
 }
-
-@SuppressWarnings("serial")
-class DrawPanel extends JPanel {
-
-    private void doDrawing(Graphics g) {
-
-        Graphics2D g2d = (Graphics2D) g;
-
-        g2d.setColor(Color.blue);
-        
-        g2d.setColor(Color.black);
-        g2d.drawRect(0, 0, 15, 15);
-        g2d.fillRect(0, 0, 10, 10);
-        
-        /*
-        for (int i = 0; i <= 1000; i++) {  
-            Dimension size = getSize();
-            Insets insets = getInsets();
-
-            int w = size.width - insets.left - insets.right;
-            int h = size.height - insets.top - insets.bottom;
-
-            Random r = new Random();
-            int x = Math.abs(r.nextInt()) % w;
-            int y = Math.abs(r.nextInt()) % h;
-            g2d.drawLine(x, y, x, y);
-        }
-        */
-    }
-
-    @Override
-    public void paintComponent(Graphics g) {
-        
-        super.paintComponent(g);
-        doDrawing(g);
-    }
-}
-
