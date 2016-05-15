@@ -1,6 +1,7 @@
 import java.awt.EventQueue;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Random;
 
 /**
  * MazePuzzleGame maintains and connects the different parts of the
@@ -92,7 +93,6 @@ public class MazePuzzleGame {
         int width = c.getWidth();
         int height = c.getHeight();
         world.generateWorld(width, height);
-         
         addCommand(new Command(Com.DRAW));
     }
     

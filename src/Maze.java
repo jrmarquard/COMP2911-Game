@@ -39,10 +39,16 @@ public class Maze {
 	public Node getStart() {
 		return this.start;
 	}
+	public Coordinate getStartCoordinate() {
+	    return start.getCoordinate();
+	}
 	
 	public Node getFinish() {
 		return this.finish;
 	}
+    public Coordinate getFinishCoordinate() {
+        return finish.getCoordinate();
+    }
 	
 	public int getWidth() {
 		return this.width;
@@ -55,29 +61,44 @@ public class Maze {
 	public Node getNode(int x, int y) {
 		return this.nodes.get(x).get(y);
 	}
+	public Node getNode(Coordinate c) {
+	    return this.nodes.get(c.getX()).get(c.getY());
+	}
 	
 	public boolean isAdjacent(int x1, int y1, int x2, int y2) {
 	    return getNode(x1,y1).isAdjacent(getNode(x2,y2));
 	}
 	
-	public boolean isDown(int x, int y) {
-        if (getNode(x,y).getDown() == null) return false;
-        return true;
+	public boolean isDown(Coordinate c) {
+        if (getNode(c).getDown() == null) {
+            return false;
+        } else {
+            return true;
+        }
 	}
 	
-	public boolean isUp(int x, int y) {
-        if (getNode(x,y).getUp() == null) return false;
-        return true;
+	public boolean isUp(Coordinate c) {
+        if (getNode(c).getUp() == null) {
+            return false;
+        } else {
+            return true;
+        }
 	}
 
-    public boolean isRight(int x, int y) {
-        if (getNode(x,y).getRight() == null) return false;
-        return true;
+    public boolean isRight(Coordinate c) {
+        if (getNode(c).getRight() == null) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
-    public boolean isLeft(int x, int y) {
-        if (getNode(x,y).getLeft() == null) return false;
-        return true;
+    public boolean isLeft(Coordinate c) {
+        if (getNode(c).getLeft() == null) {
+            return false;
+        } else {
+            return true;
+        }
     }
 	
 	public boolean isStart(int x, int y) {
@@ -118,7 +139,7 @@ public class Maze {
 		this.finish = new Node(x, y);
 	}
 	
-	public void printMaze(Player player) {
+	public void printMaze() {
 	   int width = 0;
 	   int height = 0;
 	   System.out.print("  ");
@@ -146,11 +167,7 @@ public class Maze {
 		   }
 		   
 		   while (width < this.width) {
-			   if (player.getPosition().equals(this.getNode(width, height))) {
-				   System.out.print(" @ ");
-			   } else {
-				   System.out.print("   ");
-			   }
+		       System.out.print("   ");
 			   if (this.getNode(width, height).getRight() == null) {
 				   System.out.print("|");
 			   } else {
@@ -279,7 +296,7 @@ public class Maze {
 		int y = node.getY();
 		
 		// Now looks for neighbors of the given node depending on its position
-		// Nodes that are not at the boarder
+		// Nodes that are not at the border
 		if(x > 0 && x < this.width - 1 && y > 0 && y < this.height - 1) {
 			if(!visited.contains(this.getNode(x, y + 1))) {
 				unvisit.add(this.getNode(x, y + 1));
@@ -440,4 +457,17 @@ public class Maze {
 			nodeB.setRight(nodeA);
 		}
 	}
+
+    public boolean isNorthWall(Coordinate coord) {
+        return !getNode(coord).isUp();
+    }
+    public boolean isEastWall(Coordinate coord) {
+        return !getNode(coord).isRight();
+    }
+    public boolean isSouthWall(Coordinate coord) {
+        return !getNode(coord).isDown();
+    }
+    public boolean isWestWall(Coordinate coord) {
+        return !getNode(coord).isLeft();
+    }
 }

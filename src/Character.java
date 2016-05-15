@@ -4,8 +4,8 @@ public class Character extends Entity {
     private String name;
     private int coins;
     
-    public Character(int x, int y, String name) {
-        super(x, y);
+    public Character(Coordinate coord, String name) {
+        super(coord);
         this.name = name;
         this.coins = 0;
     }
@@ -27,7 +27,5 @@ public class Character extends Entity {
 
     public void addCoins(int coins) {
         this.coins += coins;
-    }
-
-    
+    }    
 }

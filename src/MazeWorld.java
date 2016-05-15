@@ -38,7 +38,7 @@ public class MazeWorld {
         ai = new AI2();
         entities = new ArrayList<Entity>();
         maze.mazeGenerator();
-        player = new Character(maze.getStart().getX(), maze.getStart().getY(), pref.getText("playerName"));
+        player = new Character(new Coordinate(maze.getStart().getX(), maze.getStart().getY()), pref.getText("playerName"));
         
         float h = (float)maze.getHeight();
         float w = (float)maze.getWidth();
@@ -51,23 +51,25 @@ public class MazeWorld {
         updated = false;
     }
     
-    public void generateCoins(int instances) {
+    private void generateCoins(int instances) {
 
         Random rand = new Random();
         int xC = rand.nextInt(maze.getWidth());
         int yC = rand.nextInt(maze.getHeight());
+        int coinValue = 5+rand.nextInt(80);
         
         for (int x = 0; x < instances; x++) {
             while (!uniqueCoordinates(xC, yC)) {
                 xC = rand.nextInt(maze.getWidth());
                 yC = rand.nextInt(maze.getHeight());
+                coinValue = 5+rand.nextInt(80);
             }
-            Coins coins = new Coins(xC,yC,50);
+            Coins coins = new Coins(new Coordinate(xC,yC),coinValue);
             entities.add(coins);
         }
     }
     
-    public boolean uniqueCoordinates(int x, int y) {
+    private boolean uniqueCoordinates(int x, int y) {
         if (maze.isStart(x,y)) return false;
         if (maze.isFinish(x,y)) return false;
         for (Entity e : entities) {
@@ -112,14 +114,17 @@ public class MazeWorld {
         }
         entityCollision();
         
-        if (updated) addCommand(new Command(Com.DRAW));
+        if (updated) {
+            updated = false;
+            addCommand(new Command(Com.DRAW));
+        }
     }
     
     private void entityCollision () {
         Iterator<Entity> iter = entities.iterator();
         while (iter.hasNext()) {
             Entity e = iter.next();
-            if (isChatacterHere(e.getX(), e.getY())) {
+            if (player.getCoordinate().equals(e.getCoordinate())) {
                 if (e instanceof Coins) {
                     player.addCoins(((Coins)e).getValue());
                     iter.remove();
@@ -128,23 +133,13 @@ public class MazeWorld {
             }
         }
     }
-
     /**
-     * Return the x coordinate of the player
+     * Return the coordinates of the player
      * 
      * @return x coordinate of the player
      */
-    public int getCharacterPosX () {
-        return player.getX();
-    }
-
-    /**
-     * Return the y coordinate of the player
-     * 
-     * @return y coordinate of the player
-     */
-    public int getCharacterPosY () {
-        return player.getY();
+    public Coordinate getPlayerCoordinate () {
+        return player.getCoordinate();
     }
     
     /**
@@ -156,40 +151,46 @@ public class MazeWorld {
         return player.getName();
     }
     
-    public boolean isChatacterHere (int x, int y) {
-        return x == player.getX() && y == player.getY();
-    }
-    
     public void moveCharacterDown() {
-        if (lockPlayerControl) return;
-        if (maze.isDown(player.getX(), player.getY())) player.setY(player.getY()+1);
+        if (lockPlayerControl) {
+            return;
+        }
+        if (maze.isDown(player.getCoordinate())) {
+            player.setY(player.getY()+1);
+        }
         update();
     }
     public void moveCharacterLeft() {
-        if (lockPlayerControl) return;
-        if (maze.isLeft(player.getX(), player.getY())) player.setX(player.getX()-1);
+        if (lockPlayerControl) {
+            return;
+        }
+        if (maze.isLeft(player.getCoordinate())) {
+            player.setX(player.getX()-1);
+        }
         update();
     }
     public void moveCharacterRight() {
-        if (lockPlayerControl) return;
-        if (maze.isRight(player.getX(), player.getY())) player.setX(player.getX()+1);
+        if (lockPlayerControl) {
+            return;
+        }
+        if (maze.isRight(player.getCoordinate())) {
+            player.setX(player.getX()+1);
+        }
         update();
     }
     public void moveCharacterUp() {
-        if (lockPlayerControl) return;
-        if (maze.isUp(player.getX(), player.getY())) player.setY(player.getY()-1);
+        if (lockPlayerControl) {
+            return;
+        }
+        
+        if (maze.isUp(player.getCoordinate())) {
+            player.setY(player.getY()-1);
+        }
         update();
     }
 
     public boolean hasCharacterWon() {
-        // TODO Auto-generated method stub
-        int characterX = player.getX();
-        int characterY = player.getY();
-        
-        int finishX = maze.getFinish().getX();
-        int finishY = maze.getFinish().getY();
-        
-        return characterX == finishX && characterY == finishY;
+        return maze.getFinishCoordinate().equals(getPlayerCoordinate());
     }
     public void addCommand (Command c) {
         commands.add(c);
@@ -214,27 +215,25 @@ public class MazeWorld {
             addCommand(new Command(Com.SOLVE));
         }
         update();
-        return;
-        
     }
 
     public int getPlayerCoins() {
         return player.getCoins();
     }
-
-    public boolean isCoins(int x, int y) {
+    
+    public ArrayList<Coordinate> getEntityCoordinates() {
+        ArrayList<Coordinate> coords = new ArrayList<Coordinate>();
         for (Entity e : entities) {
-            if (e instanceof Coins) {
-                if (e.getX() == x && e.getY() == y) {
-                    return true;
-                }
-            }
+            coords.add(e.getCoordinate());
         }
-        return false;        
+        return coords;
     }
+    
+    public Coordinate getStart() {
+        return new Coordinate(maze.getStart().getX(), maze.getStart().getY());
+    }
+    public Coordinate getFinish() {
+        return new Coordinate(maze.getFinish().getX(), maze.getFinish().getY());
+    }
+    
 }
-
-
-
-
-

@@ -56,25 +56,25 @@ public class AI2 implements AIControl{
 	}
 	
 	public Command makeMove(MazeWorld world) {
-	    Node start = world.getMaze().getNode(world.getCharacterPosX(), world.getCharacterPosY());
+	    Coordinate start = world.getPlayerCoordinate();
 	    
 	    // process path
-	    traverseMaze(world.getMaze(), start);
+	    traverseMaze(world.getMaze(), world.getMaze().getNode(start));
 	    
-        Node previous = shortestPath.remove(0);
-        Node next = shortestPath.get(0);
-
-        if (previous.isLeft(next)) {
-            if (shortestPath.size() == 1) shortestPath.remove(0);
+        Coordinate previous = shortestPath.remove(0).getCoordinate();
+        Coordinate next = shortestPath.get(0).getCoordinate();
+        
+        if (shortestPath.size() == 1) {
+            shortestPath.remove(0);
+        }
+        
+        if (previous.getX() == next.getX()+1) {
             return new Command(Com.MOVE_LEFT);
-        } else if (previous.isUp(next)) {
-            if (shortestPath.size() == 1) shortestPath.remove(0);
+        } else if (previous.getY() == next.getY()+1) {
             return new Command(Com.MOVE_UP);
-        } else if (previous.isRight(next)) {
-            if (shortestPath.size() == 1) shortestPath.remove(0);
+        } else if (previous.getX() == next.getX()-1) {
             return new Command(Com.MOVE_RIGHT);
-        } else if (previous.isDown(next)) {
-            if (shortestPath.size() == 1) shortestPath.remove(0);
+        } else if (previous.getY() == next.getY()-1) {
             return new Command(Com.MOVE_DOWN);
         } else {
             System.out.println("invalid");

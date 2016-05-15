@@ -17,6 +17,10 @@ public class Node {
 		this.left = null;
 	}
 	
+	public Coordinate getCoordinate() {
+	    return new Coordinate(this.x, this.y);
+	}
+	
 	public int getX() {
 		return this.x;
 	}
@@ -78,6 +82,35 @@ public class Node {
     public boolean isRight(Node n) {
         if (this.getRight() == null) return false;
         return this.getRight().equals(n);
+    }
+    
+    public boolean isDown() {
+        if (this.getDown() == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+    public boolean isUp() {
+        if (this.getUp() == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+    public boolean isLeft() {
+        if (this.getLeft() == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+    public boolean isRight() {
+        if (this.getRight() == null) {
+            return false;
+        } else {
+            return true;
+        }
     }
 	
 	public void print() {
