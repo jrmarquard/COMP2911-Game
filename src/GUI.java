@@ -57,6 +57,7 @@ public class GUI extends JFrame implements DisplayInterface {
         // Define Layouts for each child panel
         titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
         gamePanel = new JPanel(new GridBagLayout());
+        // Default size for game window
         gamePanel.setPreferredSize(new Dimension(600, 600));
         menuPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         
@@ -103,16 +104,12 @@ public class GUI extends JFrame implements DisplayInterface {
         // Reset game panels, remove them (hopefully clears memory)
         gamePanel.removeAll();
         
-        GameMap innerGamePanel = new GameMap(world);
-        innerGamePanel.setLayout(new GridBagLayout());
-        innerGamePanel.setColour("wallColour", pref.getColour("wallColour"));
-        innerGamePanel.setColour("floorColour", pref.getColour("floorColour"));
-        innerGamePanel.setColour("startColour", pref.getColour("startColour"));
-        innerGamePanel.setColour("finishColour", pref.getColour("finishColour"));
-        innerGamePanel.setColour("playerColour", pref.getColour("playerColour"));
-        innerGamePanel.setColour("coinColour", pref.getColour("coinColour"));
+        GameMap innerGamePanel = new GameMap(world, pref);
         
+        // Attaches the innerGamePanel onto the gamePanel
         gamePanel.add(innerGamePanel);
+        
+        // Maintains the size of the window when game panel is redrawn
         gamePanel.setPreferredSize(gamePanel.getSize());
     }
 
@@ -202,6 +199,10 @@ public class GUI extends JFrame implements DisplayInterface {
         int maxSize = pref.getValue("maxMazeSize");
         if (height>maxSize) height=maxSize;
         if (width>maxSize) width=maxSize;
+        
+        Random rand = new Random();
+        width = 3+ rand.nextInt(7);
+        height = 3+ rand.nextInt(7);
         
         pref.setPreference("value.defaultMapWidth="+width);
         pref.setPreference("value.defaultMapHeight="+height);

@@ -11,41 +11,20 @@ import javax.swing.JPanel;
 
 public class GameMap extends JPanel {
 
-    private Color wallColour;
-    private Color floorColour;
-    private Color startColour;
-    private Color finishColour;
-    private Color playerColour;
-    private Color coinColour;
-    
-    private Color colour;
+    private Preferences pref;
     private MazeWorld world;
+    private Graphics2D g2d;
     
-    public GameMap (MazeWorld world) {
+    public GameMap (MazeWorld world, Preferences pref) {
         super();
         this.world = world;
+        this.pref = pref;
     }
     
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         doDrawing(g);
-    }
-    
-    @Override
-    public void setBackground(Color colour) {
-        this.colour = colour;
-    }
-    
-    public void setColour (String s, Color c) {
-        switch (s) {
-            case "wallColour": wallColour = c; break;
-            case "floorColour": floorColour = c; break;
-            case "startColour": startColour = c; break;
-            case "finishColour": finishColour = c; break;
-            case "playerColour": playerColour = c; break;
-            case "coinColour": coinColour = c; break;
-        }
     }
     
     /**
@@ -55,66 +34,90 @@ public class GameMap extends JPanel {
      */
     private void doDrawing(Graphics g) {
         System.out.println("Drawing graphics!");
-        Graphics2D g2d = (Graphics2D) g;
+        g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        Dimension d = this.getParent().getSize();
+        
+        // Gets the size of the panel to draw into
+        Dimension d = this.getPreferredSize();
         int windowHeight = d.height;
         int windowWidth = d.width;
-        int windowSize = windowWidth > windowHeight ? windowHeight : windowWidth;
+
+        g2d.setColor(pref.getColour("backgroundColour"));
+        g2d.fillRect(0, 0, windowWidth, windowHeight);
         
-        // draw the backdrop
-        
-        // draw wall columns
-        int cols = world.getMaze().getWidth()*2;
-        int rows = world.getMaze().getHeight()*2;
-        
-        // This is the ratio of tile to wall size. An r of 3 means
-        // that the tile is 4 times bigger. r>0
-        int r = 6;
-        
-        int offset = (windowSize %((r)*cols + 1))/2;
-        
-        while(windowSize %((r)*cols + 1) != 0) {
-            windowSize--;
-        }
-        // should be exactly divisible now
-        int unit = windowSize / ((cols*(r) + 1));
-        
-        int tileSize = unit*(2*r-1);
-        int wallWidth = unit;
-        
+        // Gets the number of rows and columns in maze
         Maze m = world.getMaze();
-
-        g2d.setColor(floorColour);
-        g2d.fillRect(offset, offset, (unit*((rows)*(r)+1)), (unit*((cols)*(r)+1)));
-
-        // Draw the boundaries
-        g2d.setColor(wallColour);
-        g2d.fillRect(offset+0, offset+0, unit, (unit*((rows)*(r)+1)));
-        g2d.fillRect(offset+(unit*(cols)*(r)), offset+0, unit, (unit*((rows)*(r)+1)));
-        g2d.fillRect(offset+0, offset+0, (unit*((rows)*(r)+1)), unit);
-        g2d.fillRect(offset+0, offset+(unit*(rows)*(r)), (unit*(rows)*(r)+1), unit);
+        int mazeColumns = m.getWidth();
+        int mazeRows = m.getHeight();
         
-        // Draw the inner walls
-        for (int row = 0; row <= rows; row++) {
-            for (int col = 0; col <= cols; col++) {
+        // positive integer
+        int tileRatio = 5;
+        
+        // the unit size of the width and height
+        int mazeUnitCols = mazeColumns*(1+tileRatio) +1;
+        int mazeUnitRows = mazeRows*(1+tileRatio) +1;
+        
+        // The number of grid coordinates
+        int rows = mazeRows*2 + 1;
+        int cols = mazeColumns*2 + 1;
+        
+        int mazeHeight = windowHeight;
+        int mazeWidth = windowWidth;
+        int offsetX = 0;
+        int offsetY = 0;
+        
+        float lambda = ((float)windowHeight/(float)windowWidth)*((float)mazeUnitCols/(float)mazeUnitRows); 
+        
+        if (lambda == 1) {
+            // the window is a perfect fit!
+            // default values are fine
+        } else if (lambda > 1) {
+            // Space on the top/bottom
+            mazeHeight = (int) ((float)windowWidth*((float)mazeUnitRows/(float)mazeUnitCols));
+            offsetY = (windowHeight - mazeHeight)/2;
+        } else if (lambda < 1) {
+            // space on the left and right
+            mazeWidth = (int)((float)windowHeight*((float)mazeUnitCols/(float)mazeUnitRows));
+            offsetX = (windowWidth - mazeWidth)/2;
+        }        
+        
+        // Lengths of wall and tiles in maze
+        int wallWidth = mazeWidth/mazeUnitCols;
+        int tileSize = tileRatio*wallWidth;
+        
+        // Set offset of maze
+        g2d.translate(offsetX + (mazeWidth - mazeUnitCols*wallWidth)/2, offsetY + (mazeHeight - mazeUnitRows*wallWidth)/2);
+        
+        // Draw floor colour
+        g2d.setColor(pref.getColour("floorColour"));
+        g2d.fillRect(0, 0, mazeUnitCols*wallWidth, mazeUnitRows*wallWidth);
+
+        g2d.setColor(pref.getColour("wallColour"));
+        // Draw the east/north/west/south walls of entire maze
+        g2d.fillRect(0, 0, wallWidth, mazeUnitRows*wallWidth);
+        g2d.fillRect(0, 0, mazeUnitCols*wallWidth, wallWidth);
+        g2d.fillRect((mazeUnitCols-1)*wallWidth, 0, wallWidth, mazeUnitRows*wallWidth);
+        g2d.fillRect(0, (mazeUnitRows-1)*wallWidth, mazeUnitCols*wallWidth, wallWidth);
+        
+        // Draw inside of maze
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
                 if (col%2 == 0 && row%2 == 0) {
                     // Wall corners
-                    g2d.fillRect(offset+(col*(r)*unit), offset+(row*(r)*unit), unit, unit);                    
-                } else if (col == 0 || col == cols || row == 0 || row == rows) {
-                    
+                    g2d.fillRect((col/2)*(wallWidth+tileSize),(row/2)*(wallWidth+tileSize),wallWidth,wallWidth);                    
+                } else if (col == 0 || col == cols-1 || row == 0 || row == rows-1) {
+                    // Skips north/east/south/west boundaries
                 } else {
                     // Vertical walls
                     if (col%2 == 0) {
                         if (!m.isAdjacent((col/2)-1, (row-1)/2, col/2, (row-1)/2)){
-                            g2d.fillRect(offset+(col*(r)*unit), offset+unit+(((row-1)/2)*unit*(2*r)), wallWidth, tileSize);   
+                            g2d.fillRect((tileSize+wallWidth)*((col/2)), wallWidth + (tileSize+wallWidth)*((row-1)/2), wallWidth, tileSize);   
                         }
                     }
                     // Horizontal walls
                     else if (row%2 == 0) {
                         if (!m.isAdjacent((col-1)/2, (row/2)-1, (col-1)/2, (row/2))){
-                            g2d.fillRect(offset+unit+(((col-1)/2)*unit*(2*r)), offset+(row*(r)*unit), tileSize, wallWidth);
+                            g2d.fillRect(wallWidth + (tileSize+wallWidth)*((col-1)/2), (tileSize+wallWidth)*(row/2), tileSize, wallWidth);   
                         }
                     }
                 }
@@ -122,29 +125,31 @@ public class GameMap extends JPanel {
         }
         
         // Draw on start
-        Node n = m.getStart();
-        g2d.setColor(startColour);
-        g2d.fillRect(offset+unit+(n.getX()*(wallWidth+tileSize)), offset+unit+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
+        Coordinate c = world.getStart();
+        g2d.setColor(pref.getColour("startColour"));
+        g2d.fillRect(wallWidth+(c.getX()*(wallWidth+tileSize)), wallWidth+(c.getY()*(wallWidth+tileSize)), tileSize, tileSize);
         
-
         // Draw on start
-        n = m.getFinish();
-        g2d.setColor(finishColour);
-        g2d.fillRect(offset+unit+(n.getX()*(wallWidth+tileSize)), offset+unit+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
+        c = world.getFinish();
+        g2d.setColor(pref.getColour("finishColour"));
+        g2d.fillRect(wallWidth+(c.getX()*(wallWidth+tileSize)), wallWidth+(c.getY()*(wallWidth+tileSize)), tileSize, tileSize);
 
-        
         // Draw on character
         Coordinate pC = world.getPlayerCoordinate();
-        g2d.setColor(playerColour);
-        g2d.fill(new Ellipse2D.Double(offset+unit+(pC.getX()*(wallWidth+tileSize)), offset+unit+(pC.getY()*(wallWidth+tileSize)), tileSize, tileSize));
+        g2d.setColor(pref.getColour("playerColour"));
+        Ellipse2D.Double circle = new Ellipse2D.Double(
+                wallWidth+(pC.getX()*(wallWidth+tileSize))+tileSize/4, 
+                wallWidth+(pC.getY()*(wallWidth+tileSize))+tileSize/4, 
+                tileSize/2, 
+                tileSize/2
+        );
+        g2d.fill(circle);
         
         // Draw on coins
         ArrayList<Coordinate> coords = world.getEntityCoordinates();
-        for (Coordinate c : coords) {
-            g2d.setColor(coinColour);
-            int eX = c.getX();
-            int eY = c.getY();
-            g2d.fillRect(offset+unit+(eX*unit*(2*r)), offset+unit+(eY*unit*(2*r)), tileSize, tileSize);
+        g2d.setColor(pref.getColour("coinColour"));
+        for (Coordinate s : coords) {
+            g2d.fillRect(wallWidth+(s.getX()*(wallWidth+tileSize)), wallWidth+(s.getY()*(wallWidth+tileSize)), tileSize, tileSize);
         }
     }
     
@@ -158,27 +163,10 @@ public class GameMap extends JPanel {
     @Override
     public Dimension getPreferredSize() {
         // Get the dimensions of the parent
-        Dimension d = this.getParent().getSize();
-        
-        Maze m = world.getMaze();
-        double height = m.getHeight();
-        double width = m.getWidth();
-        
-        double windowHeight = d.height;
-        double windowWidth = d.width;
-
-        // if < 1, there should be extra space on the left/right
-        // if > 1, there should be extra space on the top/bottom
-        // do the maths yourself, it just works (tm)
-        double magic = (windowWidth/windowHeight) * (height/width);
-        if (magic <= 1) {
-            int returnHeight = (int) (windowWidth*(height/width));
-            int returnWidth = (int) windowWidth;
-            return new Dimension(returnWidth,returnHeight);
-        } else {
-            int returnHeight = (int) windowHeight;
-            int returnWidth = (int) (windowHeight*(width/height));
-            return new Dimension(returnWidth,returnHeight);
-        }
+        Dimension d = this.getParent().getSize();        
+        int windowHeight = d.height;
+        int windowWidth = d.width;
+        return new Dimension(windowWidth,windowHeight);
     }
-}
+} 
+

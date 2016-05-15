@@ -220,24 +220,20 @@ public class MazeWorld {
     public int getPlayerCoins() {
         return player.getCoins();
     }
-
-    public boolean isCoins(Coordinate coord) {
-        for (Entity e : entities) {
-            if (e instanceof Coins) {
-                if (e.getCoordinate().equals(coord)) {
-                    return true;
-                }
-            }
-        }
-        return false;        
-    }
-
+    
     public ArrayList<Coordinate> getEntityCoordinates() {
         ArrayList<Coordinate> coords = new ArrayList<Coordinate>();
         for (Entity e : entities) {
             coords.add(e.getCoordinate());
         }
         return coords;
+    }
+    
+    public Coordinate getStart() {
+        return new Coordinate(maze.getStart().getX(), maze.getStart().getY());
+    }
+    public Coordinate getFinish() {
+        return new Coordinate(maze.getFinish().getX(), maze.getFinish().getY());
     }
     
 }
