@@ -1,8 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.*;
-
 import java.util.Queue;
 
 @SuppressWarnings("serial")
@@ -90,7 +88,7 @@ public class GUI extends JFrame implements DisplayInterface {
 	                case KeyEvent.VK_S:     addCommand(new Command(Com.S_DOWN));        break;
 	                case KeyEvent.VK_D:     addCommand(new Command(Com.D_RIGHT));       break;
                     case KeyEvent.VK_C:     addCommand(new Command(Com.SOLVE));         break;
-                    case KeyEvent.VK_N:     newGame();                                  break;
+                    case KeyEvent.VK_N:     newGame(1);                                  break;
                 }
             }
         });
@@ -163,38 +161,12 @@ public class GUI extends JFrame implements DisplayInterface {
         final JPopupMenu newMazePopup = new JPopupMenu();
         newMazePopup.add(new JMenuItem(new AbstractAction("Single Player") {
         	public void actionPerformed(ActionEvent event) {
-                JFormattedTextField box = (JFormattedTextField)menuPanel.getComponent(1);
-                int width = Integer.parseInt(box.getText());
-                
-                box = (JFormattedTextField)menuPanel.getComponent(3);
-                int height = Integer.parseInt(box.getText());
-                
-                int maxSize = pref.getValue("maxMazeSize");
-                if (height>maxSize) height=maxSize;
-                if (width>maxSize) width=maxSize;
-                
-                pref.setPreference("value.defaultMapWidth="+width);
-                pref.setPreference("value.defaultMapHeight="+height);
-                
-                addCommand(new CommandMap(Com.NEW_ONE_P_MAP, width, height));
+        	    newGame(1);
             }
         }));
         newMazePopup.add(new JMenuItem(new AbstractAction("Two Players") {
         	public void actionPerformed(ActionEvent event) {
-                JFormattedTextField box = (JFormattedTextField)menuPanel.getComponent(1);
-                int width = Integer.parseInt(box.getText());
-                
-                box = (JFormattedTextField)menuPanel.getComponent(3);
-                int height = Integer.parseInt(box.getText());
-                
-                int maxSize = pref.getValue("maxMazeSize");
-                if (height>maxSize) height=maxSize;
-                if (width>maxSize) width=maxSize;
-                
-                pref.setPreference("value.defaultMapWidth="+width);
-                pref.setPreference("value.defaultMapHeight="+height);
-                
-                addCommand(new CommandMap(Com.NEW_TWO_P_MAP, width, height));
+        	    newGame(2);
             }
         }));
         
@@ -250,7 +222,8 @@ public class GUI extends JFrame implements DisplayInterface {
         this.dispose();
     }
     
-    private void newGame() {JFormattedTextField box = (JFormattedTextField)menuPanel.getComponent(1);
+    private void newGame(int numPlayers) {
+        JFormattedTextField box = (JFormattedTextField)menuPanel.getComponent(1);
         int width = Integer.parseInt(box.getText());
         
         box = (JFormattedTextField)menuPanel.getComponent(3);
@@ -263,7 +236,11 @@ public class GUI extends JFrame implements DisplayInterface {
         pref.setPreference("value.defaultMapWidth="+width);
         pref.setPreference("value.defaultMapHeight="+height);
         
-        addCommand(new CommandMap(Com.NEW_ONE_P_MAP, width, height));
+        if (numPlayers == 1) {
+            addCommand(new CommandMap(Com.NEW_ONE_P_MAP, width, height));
+        } else if (numPlayers == 2) {
+            addCommand(new CommandMap(Com.NEW_TWO_P_MAP, width, height));
+        }
     }
     
     /*
