@@ -49,6 +49,7 @@ public class MazeWorld {
         float r = (float)pref.getValue("defaultCoinRatio");
         int numberOfCoins = (int)(h*w*(r/100));
         generateCoins(numberOfCoins);
+        
         multiplayer = false;
         winStatus = false;
         winPlayer = -1;
@@ -82,6 +83,7 @@ public class MazeWorld {
         }
         return true;
     }
+    
     /**
      * gets the maze
      * 

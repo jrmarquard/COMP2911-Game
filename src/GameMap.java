@@ -35,7 +35,6 @@ public class GameMap extends JPanel {
      * @param g
      */
     private void doDrawing(Graphics g) {
-        System.out.println("Drawing graphics!");
         g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         
@@ -68,11 +67,12 @@ public class GameMap extends JPanel {
         int offsetX = 0;
         int offsetY = 0;
         
+        // windowHeight/windowWidth = lambda * (mazeUnitRows/mazeUnitCols)        
         float lambda = ((float)windowHeight/(float)windowWidth)*((float)mazeUnitCols/(float)mazeUnitRows); 
         
         if (lambda == 1) {
-            // the window is a perfect fit!
-            // default values are fine
+            // The window is a perfect fit for the size of the maze (ratio matches up)
+            // The default values are fine
         } else if (lambda > 1) {
             // Space on the top/bottom
             mazeHeight = (int) ((float)windowWidth*((float)mazeUnitRows/(float)mazeUnitCols));
@@ -87,15 +87,15 @@ public class GameMap extends JPanel {
         int wallWidth = mazeWidth/mazeUnitCols;
         int tileSize = tileRatio*wallWidth;
         
-        // Set offset of maze
+        // Translate the maze to be centred in the given panel
         g2d.translate(offsetX + (mazeWidth - mazeUnitCols*wallWidth)/2, offsetY + (mazeHeight - mazeUnitRows*wallWidth)/2);
         
-        // Draw floor colour
+        // Draw floor
         g2d.setColor(pref.getColour("floorColour"));
         g2d.fillRect(0, 0, mazeUnitCols*wallWidth, mazeUnitRows*wallWidth);
 
-        g2d.setColor(pref.getColour("wallColour"));
         // Draw the east/north/west/south walls of entire maze
+        g2d.setColor(pref.getColour("wallColour"));
         g2d.fillRect(0, 0, wallWidth, mazeUnitRows*wallWidth);
         g2d.fillRect(0, 0, mazeUnitCols*wallWidth, wallWidth);
         g2d.fillRect((mazeUnitCols-1)*wallWidth, 0, wallWidth, mazeUnitRows*wallWidth);
@@ -156,15 +156,11 @@ public class GameMap extends JPanel {
     }
     
     /*
-     * This creates a new JPanel with the gePreferredSize() method
-     * @Overriden by the code inside. This code is called when java builds
-     * the swing interface (I think).
-     * This method relies on the JPanel being the only component inside
-     * the parent container.
+     * Pushes the size of this panel to the dimensions of its parent.
+     * This ensures that the panel takes up the maximum space available to it.
      */
     @Override
     public Dimension getPreferredSize() {
-        // Get the dimensions of the parent
         Dimension d = this.getParent().getSize();        
         int windowHeight = d.height;
         int windowWidth = d.width;
