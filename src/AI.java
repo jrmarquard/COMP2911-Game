@@ -74,16 +74,16 @@ public class AI {
 
         if (previous.isLeft(next)) {
             if (shortestPath.size() == 1) shortestPath.remove(0);
-            commands.add(new Command(Com.MOVE_LEFT));
+            commands.add(new Command(Com.ARROW_LEFT));
         } else if (previous.isUp(next)) {
             if (shortestPath.size() == 1) shortestPath.remove(0);
-            commands.add(new Command(Com.MOVE_UP));
+            commands.add(new Command(Com.ARROW_UP));
         } else if (previous.isRight(next)) {
             if (shortestPath.size() == 1) shortestPath.remove(0);
-            commands.add(new Command(Com.MOVE_RIGHT));
+            commands.add(new Command(Com.ARROW_RIGHT));
         } else if (previous.isDown(next)) {
             if (shortestPath.size() == 1) shortestPath.remove(0);
-            commands.add(new Command(Com.MOVE_DOWN));
+            commands.add(new Command(Com.ARROW_DOWN));
         } else {
             System.out.println("invalid");
         }

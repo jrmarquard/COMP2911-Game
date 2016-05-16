@@ -56,7 +56,7 @@ public class AI2 implements AIControl{
 	}
 	
 	public Command makeMove(MazeWorld world) {
-	    Coordinate start = world.getPlayerCoordinate();
+	    Coordinate start = world.getPlayerCoordinate(0);
 	    
 	    // process path
 	    traverseMaze(world.getMaze(), world.getMaze().getNode(start));
@@ -69,13 +69,13 @@ public class AI2 implements AIControl{
         }
         
         if (previous.getX() == next.getX()+1) {
-            return new Command(Com.MOVE_LEFT);
+            return new Command(Com.ARROW_LEFT);
         } else if (previous.getY() == next.getY()+1) {
-            return new Command(Com.MOVE_UP);
+            return new Command(Com.ARROW_UP);
         } else if (previous.getX() == next.getX()-1) {
-            return new Command(Com.MOVE_RIGHT);
+            return new Command(Com.ARROW_RIGHT);
         } else if (previous.getY() == next.getY()-1) {
-            return new Command(Com.MOVE_DOWN);
+            return new Command(Com.ARROW_DOWN);
         } else {
             System.out.println("invalid");
             return new Command(Com.IDLE);

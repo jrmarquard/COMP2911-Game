@@ -13,11 +13,13 @@ public class GameMap extends JPanel {
 
     private Preferences pref;
     private MazeWorld world;
+    private int playerToDraw;
     private Graphics2D g2d;
     
-    public GameMap (MazeWorld world, Preferences pref) {
+    public GameMap (MazeWorld world, Preferences pref, int player) {
         super();
         this.world = world;
+        this.playerToDraw = player;
         this.pref = pref;
     }
     
@@ -135,7 +137,7 @@ public class GameMap extends JPanel {
         g2d.fillRect(wallWidth+(c.getX()*(wallWidth+tileSize)), wallWidth+(c.getY()*(wallWidth+tileSize)), tileSize, tileSize);
 
         // Draw on character
-        Coordinate pC = world.getPlayerCoordinate();
+        Coordinate pC = world.getPlayerCoordinate(this.playerToDraw);
         g2d.setColor(pref.getColour("playerColour"));
         Ellipse2D.Double circle = new Ellipse2D.Double(
                 wallWidth+(pC.getX()*(wallWidth+tileSize))+tileSize/4, 
