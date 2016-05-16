@@ -2,25 +2,14 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class AI {
-
-    private Queue<Command> commands;
+public class AI implements AIControl{
 	private ArrayList<Node> shortestPath;
 	
 	public AI() {
         this.shortestPath = new ArrayList<Node>();
     }
-	public AI(Queue<Command> commands) {
-		this.shortestPath = new ArrayList<Node>();
-		this.commands = commands;
-	}
 	
-	public ArrayList<Node> getShortestPath(){
-		return this.shortestPath;
-	}
-	
-	public ArrayList<Node> traverseMaze(Maze maze, Node start){
-		
+	private ArrayList<Node> traverseMaze(Maze maze, Node start) {	    
 		ArrayList<Node> path = new ArrayList<Node>();
 		
 		Queue<Node> q = new LinkedList<Node>();
@@ -43,8 +32,7 @@ public class AI {
 				path.add(neighbour);
 				path.add(n);
 				if (neighbour.equals(maze.getFinish())){
-					return processPath(path, start, maze.getFinish());
-	
+				    return processPath(path, start, maze.getFinish());
 				} else if (!visited.contains(neighbour)){
 					q.add(neighbour);
 				}
@@ -59,37 +47,39 @@ public class AI {
 		Node source = path.get(i + 1);
 		
 		shortestPath.add(0, dest);
-		
 		if (source.equals(start)) {
-			shortestPath.add(0, start);
-			return shortestPath;
+		    shortestPath.add(0, start);
+		    return shortestPath;
 		} else {
-			return processPath(path, start, source);
+		    return processPath(path, start, source);
 		}
 	}
 	
-	public void makeMove() {
-        Node previous = shortestPath.remove(0);
-        Node next = shortestPath.get(0);
-
-        if (previous.isLeft(next)) {
-            if (shortestPath.size() == 1) shortestPath.remove(0);
-            commands.add(new Command(Com.MOVE_LEFT));
-        } else if (previous.isUp(next)) {
-            if (shortestPath.size() == 1) shortestPath.remove(0);
-            commands.add(new Command(Com.MOVE_UP));
-        } else if (previous.isRight(next)) {
-            if (shortestPath.size() == 1) shortestPath.remove(0);
-            commands.add(new Command(Com.MOVE_RIGHT));
-        } else if (previous.isDown(next)) {
-            if (shortestPath.size() == 1) shortestPath.remove(0);
-            commands.add(new Command(Com.MOVE_DOWN));
+	public Command makeMove(MazeWorld world) {
+	    Coordinate start = world.getPlayerCoordinate();
+	    
+	    // process path
+	    traverseMaze(world.getMaze(), world.getMaze().getNode(start));
+	    
+        Coordinate previous = shortestPath.remove(0).getCoordinate();
+        Coordinate next = shortestPath.get(0).getCoordinate();
+        
+        if (shortestPath.size() == 1) {
+            shortestPath.remove(0);
+        }
+        
+        if (previous.getX() == next.getX()+1) {
+            return new Command(Com.MOVE_LEFT);
+        } else if (previous.getY() == next.getY()+1) {
+            return new Command(Com.MOVE_UP);
+        } else if (previous.getX() == next.getX()-1) {
+            return new Command(Com.MOVE_RIGHT);
+        } else if (previous.getY() == next.getY()-1) {
+            return new Command(Com.MOVE_DOWN);
         } else {
             System.out.println("invalid");
+            return new Command(Com.IDLE);
         }
+        
     }
-	
-	public boolean isFinished() {
-	    return shortestPath.isEmpty();
-	}
 }

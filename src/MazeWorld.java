@@ -35,7 +35,7 @@ public class MazeWorld {
      */
     public void generateWorld(int width, int height) {
         maze = new Maze(width, height);
-        ai = new AI2();
+        ai = new AI();
         entities = new ArrayList<Entity>();
         maze.mazeGenerator();
         player = new Character(new Coordinate(maze.getStart().getX(), maze.getStart().getY()), pref.getText("playerName"));
@@ -44,8 +44,8 @@ public class MazeWorld {
         float w = (float)maze.getWidth();
         float r = (float)pref.getValue("defaultCoinRatio");
         
-        float numberOfCoins = (h*w)*(r/100);
-        generateCoins((int)numberOfCoins);
+        int numberOfCoins = (int)(h*w*(r/100));
+        generateCoins(numberOfCoins);
         winStatus = false;
         lockPlayerControl = false;
         updated = false;
