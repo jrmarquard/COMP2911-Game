@@ -32,10 +32,6 @@ public class GUI extends JFrame implements DisplayInterface {
         });
     }
     
-    public void initGUI() {
-        initUI();
-    }
-
     public void update() {
         drawTitlePanel();
         drawGamePanel();
