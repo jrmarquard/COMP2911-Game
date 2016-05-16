@@ -15,7 +15,9 @@ public class GUI extends JFrame implements DisplayInterface {
     
     JPanel windowPanel;
     JPanel titlePanel;
-    JPanel gamePanel;
+    JPanel mainGamePanel;
+    JPanel gamePanelA;
+    JPanel gamePanelB;
     JPanel menuPanel;
     
     public GUI (Preferences pref, MazeWorld world, Queue<Command> commands) {
@@ -54,16 +56,24 @@ public class GUI extends JFrame implements DisplayInterface {
         windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
         this.add(windowPanel);
         
+        mainGamePanel = new JPanel();
+        mainGamePanel.setLayout(new BoxLayout(mainGamePanel, BoxLayout.X_AXIS));
+        
         // Define Layouts for each child panel
         titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
-        gamePanel = new JPanel(new GridBagLayout());
+        gamePanelA = new JPanel(new GridBagLayout());
         // Default size for game window
-        gamePanel.setPreferredSize(new Dimension(600, 600));
+        gamePanelA.setPreferredSize(new Dimension(600, 600));
+        gamePanelB = new JPanel(new GridBagLayout());
+        // Default size for game window
+        gamePanelB.setPreferredSize(new Dimension(600, 600));
         menuPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         
         // Add children panels to the parent windowPanel
         windowPanel.add(titlePanel);
-        windowPanel.add(gamePanel);
+        windowPanel.add(mainGamePanel);
+        mainGamePanel.add(gamePanelA);
+        mainGamePanel.add(gamePanelB);
         windowPanel.add(menuPanel);
         
         // Set more information
@@ -102,15 +112,18 @@ public class GUI extends JFrame implements DisplayInterface {
     
     private void drawGamePanel() {
         // Reset game panels, remove them (hopefully clears memory)
-        gamePanel.removeAll();
+        gamePanelA.removeAll();
         
-        GameMap innerGamePanel = new GameMap(world, pref);
+        GameMap innerGamePanelA = new GameMap(world, pref);
+        GameMap innerGamePanelB = new GameMap(world, pref);
         
         // Attaches the innerGamePanel onto the gamePanel
-        gamePanel.add(innerGamePanel);
+        gamePanelA.add(innerGamePanelA);
+        gamePanelB.add(innerGamePanelB);
         
         // Maintains the size of the window when game panel is redrawn
-        gamePanel.setPreferredSize(gamePanel.getSize());
+        gamePanelA.setPreferredSize(gamePanelA.getSize());
+        gamePanelB.setPreferredSize(gamePanelB.getSize());
     }
 
     public void drawTitlePanel() {
