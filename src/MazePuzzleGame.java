@@ -88,7 +88,7 @@ public class MazePuzzleGame {
     }
 
 	/**
-	 * Executed when a new map is requested
+	 * Executed when a new single player map is requested
 	 * 
 	 * @param o the command object which ordered this method
 	 */
@@ -100,6 +100,11 @@ public class MazePuzzleGame {
         addCommand(new Command(Com.DRAW));
     }
     
+    /**
+     * Executed when a new multiplayer player map is requested
+	 * 
+	 * @param o the command object which ordered this method
+	 */
     private void newTwoPlayersMap(Command o) {
         CommandMap c = (CommandMap)o;
         int width = c.getWidth();
@@ -112,7 +117,7 @@ public class MazePuzzleGame {
     /**
      * Executed when asked to close.
      */
-    public void close () {
+    private void close () {
         disp.close();
         System.exit(0);
     }

@@ -131,14 +131,6 @@ public class Maze {
 		}
 	}
 	
-	public void setStart(int x, int y) {
-		this.start = new Node(x, y);
-	}
-	
-	public void setFinish(int x, int y) {
-		this.finish = new Node(x, y);
-	}
-	
 	public void printMaze() {
 	   int width = 0;
 	   int height = 0;
@@ -280,7 +272,7 @@ public class Maze {
 		}
 		
 		Node node = newVisited.getLast();
-		this.setFinish(node.getX(), node.getY());
+		this.finish = this.getNode(node.getX(), node.getY());
 	}
 	
 	/**

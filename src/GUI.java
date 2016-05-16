@@ -4,7 +4,6 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import java.util.Queue;
-import java.util.Random;
 
 @SuppressWarnings("serial")
 public class GUI extends JFrame implements DisplayInterface {
@@ -114,9 +113,8 @@ public class GUI extends JFrame implements DisplayInterface {
     }
     
     private void drawGamePanel() {
+    	// Reset game panels, remove them (hopefully clears memory)
     	mainGamePanel.removeAll();
-        
-        // Reset game panels, remove them (hopefully clears memory)
         gamePanelA.removeAll();
         gamePanelB.removeAll();
         
@@ -244,8 +242,10 @@ public class GUI extends JFrame implements DisplayInterface {
         menuPanel.add(widthSize);
         menuPanel.add(new JLabel("Height"));
         menuPanel.add(heightSize);
-        menuPanel.add(solveButton);
-        menuPanel.add(auto);
+        if(!world.getIsMultiplayer()) {
+        	menuPanel.add(solveButton);
+            menuPanel.add(auto);
+        }
         menuPanel.add(newMazeButton);
         menuPanel.add(closeButton);
     }

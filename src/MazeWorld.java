@@ -92,10 +92,18 @@ public class MazeWorld {
         return maze;
     }
     
+    /**
+     * Returns if it is a multiplayer maze
+     * @return if it is a multiplayer maze
+     */
     public boolean getIsMultiplayer() {
     	return this.multiplayer;
     }
     
+    /**
+     * Sets the maze to multiplayer and adds an extra player
+     * @param multiplayer the boolean to tell if it is a multiplayer maze
+     */
     public void setMuptiplayer(boolean multiplayer) {
     	this.multiplayer = multiplayer;
     	players.add(new Character(new Coordinate(maze.getStart().getX(), maze.getStart().getY()), pref.getText("playerName")));
@@ -110,6 +118,10 @@ public class MazeWorld {
         return winStatus;
     }
     
+    /**
+     * Returns the player who won
+     * @return the player who won
+     */
     public int getWinPlayer() {
     	return this.winPlayer + 1;
     }
