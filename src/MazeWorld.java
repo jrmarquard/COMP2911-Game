@@ -1,7 +1,14 @@
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.Random;
+
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.DataLine;
 
 
 public class MazeWorld {
@@ -122,6 +129,23 @@ public class MazeWorld {
             if (isChatacterHere(e.getX(), e.getY())) {
                 if (e instanceof Coins) {
                     player.addCoins(((Coins)e).getValue());
+                    
+                    //Where tim is attempting to add coin sound
+                    try {
+            	    	String fileName = new String("coin-sound.wav");
+            		    File soundFile = new File(fileName);
+
+            	        AudioInputStream stream = AudioSystem.getAudioInputStream(soundFile);
+            	        AudioFormat format = stream.getFormat();
+            	        DataLine.Info info = new DataLine.Info(Clip.class, format);
+            	        Clip clip = (Clip) AudioSystem.getLine(info);
+            	        clip.open(stream);
+            	        clip.start();
+            	    }
+            	    catch (Exception eA) {
+            	        
+            	    }
+                    
                     iter.remove();
                     updated = true;
                 }

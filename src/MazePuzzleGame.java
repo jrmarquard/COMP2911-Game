@@ -1,6 +1,13 @@
+import java.applet.AudioClip;
 import java.awt.EventQueue;
+import java.io.*;
+import java.net.URL;
 import java.util.LinkedList;
 import java.util.Queue;
+
+import javax.sound.sampled.*;
+
+
 
 /**
  * MazePuzzleGame maintains and connects the different parts of the
@@ -45,6 +52,30 @@ public class MazePuzzleGame {
 	public static void main(String[] args) {
 	    
 	    MazePuzzleGame game = new MazePuzzleGame();
+	    
+	    //Where tim is playing around with sound
+	
+	    try {
+	    	String fileName = new String("coin-sound.wav");
+		    File soundFile = new File(fileName);
+	        File yourFile;
+	        AudioInputStream stream;
+	        AudioFormat format;
+	        DataLine.Info info;
+	        Clip clip; 
+
+	        stream = AudioSystem.getAudioInputStream(soundFile);
+	        format = stream.getFormat();
+	        info = new DataLine.Info(Clip.class, format);
+	        clip = (Clip) AudioSystem.getLine(info);
+	        clip.open(stream);
+	        clip.start();
+	    }
+	    catch (Exception e) {
+	        
+	    }
+	    
+	    
 	    
 	    for (Command c = null; ; c = game.pollCommands()) {
 	        // Adds a delay to stop the program hanging
