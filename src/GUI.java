@@ -4,7 +4,6 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import java.util.Queue;
-import java.util.Random;
 
 @SuppressWarnings("serial")
 public class GUI extends JFrame implements DisplayInterface {
@@ -15,7 +14,9 @@ public class GUI extends JFrame implements DisplayInterface {
     
     JPanel windowPanel;
     JPanel titlePanel;
-    JPanel gamePanel;
+    JPanel mainGamePanel;
+    JPanel gamePanelA;
+    JPanel gamePanelB;
     JPanel menuPanel;
     
     public GUI (Preferences pref, MazeWorld world, Queue<Command> commands) {
@@ -54,16 +55,23 @@ public class GUI extends JFrame implements DisplayInterface {
         windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
         this.add(windowPanel);
         
+        mainGamePanel = new JPanel();
+        mainGamePanel.setLayout(new BoxLayout(mainGamePanel, BoxLayout.X_AXIS));
+        
         // Define Layouts for each child panel
         titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
-        gamePanel = new JPanel(new GridBagLayout());
+        gamePanelA = new JPanel(new GridBagLayout());
         // Default size for game window
-        gamePanel.setPreferredSize(new Dimension(600, 600));
+        gamePanelA.setPreferredSize(new Dimension(600, 600));
+        gamePanelB = new JPanel(new GridBagLayout());
         menuPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         
         // Add children panels to the parent windowPanel
         windowPanel.add(titlePanel);
-        windowPanel.add(gamePanel);
+        windowPanel.add(mainGamePanel);
+        // Add children panels to the parent mainGamePanel
+        mainGamePanel.add(gamePanelA);
+        mainGamePanel.add(gamePanelB);
         windowPanel.add(menuPanel);
         
         // Set more information
@@ -77,10 +85,14 @@ public class GUI extends JFrame implements DisplayInterface {
         this.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 switch (e.getKeyCode()) {
-                    case KeyEvent.VK_DOWN:  addCommand(new Command(Com.MOVE_DOWN));     break;
-                    case KeyEvent.VK_LEFT:  addCommand(new Command(Com.MOVE_LEFT));     break;
-                    case KeyEvent.VK_RIGHT: addCommand(new Command(Com.MOVE_RIGHT));    break;
-                    case KeyEvent.VK_UP:    addCommand(new Command(Com.MOVE_UP));       break;
+	                case KeyEvent.VK_DOWN:  addCommand(new Command(Com.ARROW_DOWN));    break;
+	                case KeyEvent.VK_LEFT:  addCommand(new Command(Com.ARROW_LEFT));    break;
+	                case KeyEvent.VK_RIGHT: addCommand(new Command(Com.ARROW_RIGHT));   break;
+	                case KeyEvent.VK_UP:    addCommand(new Command(Com.ARROW_UP));      break;
+	                case KeyEvent.VK_W:     addCommand(new Command(Com.W_UP));          break;
+	                case KeyEvent.VK_A:     addCommand(new Command(Com.A_LEFT));        break;
+	                case KeyEvent.VK_S:     addCommand(new Command(Com.S_DOWN));        break;
+	                case KeyEvent.VK_D:     addCommand(new Command(Com.D_RIGHT));       break;
                     case KeyEvent.VK_C:     addCommand(new Command(Com.SOLVE));         break;
                     case KeyEvent.VK_N:     newGame();                                  break;
                 }
@@ -101,16 +113,29 @@ public class GUI extends JFrame implements DisplayInterface {
     }
     
     private void drawGamePanel() {
-        // Reset game panels, remove them (hopefully clears memory)
-        gamePanel.removeAll();
+    	// Reset game panels, remove them (hopefully clears memory)
+    	mainGamePanel.removeAll();
+        gamePanelA.removeAll();
+        gamePanelB.removeAll();
         
-        GameMap innerGamePanel = new GameMap(world, pref);
+        GameMap innerGamePanelA = new GameMap(world, pref, 0);
         
         // Attaches the innerGamePanel onto the gamePanel
-        gamePanel.add(innerGamePanel);
+        gamePanelA.add(innerGamePanelA);
         
         // Maintains the size of the window when game panel is redrawn
-        gamePanel.setPreferredSize(gamePanel.getSize());
+        gamePanelA.setPreferredSize(gamePanelA.getSize());
+        
+        mainGamePanel.add(gamePanelA);
+        
+        if(world.getIsMultiplayer()) {
+        	mainGamePanel.add(gamePanelB);
+        	GameMap innerGamePanelB = new GameMap(world, pref, 1);
+        	gamePanelB.add(innerGamePanelB);
+        	gamePanelB.setPreferredSize(gamePanelA.getSize());
+        }
+        
+        mainGamePanel.setPreferredSize(mainGamePanel.getSize());
     }
 
     public void drawTitlePanel() {
@@ -123,7 +148,7 @@ public class GUI extends JFrame implements DisplayInterface {
         }
         
         JLabel title = new JLabel();
-        title.setText("Coins: "+world.getPlayerCoins());
+        title.setText("Coins: "+world.getPlayerCoins(0));
 
         titlePanel.add(title);
     }
@@ -139,14 +164,51 @@ public class GUI extends JFrame implements DisplayInterface {
         heightSize.setValue(Integer.toString(pref.getValue("defaultMapHeight")));
         heightSize.setColumns(2);
 
+        final JPopupMenu newMazePopup = new JPopupMenu();
+        newMazePopup.add(new JMenuItem(new AbstractAction("Single Player") {
+        	public void actionPerformed(ActionEvent event) {
+                JFormattedTextField box = (JFormattedTextField)menuPanel.getComponent(1);
+                int width = Integer.parseInt(box.getText());
+                
+                box = (JFormattedTextField)menuPanel.getComponent(3);
+                int height = Integer.parseInt(box.getText());
+                
+                int maxSize = pref.getValue("maxMazeSize");
+                if (height>maxSize) height=maxSize;
+                if (width>maxSize) width=maxSize;
+                
+                pref.setPreference("value.defaultMapWidth="+width);
+                pref.setPreference("value.defaultMapHeight="+height);
+                
+                addCommand(new CommandMap(Com.NEW_ONE_P_MAP, width, height));
+            }
+        }));
+        newMazePopup.add(new JMenuItem(new AbstractAction("Two Players") {
+        	public void actionPerformed(ActionEvent event) {
+                JFormattedTextField box = (JFormattedTextField)menuPanel.getComponent(1);
+                int width = Integer.parseInt(box.getText());
+                
+                box = (JFormattedTextField)menuPanel.getComponent(3);
+                int height = Integer.parseInt(box.getText());
+                
+                int maxSize = pref.getValue("maxMazeSize");
+                if (height>maxSize) height=maxSize;
+                if (width>maxSize) width=maxSize;
+                
+                pref.setPreference("value.defaultMapWidth="+width);
+                pref.setPreference("value.defaultMapHeight="+height);
+                
+                addCommand(new CommandMap(Com.NEW_TWO_P_MAP, width, height));
+            }
+        }));
+        
         JButton newMazeButton = new JButton("New Maze");
-        newMazeButton.setMnemonic(KeyEvent.VK_N);
-        newMazeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                newGame();
+        newMazeButton.addMouseListener(new MouseAdapter() {
+        	public void mousePressed(MouseEvent e) {
+                newMazePopup.show(e.getComponent(), e.getX(), e.getY());
             }
         });
+        
         JCheckBox auto = new JCheckBox("Auto", pref.getBool("autoComplete"));
         auto.addActionListener(new ActionListener() {
             @Override
@@ -180,8 +242,10 @@ public class GUI extends JFrame implements DisplayInterface {
         menuPanel.add(widthSize);
         menuPanel.add(new JLabel("Height"));
         menuPanel.add(heightSize);
-        menuPanel.add(solveButton);
-        menuPanel.add(auto);
+        if(!world.getIsMultiplayer()) {
+        	menuPanel.add(solveButton);
+            menuPanel.add(auto);
+        }
         menuPanel.add(newMazeButton);
         menuPanel.add(closeButton);
     }
@@ -203,7 +267,7 @@ public class GUI extends JFrame implements DisplayInterface {
         pref.setPreference("value.defaultMapWidth="+width);
         pref.setPreference("value.defaultMapHeight="+height);
         
-        addCommand(new CommandMap(Com.NEW_MAP, width, height));
+        addCommand(new CommandMap(Com.NEW_ONE_P_MAP, width, height));
     }
     
     /*

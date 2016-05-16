@@ -4,10 +4,7 @@ import java.io.*;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.Queue;
-
 import javax.sound.sampled.*;
-
-
 
 /**
  * MazePuzzleGame maintains and connects the different parts of the
@@ -87,14 +84,19 @@ public class MazePuzzleGame {
 	        
 	        // Get the command ID from the command and run appropriate game method
 	        switch (c.getCommandID()) {
-	            case NEW_MAP:      game.newMap(c);                     break;
-	            case DRAW:         game.refreshDisplay();              break;
-	            case EXIT:         game.close();	                   break;
-	            case MOVE_DOWN:    game.moveCharacterDown();           break;
-	            case MOVE_LEFT:    game.moveCharacterLeft();           break;
-	            case MOVE_RIGHT:   game.moveCharacterRight();          break;
-	            case MOVE_UP:      game.moveCharacterUp();             break;
-	            case SOLVE:        game.solveCharacter();              break;
+		        case NEW_ONE_P_MAP: game.newOnePlayerMap(c);            break;
+	            case NEW_TWO_P_MAP: game.newTwoPlayersMap(c);           break;
+	            case DRAW:          game.refreshDisplay();              break;
+	            case EXIT:          game.close();	                    break;
+	            case ARROW_DOWN:    game.moveCharacterADown();          break;
+	            case ARROW_LEFT:    game.moveCharacterALeft();          break;
+	            case ARROW_RIGHT:   game.moveCharacterARight();         break;
+	            case ARROW_UP:      game.moveCharacterAUp();            break;
+	            case S_DOWN:        game.moveCharacterBDown();          break;
+	            case A_LEFT:        game.moveCharacterBLeft();          break;
+	            case D_RIGHT:       game.moveCharacterBRight();         break;
+	            case W_UP:          game.moveCharacterBUp();            break;
+	            case SOLVE:         game.solveCharacter();              break;
 	        }
 	    }
 	}
@@ -114,11 +116,11 @@ public class MazePuzzleGame {
     }
 
 	/**
-	 * Executed when a new map is requested
+	 * Executed when a new single player map is requested
 	 * 
 	 * @param o the command object which ordered this method
 	 */
-    private void newMap(Command o) {
+    private void newOnePlayerMap(Command o) {
         CommandMap c = (CommandMap)o;
         int width = c.getWidth();
         int height = c.getHeight();
@@ -128,9 +130,23 @@ public class MazePuzzleGame {
     }
     
     /**
+     * Executed when a new multiplayer player map is requested
+	 * 
+	 * @param o the command object which ordered this method
+	 */
+    private void newTwoPlayersMap(Command o) {
+        CommandMap c = (CommandMap)o;
+        int width = c.getWidth();
+        int height = c.getHeight();
+        world.generateWorld(width, height);
+        world.setMuptiplayer(true);
+        addCommand(new Command(Com.DRAW));
+    }
+    
+    /**
      * Executed when asked to close.
      */
-    public void close () {
+    private void close () {
         disp.close();
         System.exit(0);
     }
@@ -138,33 +154,89 @@ public class MazePuzzleGame {
     /**
      * Moves player up a coordinate
      */
-    private void moveCharacterUp() {
-	    world.moveCharacterUp();
+    private void moveCharacterAUp() {
+    	if(!world.getIsMultiplayer()) {
+    		world.moveCharacterUp(0);
+    	} else {
+    		world.moveCharacterUp(1);
+    	}
         addCommand(new Command(Com.DRAW));
 	}
     
     /**
      * Moves player left a coordinate
      */
-    private void moveCharacterLeft() {
-        world.moveCharacterLeft();
+    private void moveCharacterALeft() {
+    	if(!world.getIsMultiplayer()) {
+    		world.moveCharacterLeft(0);
+    	} else {
+    		world.moveCharacterLeft(1);
+    	}
         addCommand(new Command(Com.DRAW));
     }
     
     /**
      * Moves player right a coordinate
      */
-    private void moveCharacterRight() {
-        world.moveCharacterRight();
+    private void moveCharacterARight() {
+    	if(!world.getIsMultiplayer()) {
+    		world.moveCharacterRight(0);
+    	} else {
+    		world.moveCharacterRight(1);
+    	}
         addCommand(new Command(Com.DRAW));
     }
     
     /**
      * Moves player down a coordinate
      */
-    private void moveCharacterDown() {
-        world.moveCharacterDown();
+    private void moveCharacterADown() {
+    	if(!world.getIsMultiplayer()) {
+    		world.moveCharacterDown(0);
+    	} else {
+    		world.moveCharacterDown(1);
+    	}
         addCommand(new Command(Com.DRAW));
+    }
+    
+    /**
+     * Moves player up a coordinate
+     */
+    private void moveCharacterBUp() {
+    	if(world.getIsMultiplayer()) {
+    		world.moveCharacterUp(0);
+            addCommand(new Command(Com.DRAW));
+    	}
+	}
+    
+    /**
+     * Moves player left a coordinate
+     */
+    private void moveCharacterBLeft() {
+    	if(world.getIsMultiplayer()) {
+	        world.moveCharacterLeft(0);
+	        addCommand(new Command(Com.DRAW));
+    	}
+    }
+    
+    /**
+     * Moves player right a coordinate
+     */
+    private void moveCharacterBRight() {
+    	if(world.getIsMultiplayer()) {
+	        world.moveCharacterRight(0);
+	        addCommand(new Command(Com.DRAW));
+    	}
+    }
+    
+    /**
+     * Moves player down a coordinate
+     */
+    private void moveCharacterBDown() {
+    	if(world.getIsMultiplayer()) {
+	        world.moveCharacterDown(0);
+	        addCommand(new Command(Com.DRAW));
+    	}
     }
     
     /**
