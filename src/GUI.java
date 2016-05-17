@@ -204,22 +204,34 @@ public class GUI extends JFrame implements DisplayInterface {
         windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
         
         for (String s : pref.getColourKeys()) {
-        Color c = pref.getColour(s);
-        int red = c.getRed();
-        int blue = c.getBlue();
-        int green = c.getGreen();
-        String value = "" + Integer.toHexString(red) + Integer.toHexString(green) + Integer.toHexString(blue);
-        JPanel settingRow = new JPanel();
-        JTextField settingName = new JTextField();
-        JTextField settingValue = new JTextField();
-        settingRow.add(settingName);
-        settingRow.add(settingValue);
-        settingName.setText(s);
-        settingValue.setText(value);
-        settingValue.setColumns(value.length());
-        settingName.setEditable(true);
-        
-        windowPanel.add(settingRow);
+            Color c = pref.getColour(s);
+            String red = String.format("%02X",c.getRed());
+            String green = String.format("%02X",c.getGreen());
+            String blue = String.format("%02X",c.getBlue());
+            String value = red+green+blue;
+            
+            // Create row for setting
+            JPanel settingRow = new JPanel();
+            settingRow.setLayout(new BoxLayout(settingRow, BoxLayout.X_AXIS));
+            JTextField settingName = new JTextField();
+            JTextField settingValue = new JTextField();
+            settingValue.setColumns(6);
+            settingValue.getDocument().addDocumentListener(new PrefUpdate("colour", s));
+            JPanel boxColour = new JPanel();
+            boxColour.setSize(10,10);
+            boxColour.setBackground(c);
+            
+            // Display
+            settingName.setText(s);
+            settingValue.setText(value);
+            settingValue.setColumns(value.length());
+            settingName.setEditable(true);
+            
+            // Add to parent panels
+            settingRow.add(settingName);
+            settingRow.add(settingValue);
+            settingRow.add(boxColour);
+            windowPanel.add(settingRow);
         }
         
         JButton backButton = new JButton("Back");
@@ -298,12 +310,12 @@ public class GUI extends JFrame implements DisplayInterface {
         JFormattedTextField widthSize = new JFormattedTextField();
         widthSize.setValue(Integer.toString(pref.getValue("defaultMapWidth")));
         widthSize.setColumns(2);
-        widthSize.getDocument().addDocumentListener(new ValueUpdate("defaultMapWidth"));
+        widthSize.getDocument().addDocumentListener(new PrefUpdate("value", "defaultMapWidth"));
         
         JFormattedTextField heightSize = new JFormattedTextField();
         heightSize.setValue(Integer.toString(pref.getValue("defaultMapHeight")));
         heightSize.setColumns(2);
-        heightSize.getDocument().addDocumentListener(new ValueUpdate("defaultMapHeight"));
+        heightSize.getDocument().addDocumentListener(new PrefUpdate("value", "defaultMapHeight"));
         
         final JPopupMenu newMazePopup = new JPopupMenu();
         newMazePopup.add(new JMenuItem(new AbstractAction("Single Player") {
@@ -403,39 +415,52 @@ public class GUI extends JFrame implements DisplayInterface {
     }
     */
     
-    private class ValueUpdate implements DocumentListener {
-            
-            String valueName;
-            
-            public ValueUpdate(String s) {
-                super();
-                this.valueName = s;
-            }
-    
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                update(e);
-            }
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                update(e);    
-            }
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                update(e);
-            }
-            private void update(DocumentEvent e) {
-                int value;
-                try {
-                    int textLength = e.getDocument().getLength();
-                    if (textLength >= 2) textLength = 2;
-                    value = Integer.parseInt(e.getDocument().getText(0,textLength));
-                    pref.setPreference("value."+valueName+"="+value);
-                } catch (NumberFormatException | BadLocationException e1) {
-                    // Do nothing
+    private class PrefUpdate implements DocumentListener {
+        String spaceName;
+        String prefName;
+        
+        public PrefUpdate(String s, String p) {
+            super();
+            this.spaceName = s;
+            this.prefName = p;
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            update(e);
+        }
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            update(e);    
+        }
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            update(e);
+        }
+        private void update(DocumentEvent e) {
+            try {
+                String value = "";
+                int textLength = e.getDocument().getLength();
+                switch(spaceName) {
+                    case "value":
+                        if (textLength == 1 || textLength == 2)  {
+                            value = e.getDocument().getText(0,textLength);
+                            pref.setPreference(spaceName+"."+prefName+"="+value);
+                        }
+                        break;
+                    case "colour":
+                        if (textLength == 6) {
+                            value = e.getDocument().getText(0,textLength);
+                            pref.setPreference(spaceName+"."+prefName+"="+value);
+                        }
+                        break;
+                    default:
+                        break;
                 }
+            } catch (NumberFormatException | BadLocationException e1) {
+                // Do nothing
             }
-    
+        }
     }
     
 }
