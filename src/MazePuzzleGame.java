@@ -100,8 +100,8 @@ public class MazePuzzleGame {
         int height = c.getHeight();
         world.generateWorld(width, height);
         
-        if (c.getPlayers()==2) {
-            world.setMuptiplayer(true);
+        if (c.getPlayers() > 1) {
+            world.setMuptiplayer(c.getPlayers());
         }
         addCommand(new Command(Com.DRAW));
     }
@@ -118,7 +118,7 @@ public class MazePuzzleGame {
      * Moves player up a coordinate
      */
     private void moveCharacterAUp() {
-    	if(!world.getIsMultiplayer()) {
+    	if(world.getNumberOfPlayers() == 1) {
     		world.moveCharacterUp(0);
     	} else {
     		world.moveCharacterUp(1);
@@ -130,7 +130,7 @@ public class MazePuzzleGame {
      * Moves player left a coordinate
      */
     private void moveCharacterALeft() {
-    	if(!world.getIsMultiplayer()) {
+    	if(world.getNumberOfPlayers() == 1) {
     		world.moveCharacterLeft(0);
     	} else {
     		world.moveCharacterLeft(1);
@@ -142,7 +142,7 @@ public class MazePuzzleGame {
      * Moves player right a coordinate
      */
     private void moveCharacterARight() {
-    	if(!world.getIsMultiplayer()) {
+    	if(world.getNumberOfPlayers() == 1) {
     		world.moveCharacterRight(0);
     	} else {
     		world.moveCharacterRight(1);
@@ -154,7 +154,7 @@ public class MazePuzzleGame {
      * Moves player down a coordinate
      */
     private void moveCharacterADown() {
-    	if(!world.getIsMultiplayer()) {
+    	if(world.getNumberOfPlayers() == 1) {
     		world.moveCharacterDown(0);
     	} else {
     		world.moveCharacterDown(1);
@@ -166,7 +166,7 @@ public class MazePuzzleGame {
      * Moves player up a coordinate
      */
     private void moveCharacterBUp() {
-    	if(world.getIsMultiplayer()) {
+    	if(world.getNumberOfPlayers() == 2) {
     		world.moveCharacterUp(0);
             addCommand(new Command(Com.DRAW));
     	}
@@ -176,7 +176,7 @@ public class MazePuzzleGame {
      * Moves player left a coordinate
      */
     private void moveCharacterBLeft() {
-    	if(world.getIsMultiplayer()) {
+    	if(world.getNumberOfPlayers() == 2) {
 	        world.moveCharacterLeft(0);
 	        addCommand(new Command(Com.DRAW));
     	}
@@ -186,7 +186,7 @@ public class MazePuzzleGame {
      * Moves player right a coordinate
      */
     private void moveCharacterBRight() {
-    	if(world.getIsMultiplayer()) {
+    	if(world.getNumberOfPlayers() == 2) {
 	        world.moveCharacterRight(0);
 	        addCommand(new Command(Com.DRAW));
     	}
@@ -196,7 +196,7 @@ public class MazePuzzleGame {
      * Moves player down a coordinate
      */
     private void moveCharacterBDown() {
-    	if(world.getIsMultiplayer()) {
+    	if(world.getNumberOfPlayers() == 2) {
 	        world.moveCharacterDown(0);
 	        addCommand(new Command(Com.DRAW));
     	}

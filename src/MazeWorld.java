@@ -11,7 +11,6 @@ public class MazeWorld {
     private ArrayList<Character> players;
     private AIControl ai;
     private ArrayList<Entity> entities;
-    private boolean multiplayer;
     private boolean lockPlayerControl;
     private boolean winStatus;
     private int winPlayer;
@@ -45,8 +44,7 @@ public class MazeWorld {
         // Generate maze
         maze.mazeGenerator();
         
-        // Add players
-        players.clear();
+        // Add player
         players.add(new Character(new Coordinate(maze.getStart().getX(), maze.getStart().getY()), pref.getText("playerName")));
         
         float h = (float)maze.getHeight();
@@ -54,8 +52,7 @@ public class MazeWorld {
         float r = (float)pref.getValue("defaultCoinRatio");
         int numberOfCoins = (int)(h*w*(r/100));
         generateCoins(numberOfCoins);
-        
-        multiplayer = false;
+
         winStatus = false;
         winPlayer = -1;
         lockPlayerControl = false;
@@ -98,21 +95,20 @@ public class MazeWorld {
         return maze;
     }
     
-    /**
-     * Returns if it is a multiplayer maze
-     * @return if it is a multiplayer maze
-     */
-    public boolean getIsMultiplayer() {
-    	return this.multiplayer;
+    public int getNumberOfPlayers() {
+    	return this.players.size();
     }
     
     /**
      * Sets the maze to multiplayer and adds an extra player
      * @param multiplayer the boolean to tell if it is a multiplayer maze
      */
-    public void setMuptiplayer(boolean multiplayer) {
-    	this.multiplayer = multiplayer;
-    	players.add(new Character(new Coordinate(maze.getStart().getX(), maze.getStart().getY()), pref.getText("playerName")));
+    public void setMuptiplayer(int numPlayers) {
+    	int i;
+    	
+    	for(i = 1; i < numPlayers; i++) {
+    		players.add(new Character(new Coordinate(maze.getStart().getX(), maze.getStart().getY()), pref.getText("playerName")));
+    	}
     }
     
     /**

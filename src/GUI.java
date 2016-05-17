@@ -40,9 +40,12 @@ public class GUI extends JFrame implements DisplayInterface {
     
     JPanel windowPanel;
     JPanel titlePanel;
-    JPanel gameMainPanel;
+    JPanel gameMainPanelA;
+    JPanel gameMainPanelB;
     JPanel gamePanelA;
     JPanel gamePanelB;
+    JPanel gamePanelC;
+    JPanel gamePanelD;
     JPanel gameMenuPanel;
     
     public GUI (Preferences pref, MazeWorld world, Queue<Command> commands) {
@@ -223,16 +226,22 @@ public class GUI extends JFrame implements DisplayInterface {
         // This recreates the panels EVERYTIME the game is drawn.
         // Need to update this to something that is halfway efficient
         titlePanel = new JPanel();
-        gameMainPanel = new JPanel();
+        gameMainPanelA = new JPanel();
+        gameMainPanelB = new JPanel();
         gamePanelA = new JPanel();
         gamePanelB = new JPanel();
+        gamePanelC = new JPanel();
+        gamePanelD = new JPanel();
         gameMenuPanel = new JPanel();
         
         // Sets the layout for each component
         titlePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
-        gameMainPanel.setLayout(new BoxLayout(gameMainPanel, BoxLayout.X_AXIS));
+        gameMainPanelA.setLayout(new BoxLayout(gameMainPanelA, BoxLayout.X_AXIS));
+        gameMainPanelB.setLayout(new BoxLayout(gameMainPanelB, BoxLayout.X_AXIS));
         gamePanelA.setLayout(new GridBagLayout());
         gamePanelB.setLayout(new GridBagLayout());
+        gamePanelC.setLayout(new GridBagLayout());
+        gamePanelD.setLayout(new GridBagLayout());
         gameMenuPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
         
         // Creates the GameMap for the world to be draw onto
@@ -240,16 +249,31 @@ public class GUI extends JFrame implements DisplayInterface {
         
         // Attaches the innerGamePanel onto the gamePanel
         gamePanelA.add(innerGamePanelA);
-        gameMainPanel.add(gamePanelA);  
+        gameMainPanelA.add(gamePanelA);  
               
-        if (world.getIsMultiplayer()) {
-        	gameMainPanel.add(gamePanelB);
+        if (world.getNumberOfPlayers() >= 2) {
         	GameMap innerGamePanelB = new GameMap(world, pref, 1);
         	gamePanelB.add(innerGamePanelB);
+        	gameMainPanelA.add(gamePanelB);
+        	
+        	if (world.getNumberOfPlayers() >= 3) {
+            	GameMap innerGamePanelC = new GameMap(world, pref, 2);
+            	gamePanelC.add(innerGamePanelC);
+            	gameMainPanelB.add(gamePanelC);
+            	
+            	if (world.getNumberOfPlayers() == 4) {
+                	GameMap innerGamePanelD = new GameMap(world, pref, 3);
+                	gamePanelD.add(innerGamePanelD);
+                	gameMainPanelB.add(gamePanelD);
+                }
+            }
         }
         
         windowPanel.add(titlePanel);
-        windowPanel.add(gameMainPanel);
+        windowPanel.add(gameMainPanelA);
+        if(world.getNumberOfPlayers() > 2) {
+        	windowPanel.add(gameMainPanelB);
+        }
         windowPanel.add(gameMenuPanel);
         
         drawTitlePanel();
@@ -288,7 +312,7 @@ public class GUI extends JFrame implements DisplayInterface {
         heightSize.getDocument().addDocumentListener(new ValueUpdate("defaultMapHeight"));
         
         final JPopupMenu newMazePopup = new JPopupMenu();
-        newMazePopup.add(new JMenuItem(new AbstractAction("Single Player") {
+        newMazePopup.add(new JMenuItem(new AbstractAction("One Player") {
         	public void actionPerformed(ActionEvent event) {
         	    newGame(1);
             }
@@ -296,6 +320,16 @@ public class GUI extends JFrame implements DisplayInterface {
         newMazePopup.add(new JMenuItem(new AbstractAction("Two Players") {
         	public void actionPerformed(ActionEvent event) {
         	    newGame(2);
+            }
+        }));
+        newMazePopup.add(new JMenuItem(new AbstractAction("Three Players") {
+        	public void actionPerformed(ActionEvent event) {
+        	    newGame(3);
+            }
+        }));
+        newMazePopup.add(new JMenuItem(new AbstractAction("Four Players") {
+        	public void actionPerformed(ActionEvent event) {
+        	    newGame(4);
             }
         }));
         
@@ -340,7 +374,7 @@ public class GUI extends JFrame implements DisplayInterface {
         gameMenuPanel.add(widthSize);
         gameMenuPanel.add(new JLabel("Height"));
         gameMenuPanel.add(heightSize);
-        if(!world.getIsMultiplayer()) {
+        if(world.getNumberOfPlayers() == 1) {
         	gameMenuPanel.add(solveButton);
             gameMenuPanel.add(auto);
         }
