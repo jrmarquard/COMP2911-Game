@@ -2,6 +2,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
@@ -39,11 +40,6 @@ public class GUI extends JFrame implements DisplayInterface {
     AppState appState;
     
     JPanel windowPanel;
-    JPanel titlePanel;
-    JPanel gameMainPanel;
-    JPanel gamePanelA;
-    JPanel gamePanelB;
-    JPanel gameMenuPanel;
     
     public GUI (Preferences pref, MazeWorld world, Queue<Command> commands) {
         this.pref = pref;
@@ -114,15 +110,23 @@ public class GUI extends JFrame implements DisplayInterface {
 
         // Draws whatever mode the GUI is currently in
         switch(appState) {
-            case MENU:      drawMenu();         break;
-            case GAME:      drawGame();         break;
-            case SETTINGS:  drawSettings();     break;
-            case ABOUT:     drawAbout();        break;
-            case EXIT:      ;                   break;
+            case MENU:      drawMenu();         
+                            break;
+            case GAME:      drawGame();         
+                            break;
+            case SETTINGS:  drawSettings();     
+                            break;
+            case ABOUT:     drawAbout();        
+                            break;
+            case EXIT:      addCommand(new Command(Com.EXIT));
+                            break;
         }
         
         // Refocuses the window so keystrokes are registered
         setFocusable(true);
+        
+        // Will retain window size when switching between menus
+        windowPanel.setPreferredSize(windowPanel.getSize());
         
         // Packs
         pack();
@@ -137,7 +141,7 @@ public class GUI extends JFrame implements DisplayInterface {
         windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
 
         // Button will start a new game
-        JButton startGameButton = new JButton("Start Game");
+        JButton startGameButton = new JButton("Play");
         startGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -168,7 +172,7 @@ public class GUI extends JFrame implements DisplayInterface {
         exitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                addCommand(new Command(Com.EXIT));
+                setAppState(AppState.EXIT);
             }
         });
 
@@ -183,18 +187,44 @@ public class GUI extends JFrame implements DisplayInterface {
      */
     private void drawAbout() {
         windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
-        JTextField about = new JTextField();
-        about.setText("Game written by: John, Joshua, Patrick, Tim, Tyler");
+        
+        // Navigation panel across the top of the screen.
+        JPanel navPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        navPanel.setBackground(windowPanel.getBackground().darker());
+        windowPanel.add(navPanel);
+        
+        JButton resetButton = new JButton("Reset to defaults");
+        resetButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                pref.loadPreferences();
+                setAppState(AppState.SETTINGS);
+            }
+        });
         JButton backButton = new JButton("Back");
-        backButton.setMnemonic(KeyEvent.VK_W);
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setAppState(AppState.MENU);
             }
         });
-        windowPanel.add(about);
-        windowPanel.add(backButton);
+        navPanel.add(resetButton);
+        navPanel.add(backButton);
+        
+        JPanel aboutTextPanel = new JPanel() {
+                @Override
+                public Dimension getPreferredSize() {
+                    Dimension d = this.getParent().getSize();
+                    return new Dimension(d.height,d.height);
+                }
+            };
+        aboutTextPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        JTextField aboutText = new JTextField();
+        aboutText.setMargin(new Insets(10,10,10,10));
+        aboutText.setText("Game written by: John, Joshua, Patrick, Tim, Tyler");
+        aboutTextPanel.add(aboutText);
+        
+        windowPanel.add(aboutTextPanel);
     }
     
     private void drawSettings() {
@@ -205,16 +235,16 @@ public class GUI extends JFrame implements DisplayInterface {
         navPanel.setBackground(windowPanel.getBackground().darker());
         windowPanel.add(navPanel);
         
-        JButton backButton = new JButton("Reset to defaults");
-        backButton.addActionListener(new ActionListener() {
+        JButton resetButton = new JButton("Reset to defaults");
+        resetButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 pref.loadPreferences();
                 setAppState(AppState.SETTINGS);
             }
         });
-        JButton resetButton = new JButton("Back");
-        resetButton.addActionListener(new ActionListener() {
+        JButton backButton = new JButton("Back");
+        backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setAppState(AppState.MENU);
@@ -276,14 +306,14 @@ public class GUI extends JFrame implements DisplayInterface {
     private void drawGame() {
         System.out.println("Drawing game");
         windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
-
+        
         // This recreates the panels EVERYTIME the game is drawn.
         // Need to update this to something that is halfway efficient
-        titlePanel = new JPanel();
-        gameMainPanel = new JPanel();
-        gamePanelA = new JPanel();
-        gamePanelB = new JPanel();
-        gameMenuPanel = new JPanel();
+        JPanel titlePanel = new JPanel();
+        JPanel gameMainPanel = new JPanel();
+        JPanel gamePanelA = new JPanel();
+        JPanel gamePanelB = new JPanel();
+        JPanel gameMenuPanel = new JPanel();
         
         // Sets the layout for each component
         titlePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
@@ -291,6 +321,15 @@ public class GUI extends JFrame implements DisplayInterface {
         gamePanelA.setLayout(new GridBagLayout());
         gamePanelB.setLayout(new GridBagLayout());
         gameMenuPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        
+        if (world.getWinStatus()) {
+            titlePanel.setBackground(pref.getColour("titleWinColour"));
+        } else {
+            titlePanel.setBackground(pref.getColour("titleDefaultColour"));
+        }
+        JLabel title = new JLabel();
+        title.setText("Coins: "+world.getPlayerCoins(0));
+        titlePanel.add(title);
         
         // Creates the GameMap for the world to be draw onto
         GameMap innerGamePanelA = new GameMap(world, pref, 0);
@@ -309,28 +348,12 @@ public class GUI extends JFrame implements DisplayInterface {
         windowPanel.add(gameMainPanel);
         windowPanel.add(gameMenuPanel);
         
-        drawTitlePanel();
-        drawGameMenuPanel();
+        drawGameMenuPanel(gameMenuPanel);
         
         windowPanel.setPreferredSize(windowPanel.getSize());
     }
-
-    private void drawTitlePanel() {
-        titlePanel.removeAll();
-        
-        if (world.getWinStatus()) {
-            titlePanel.setBackground(pref.getColour("titleWinColour"));
-        } else {
-            titlePanel.setBackground(pref.getColour("titleDefaultColour"));
-        }
-        
-        JLabel title = new JLabel();
-        title.setText("Coins: "+world.getPlayerCoins(0));
-
-        titlePanel.add(title);
-    }
     
-    private void drawGameMenuPanel() {
+    private void drawGameMenuPanel(JPanel gameMenuPanel) {
         gameMenuPanel.removeAll();
         gameMenuPanel.setBackground(pref.getColour("menuColour"));
 
@@ -343,6 +366,18 @@ public class GUI extends JFrame implements DisplayInterface {
         heightSize.setValue(Integer.toString(pref.getValue("defaultMapHeight")));
         heightSize.setColumns(2);
         heightSize.getDocument().addDocumentListener(new PrefUpdate("value", "defaultMapHeight"));
+        
+        
+        JCheckBox auto = new JCheckBox("Auto", pref.getBool("autoComplete"));
+        auto.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                pref.toggleBool("autoComplete");
+                if (pref.getBool("autoComplete")) {
+                    addCommand(new Command(Com.SOLVE));
+                }
+            }
+        });
         
         final JPopupMenu newMazePopup = new JPopupMenu();
         newMazePopup.add(new JMenuItem(new AbstractAction("Single Player") {
@@ -363,25 +398,6 @@ public class GUI extends JFrame implements DisplayInterface {
             }
         });
         
-        JCheckBox auto = new JCheckBox("Auto", pref.getBool("autoComplete"));
-        auto.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                pref.toggleBool("autoComplete");
-                if (pref.getBool("autoComplete")) {
-                    addCommand(new Command(Com.SOLVE));
-                }
-            }
-        });
-        
-        JButton solveButton = new JButton("Solve");
-        solveButton.setMnemonic(KeyEvent.VK_S);
-        solveButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                addCommand(new Command(Com.SOLVE));
-            }
-        });
         JButton closeButton = new JButton("Exit to menu");
         closeButton.setMnemonic(KeyEvent.VK_W);
         closeButton.addActionListener(new ActionListener() {
@@ -395,15 +411,10 @@ public class GUI extends JFrame implements DisplayInterface {
         gameMenuPanel.add(new JLabel("Height"));
         gameMenuPanel.add(heightSize);
         if(!world.getIsMultiplayer()) {
-        	gameMenuPanel.add(solveButton);
             gameMenuPanel.add(auto);
         }
         gameMenuPanel.add(newMazeButton);
         gameMenuPanel.add(closeButton);
-    }
-    
-    public void close() {
-        this.dispose();
     }
     
     /**
@@ -425,7 +436,9 @@ public class GUI extends JFrame implements DisplayInterface {
         appState = s;
         addCommand(new Command(Com.DRAW));
     }
-    
+    public void close() {
+        this.dispose();
+    }
     /*
     private class MenuItemAction extends AbstractAction {
         public MenuItemAction(String text, Integer mnemonic) {
