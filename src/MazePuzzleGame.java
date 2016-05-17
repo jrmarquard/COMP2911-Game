@@ -67,6 +67,14 @@ public class MazePuzzleGame {
 	            case A_LEFT:        game.moveCharacterBLeft();         break;
 	            case D_RIGHT:       game.moveCharacterBRight();        break;
 	            case W_UP:          game.moveCharacterBUp();           break;
+	            case G_DOWN:        game.moveCharacterCDown();         break;
+	            case F_LEFT:        game.moveCharacterCLeft();         break;
+	            case H_RIGHT:       game.moveCharacterCRight();        break;
+	            case T_UP:          game.moveCharacterCUp();           break;
+	            case K_DOWN:        game.moveCharacterDDown();         break;
+	            case J_LEFT:        game.moveCharacterDLeft();         break;
+	            case L_RIGHT:       game.moveCharacterDRight();        break;
+	            case I_UP:          game.moveCharacterDUp();           break;
 	            case SOLVE:         game.solveCharacter();             break;
 	            case IDLE:                                             break;
 	            default: 
@@ -100,8 +108,8 @@ public class MazePuzzleGame {
         int height = c.getHeight();
         world.generateWorld(width, height);
         
-        if (c.getPlayers()==2) {
-            world.setMuptiplayer(true);
+        if (c.getPlayers() > 1) {
+            world.setMuptiplayer(c.getPlayers());
         }
         addCommand(new Command(Com.DRAW));
     }
@@ -118,11 +126,7 @@ public class MazePuzzleGame {
      * Moves player up a coordinate
      */
     private void moveCharacterAUp() {
-    	if(!world.getIsMultiplayer()) {
-    		world.moveCharacterUp(0);
-    	} else {
-    		world.moveCharacterUp(1);
-    	}
+    	world.moveCharacterUp(world.getNumberOfPlayers() - 1);
         addCommand(new Command(Com.DRAW));
 	}
     
@@ -130,11 +134,7 @@ public class MazePuzzleGame {
      * Moves player left a coordinate
      */
     private void moveCharacterALeft() {
-    	if(!world.getIsMultiplayer()) {
-    		world.moveCharacterLeft(0);
-    	} else {
-    		world.moveCharacterLeft(1);
-    	}
+    	world.moveCharacterLeft(world.getNumberOfPlayers() - 1);
         addCommand(new Command(Com.DRAW));
     }
     
@@ -142,11 +142,7 @@ public class MazePuzzleGame {
      * Moves player right a coordinate
      */
     private void moveCharacterARight() {
-    	if(!world.getIsMultiplayer()) {
-    		world.moveCharacterRight(0);
-    	} else {
-    		world.moveCharacterRight(1);
-    	}
+    	world.moveCharacterRight(world.getNumberOfPlayers() - 1);
         addCommand(new Command(Com.DRAW));
     }
     
@@ -154,11 +150,7 @@ public class MazePuzzleGame {
      * Moves player down a coordinate
      */
     private void moveCharacterADown() {
-    	if(!world.getIsMultiplayer()) {
-    		world.moveCharacterDown(0);
-    	} else {
-    		world.moveCharacterDown(1);
-    	}
+    	world.moveCharacterDown(world.getNumberOfPlayers() - 1);
         addCommand(new Command(Com.DRAW));
     }
     
@@ -166,7 +158,7 @@ public class MazePuzzleGame {
      * Moves player up a coordinate
      */
     private void moveCharacterBUp() {
-    	if(world.getIsMultiplayer()) {
+    	if(world.getNumberOfPlayers() > 1) {
     		world.moveCharacterUp(0);
             addCommand(new Command(Com.DRAW));
     	}
@@ -176,7 +168,7 @@ public class MazePuzzleGame {
      * Moves player left a coordinate
      */
     private void moveCharacterBLeft() {
-    	if(world.getIsMultiplayer()) {
+    	if(world.getNumberOfPlayers() > 1) {
 	        world.moveCharacterLeft(0);
 	        addCommand(new Command(Com.DRAW));
     	}
@@ -186,7 +178,7 @@ public class MazePuzzleGame {
      * Moves player right a coordinate
      */
     private void moveCharacterBRight() {
-    	if(world.getIsMultiplayer()) {
+    	if(world.getNumberOfPlayers() > 1) {
 	        world.moveCharacterRight(0);
 	        addCommand(new Command(Com.DRAW));
     	}
@@ -196,8 +188,88 @@ public class MazePuzzleGame {
      * Moves player down a coordinate
      */
     private void moveCharacterBDown() {
-    	if(world.getIsMultiplayer()) {
+    	if(world.getNumberOfPlayers() > 1) {
 	        world.moveCharacterDown(0);
+	        addCommand(new Command(Com.DRAW));
+    	}
+    }
+    
+    /**
+     * Moves player up a coordinate
+     */
+    private void moveCharacterCUp() {
+    	if(world.getNumberOfPlayers() > 2) {
+    		world.moveCharacterUp(1);
+            addCommand(new Command(Com.DRAW));
+    	}
+	}
+    
+    /**
+     * Moves player left a coordinate
+     */
+    private void moveCharacterCLeft() {
+    	if(world.getNumberOfPlayers() > 2) {
+	        world.moveCharacterLeft(1);
+	        addCommand(new Command(Com.DRAW));
+    	}
+    }
+    
+    /**
+     * Moves player right a coordinate
+     */
+    private void moveCharacterCRight() {
+    	if(world.getNumberOfPlayers() > 2) {
+	        world.moveCharacterRight(1);
+	        addCommand(new Command(Com.DRAW));
+    	}
+    }
+    
+    /**
+     * Moves player down a coordinate
+     */
+    private void moveCharacterCDown() {
+    	if(world.getNumberOfPlayers() > 2) {
+	        world.moveCharacterDown(1);
+	        addCommand(new Command(Com.DRAW));
+    	}
+    }
+    
+    /**
+     * Moves player up a coordinate
+     */
+    private void moveCharacterDUp() {
+    	if(world.getNumberOfPlayers() > 3) {
+    		world.moveCharacterUp(2);
+            addCommand(new Command(Com.DRAW));
+    	}
+	}
+    
+    /**
+     * Moves player left a coordinate
+     */
+    private void moveCharacterDLeft() {
+    	if(world.getNumberOfPlayers() > 3) {
+	        world.moveCharacterLeft(2);
+	        addCommand(new Command(Com.DRAW));
+    	}
+    }
+    
+    /**
+     * Moves player right a coordinate
+     */
+    private void moveCharacterDRight() {
+    	if(world.getNumberOfPlayers() > 3) {
+	        world.moveCharacterRight(2);
+	        addCommand(new Command(Com.DRAW));
+    	}
+    }
+    
+    /**
+     * Moves player down a coordinate
+     */
+    private void moveCharacterDDown() {
+    	if(world.getNumberOfPlayers() > 3) {
+	        world.moveCharacterDown(2);
 	        addCommand(new Command(Com.DRAW));
     	}
     }

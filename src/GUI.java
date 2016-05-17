@@ -39,10 +39,17 @@ public class GUI extends JFrame implements DisplayInterface {
     AppState appState;
     
     JPanel windowPanel;
-    JPanel titlePanel;
-    JPanel gameMainPanel;
+    JPanel titleMainPanel;
+    JPanel titlePanelA;
+    JPanel titlePanelB;
+    JPanel titlePanelC;
+    JPanel titlePanelD;
+    JPanel gameMainPanelA;
+    JPanel gameMainPanelB;
     JPanel gamePanelA;
     JPanel gamePanelB;
+    JPanel gamePanelC;
+    JPanel gamePanelD;
     JPanel gameMenuPanel;
     
     public GUI (Preferences pref, MazeWorld world, Queue<Command> commands) {
@@ -113,8 +120,16 @@ public class GUI extends JFrame implements DisplayInterface {
 	                case KeyEvent.VK_A:     addCommand(new Command(Com.A_LEFT));        break;
 	                case KeyEvent.VK_S:     addCommand(new Command(Com.S_DOWN));        break;
 	                case KeyEvent.VK_D:     addCommand(new Command(Com.D_RIGHT));       break;
+	                case KeyEvent.VK_T:     addCommand(new Command(Com.T_UP));          break;
+	                case KeyEvent.VK_F:     addCommand(new Command(Com.F_LEFT));        break;
+	                case KeyEvent.VK_G:     addCommand(new Command(Com.G_DOWN));        break;
+	                case KeyEvent.VK_H:     addCommand(new Command(Com.H_RIGHT));       break;
+	                case KeyEvent.VK_I:     addCommand(new Command(Com.I_UP));          break;
+	                case KeyEvent.VK_J:     addCommand(new Command(Com.J_LEFT));        break;
+	                case KeyEvent.VK_K:     addCommand(new Command(Com.K_DOWN));        break;
+	                case KeyEvent.VK_L:     addCommand(new Command(Com.L_RIGHT));       break;
                     case KeyEvent.VK_C:     addCommand(new Command(Com.SOLVE));         break;
-                    case KeyEvent.VK_N:     newGame(1);                                  break;
+                    case KeyEvent.VK_N:     newGame(1);                                 break;
                 }
             }
         });
@@ -222,34 +237,68 @@ public class GUI extends JFrame implements DisplayInterface {
 
         // This recreates the panels EVERYTIME the game is drawn.
         // Need to update this to something that is halfway efficient
-        titlePanel = new JPanel();
-        gameMainPanel = new JPanel();
+        titleMainPanel = new JPanel();
+        titlePanelA = new JPanel();
+        titlePanelB = new JPanel();
+        titlePanelC = new JPanel();
+        titlePanelD = new JPanel();
+        gameMainPanelA = new JPanel();
+        gameMainPanelB = new JPanel();
         gamePanelA = new JPanel();
         gamePanelB = new JPanel();
+        gamePanelC = new JPanel();
+        gamePanelD = new JPanel();
         gameMenuPanel = new JPanel();
         
         // Sets the layout for each component
-        titlePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
-        gameMainPanel.setLayout(new BoxLayout(gameMainPanel, BoxLayout.X_AXIS));
+        titleMainPanel.setLayout(new BoxLayout(titleMainPanel, BoxLayout.X_AXIS));
+        titlePanelA.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
+        titlePanelB.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
+        titlePanelC.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
+        titlePanelD.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
+        gameMainPanelA.setLayout(new BoxLayout(gameMainPanelA, BoxLayout.X_AXIS));
+        gameMainPanelB.setLayout(new BoxLayout(gameMainPanelB, BoxLayout.X_AXIS));
         gamePanelA.setLayout(new GridBagLayout());
         gamePanelB.setLayout(new GridBagLayout());
+        gamePanelC.setLayout(new GridBagLayout());
+        gamePanelD.setLayout(new GridBagLayout());
         gameMenuPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        
+        windowPanel.add(titleMainPanel);
+        titleMainPanel.add(titlePanelA);
         
         // Creates the GameMap for the world to be draw onto
         GameMap innerGamePanelA = new GameMap(world, pref, 0);
         
         // Attaches the innerGamePanel onto the gamePanel
         gamePanelA.add(innerGamePanelA);
-        gameMainPanel.add(gamePanelA);  
+        gameMainPanelA.add(gamePanelA);  
               
-        if (world.getIsMultiplayer()) {
-        	gameMainPanel.add(gamePanelB);
+        if (world.getNumberOfPlayers() > 1) {
+        	titleMainPanel.add(titlePanelB);
         	GameMap innerGamePanelB = new GameMap(world, pref, 1);
         	gamePanelB.add(innerGamePanelB);
+        	gameMainPanelA.add(gamePanelB);
+        	
+        	if (world.getNumberOfPlayers() > 2) {
+        		titleMainPanel.add(titlePanelC);
+            	GameMap innerGamePanelC = new GameMap(world, pref, 2);
+            	gamePanelC.add(innerGamePanelC);
+            	gameMainPanelB.add(gamePanelC);
+            	
+            	if (world.getNumberOfPlayers() == 4) {
+            		titleMainPanel.add(titlePanelD);
+                	GameMap innerGamePanelD = new GameMap(world, pref, 3);
+                	gamePanelD.add(innerGamePanelD);
+                	gameMainPanelB.add(gamePanelD);
+                }
+            }
         }
         
-        windowPanel.add(titlePanel);
-        windowPanel.add(gameMainPanel);
+        windowPanel.add(gameMainPanelA);
+        if(world.getNumberOfPlayers() > 2) {
+        	windowPanel.add(gameMainPanelB);
+        }
         windowPanel.add(gameMenuPanel);
         
         drawTitlePanel();
@@ -259,18 +308,46 @@ public class GUI extends JFrame implements DisplayInterface {
     }
 
     private void drawTitlePanel() {
-        titlePanel.removeAll();
+        //titleMainPanel.removeAll();
         
+    	titlePanelA.setBackground(pref.getColour("titleDefaultColour"));
+        titlePanelB.setBackground(pref.getColour("titleDefaultColour"));
+        titlePanelC.setBackground(pref.getColour("titleDefaultColour"));
+        titlePanelD.setBackground(pref.getColour("titleDefaultColour"));
+    	
         if (world.getWinStatus()) {
-            titlePanel.setBackground(pref.getColour("titleWinColour"));
-        } else {
-            titlePanel.setBackground(pref.getColour("titleDefaultColour"));
+        	if(world.getWinPlayer() == 0) {
+        		titlePanelA.setBackground(pref.getColour("titleWinColour"));
+        	} else if(world.getWinPlayer() == 1) {
+        		titlePanelB.setBackground(pref.getColour("titleWinColour"));
+        	} else if(world.getWinPlayer() == 2) {
+        		titlePanelC.setBackground(pref.getColour("titleWinColour"));
+        	} else if(world.getWinPlayer() == 3) {
+        		titlePanelD.setBackground(pref.getColour("titleWinColour"));
+        	}
         }
         
-        JLabel title = new JLabel();
-        title.setText("Coins: "+world.getPlayerCoins(0));
-
-        titlePanel.add(title);
+        JLabel titleA = new JLabel();
+        titleA.setText("Coins: "+world.getPlayerCoins(0));
+        titlePanelA.add(titleA);
+        
+        if(world.getNumberOfPlayers() > 1) {
+        	JLabel titleB = new JLabel();
+            titleB.setText("Coins: "+world.getPlayerCoins(1));
+        	titlePanelB.add(titleB);
+        	
+        	if(world.getNumberOfPlayers() > 2) {
+        		JLabel titleC = new JLabel();
+                titleC.setText("Coins: "+world.getPlayerCoins(2));
+            	titlePanelC.add(titleC);
+            	
+            	if(world.getNumberOfPlayers() == 4) {
+            		JLabel titleD = new JLabel();
+                    titleD.setText("Coins: "+world.getPlayerCoins(3));
+                	titlePanelD.add(titleD);
+            	}
+        	}
+        }
     }
     
     private void drawGameMenuPanel() {
@@ -288,7 +365,7 @@ public class GUI extends JFrame implements DisplayInterface {
         heightSize.getDocument().addDocumentListener(new ValueUpdate("defaultMapHeight"));
         
         final JPopupMenu newMazePopup = new JPopupMenu();
-        newMazePopup.add(new JMenuItem(new AbstractAction("Single Player") {
+        newMazePopup.add(new JMenuItem(new AbstractAction("One Player") {
         	public void actionPerformed(ActionEvent event) {
         	    newGame(1);
             }
@@ -296,6 +373,16 @@ public class GUI extends JFrame implements DisplayInterface {
         newMazePopup.add(new JMenuItem(new AbstractAction("Two Players") {
         	public void actionPerformed(ActionEvent event) {
         	    newGame(2);
+            }
+        }));
+        newMazePopup.add(new JMenuItem(new AbstractAction("Three Players") {
+        	public void actionPerformed(ActionEvent event) {
+        	    newGame(3);
+            }
+        }));
+        newMazePopup.add(new JMenuItem(new AbstractAction("Four Players") {
+        	public void actionPerformed(ActionEvent event) {
+        	    newGame(4);
             }
         }));
         
@@ -340,7 +427,7 @@ public class GUI extends JFrame implements DisplayInterface {
         gameMenuPanel.add(widthSize);
         gameMenuPanel.add(new JLabel("Height"));
         gameMenuPanel.add(heightSize);
-        if(!world.getIsMultiplayer()) {
+        if(world.getNumberOfPlayers() == 1) {
         	gameMenuPanel.add(solveButton);
             gameMenuPanel.add(auto);
         }
