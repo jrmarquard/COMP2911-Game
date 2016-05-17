@@ -61,7 +61,7 @@ public class GUI extends JFrame implements DisplayInterface {
          */
         
         // Defaults to display the main menu first
-        this.appState = AppState.MENU; 
+        setAppState(AppState.MENU); 
         
         // windowPanel is the root panel within this object
         windowPanel = new JPanel();
@@ -301,7 +301,6 @@ public class GUI extends JFrame implements DisplayInterface {
     }
     
     private void drawGame() {
-        System.out.println("Drawing game");
         windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
         
         // This recreates the panels EVERYTIME the game is drawn.
