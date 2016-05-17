@@ -1,4 +1,3 @@
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -9,6 +8,7 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 
 
+@SuppressWarnings("serial")
 public class GameMap extends JPanel {
 
     private Preferences pref;
@@ -32,7 +32,15 @@ public class GameMap extends JPanel {
     /**
      * Draws the map onto graphics g.
      * 
-     * @param g
+     * The map is represented by a grid where each wall and each floor tile
+     * have a cell. The wall rows/columns are resized so that they are smaller
+     * than the floor tiles and look like an actual wall.
+     * 
+     * Each wall/tile is then checked and drawn onto the Graphics g, essentially
+     * laying out the maze. This is followed by the game entities and features
+     * such as the player, coins, start, finish, ... etc which are drawn on top.
+     * 
+     * @param g The graphics object to draw onto.
      */
     private void doDrawing(Graphics g) {
         g2d = (Graphics2D) g;
