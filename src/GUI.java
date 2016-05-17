@@ -214,7 +214,6 @@ public class GUI extends JFrame implements DisplayInterface {
             }
         });
         windowPanel.add(backButton);
-        
     }
     
     private void drawGame() {
@@ -281,62 +280,13 @@ public class GUI extends JFrame implements DisplayInterface {
         JFormattedTextField widthSize = new JFormattedTextField();
         widthSize.setValue(Integer.toString(pref.getValue("defaultMapWidth")));
         widthSize.setColumns(2);
-        widthSize.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                updateWidth(e);
-            }
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                updateWidth(e);    
-            }
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                updateWidth(e);
-            }
-            private void updateWidth(DocumentEvent e) {
-                int width;
-                try {
-                    int textLength = e.getDocument().getLength();
-                    if (textLength >= 2) textLength = 2;
-                    width = Integer.parseInt(e.getDocument().getText(0,textLength));
-                    pref.setPreference("value.defaultMapWidth="+width);
-                } catch (NumberFormatException | BadLocationException e1) {
-                    // Do nothing
-                }
-            }
-        });
-        
+        widthSize.getDocument().addDocumentListener(new ValueUpdate("defaultMapWidth"));
         
         JFormattedTextField heightSize = new JFormattedTextField();
         heightSize.setValue(Integer.toString(pref.getValue("defaultMapHeight")));
         heightSize.setColumns(2);
-        heightSize.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                updateHeight(e);
-            }
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                updateHeight(e);    
-            }
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                updateHeight(e);
-            }
-            private void updateHeight(DocumentEvent e) {
-                int height;
-                try {
-                    int textLength = e.getDocument().getLength();
-                    if (textLength >= 2) textLength = 2;
-                    height = Integer.parseInt(e.getDocument().getText(0,textLength));
-                    pref.setPreference("value.defaultMapHeight="+height);
-                } catch (NumberFormatException | BadLocationException e1) {
-                    // Do nothing
-                }
-            }
-        });
-
+        heightSize.getDocument().addDocumentListener(new ValueUpdate("defaultMapHeight"));
+        
         final JPopupMenu newMazePopup = new JPopupMenu();
         newMazePopup.add(new JMenuItem(new AbstractAction("Single Player") {
         	public void actionPerformed(ActionEvent event) {
@@ -436,4 +386,40 @@ public class GUI extends JFrame implements DisplayInterface {
         }
     }
     */
+    
+    private class ValueUpdate implements DocumentListener {
+            
+            String valueName;
+            
+            public ValueUpdate(String s) {
+                super();
+                this.valueName = s;
+            }
+    
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                update(e);
+            }
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                update(e);    
+            }
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                update(e);
+            }
+            private void update(DocumentEvent e) {
+                int value;
+                try {
+                    int textLength = e.getDocument().getLength();
+                    if (textLength >= 2) textLength = 2;
+                    value = Integer.parseInt(e.getDocument().getText(0,textLength));
+                    pref.setPreference("value."+valueName+"="+value);
+                } catch (NumberFormatException | BadLocationException e1) {
+                    // Do nothing
+                }
+            }
+    
+    }
+    
 }
