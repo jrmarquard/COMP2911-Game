@@ -4,6 +4,7 @@ import java.io.FileReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 
 public class Preferences {
     private Map<String, Color> GUIcolours;
@@ -69,4 +70,12 @@ public class Preferences {
             if (sc != null) sc.close();
         }
     }
+    
+    public Set<String> getColourKeys() {
+        return GUIcolours.keySet();
+    }
+    
+    
+    
+    
 }

@@ -58,29 +58,6 @@ public class GUI extends JFrame implements DisplayInterface {
         });
     }
     
-    public void update() {
-        System.out.println("Updating display");
-
-        // Reset game panels, remove them (hopefully clears memory)switch (state)
-        windowPanel.removeAll();
-        windowPanel.repaint();
-
-        // Draws whatever mode the GUI is currently in
-        switch(appState) {
-            case MENU:      drawMenu();         break;
-            case GAME:      drawGame();         break;
-            case SETTINGS:  drawSettings();     break;
-            case ABOUT:     drawAbout();        break;
-            case EXIT:      ;                   break;
-        }
-        
-        // Refocuses the window so keystrokes are registered
-        setFocusable(true);
-        
-        // Packs
-        pack();
-    }
-    
     private void initUI() {
         /* Any layout information that should never be changed
          * should be contained in here. Anything that can be redrawn
@@ -126,6 +103,30 @@ public class GUI extends JFrame implements DisplayInterface {
             }
         });
     }
+    
+    public void update() {
+        System.out.println("Updating display");
+
+        // Reset game panels, remove them (hopefully clears memory)switch (state)
+        windowPanel.removeAll();
+        windowPanel.repaint();
+
+        // Draws whatever mode the GUI is currently in
+        switch(appState) {
+            case MENU:      drawMenu();         break;
+            case GAME:      drawGame();         break;
+            case SETTINGS:  drawSettings();     break;
+            case ABOUT:     drawAbout();        break;
+            case EXIT:      ;                   break;
+        }
+        
+        // Refocuses the window so keystrokes are registered
+        setFocusable(true);
+        
+        // Packs
+        pack();
+    }
+    
     
     /**
      * drawMenu 
@@ -202,7 +203,24 @@ public class GUI extends JFrame implements DisplayInterface {
     private void drawSettings() {
         windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
         
+        for (String s : pref.getColourKeys()) {
+        Color c = pref.getColour(s);
+        int red = c.getRed();
+        int blue = c.getBlue();
+        int green = c.getGreen();
+        String value = "" + Integer.toHexString(red) + Integer.toHexString(green) + Integer.toHexString(blue);
+        JPanel settingRow = new JPanel();
+        JTextField settingName = new JTextField();
+        JTextField settingValue = new JTextField();
+        settingRow.add(settingName);
+        settingRow.add(settingValue);
+        settingName.setText(s);
+        settingValue.setText(value);
+        settingValue.setColumns(value.length());
+        settingName.setEditable(true);
         
+        windowPanel.add(settingRow);
+        }
         
         JButton backButton = new JButton("Back");
         backButton.setMnemonic(KeyEvent.VK_W);
@@ -310,10 +328,8 @@ public class GUI extends JFrame implements DisplayInterface {
         auto.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                
                 pref.toggleBool("autoComplete");
                 if (pref.getBool("autoComplete")) {
-                    // if the preference is now on, solve the maze
                     addCommand(new Command(Com.SOLVE));
                 }
             }
