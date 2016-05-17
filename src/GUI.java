@@ -82,16 +82,17 @@ public class GUI extends JFrame implements DisplayInterface {
         this.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 switch (e.getKeyCode()) {
-	                case KeyEvent.VK_DOWN:  addCommand(new Command(Com.ARROW_DOWN));    break;
-	                case KeyEvent.VK_LEFT:  addCommand(new Command(Com.ARROW_LEFT));    break;
-	                case KeyEvent.VK_RIGHT: addCommand(new Command(Com.ARROW_RIGHT));   break;
-	                case KeyEvent.VK_UP:    addCommand(new Command(Com.ARROW_UP));      break;
-	                case KeyEvent.VK_W:     addCommand(new Command(Com.W_UP));          break;
-	                case KeyEvent.VK_A:     addCommand(new Command(Com.A_LEFT));        break;
-	                case KeyEvent.VK_S:     addCommand(new Command(Com.S_DOWN));        break;
-	                case KeyEvent.VK_D:     addCommand(new Command(Com.D_RIGHT));       break;
-                    case KeyEvent.VK_C:     addCommand(new Command(Com.SOLVE));         break;
-                    case KeyEvent.VK_N:     newGame(1);                                  break;
+	                case KeyEvent.VK_DOWN:      addCommand(new Command(Com.ARROW_DOWN));    break;
+	                case KeyEvent.VK_LEFT:      addCommand(new Command(Com.ARROW_LEFT));    break;
+	                case KeyEvent.VK_RIGHT:     addCommand(new Command(Com.ARROW_RIGHT));   break;
+	                case KeyEvent.VK_UP:        addCommand(new Command(Com.ARROW_UP));      break;
+	                case KeyEvent.VK_W:         addCommand(new Command(Com.W_UP));          break;
+	                case KeyEvent.VK_A:         addCommand(new Command(Com.A_LEFT));        break;
+	                case KeyEvent.VK_S:         addCommand(new Command(Com.S_DOWN));        break;
+	                case KeyEvent.VK_D:         addCommand(new Command(Com.D_RIGHT));       break;
+                    case KeyEvent.VK_C:         addCommand(new Command(Com.SOLVE));         break;
+                    case KeyEvent.VK_ESCAPE:    setAppState(AppState.MENU);                 break; 
+                    case KeyEvent.VK_N:         newGame(1);                                  break;
                 }
             }
         });
@@ -140,8 +141,8 @@ public class GUI extends JFrame implements DisplayInterface {
         startGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                setState(AppState.GAME);
                 newGame(1);
+                setAppState(AppState.GAME);
             }
         });
 
@@ -150,8 +151,7 @@ public class GUI extends JFrame implements DisplayInterface {
         settingsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                setState(AppState.SETTINGS);
-                update();
+                setAppState(AppState.SETTINGS);
             }
         });
         
@@ -160,8 +160,7 @@ public class GUI extends JFrame implements DisplayInterface {
         aboutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                setState(AppState.ABOUT);
-                update();
+                setAppState(AppState.ABOUT);
             }
         });
         // Button will quit the game
@@ -177,7 +176,6 @@ public class GUI extends JFrame implements DisplayInterface {
         windowPanel.add(settingsButton);
         windowPanel.add(aboutButton);
         windowPanel.add(exitButton);
-        
     }
     
     /**
@@ -192,8 +190,7 @@ public class GUI extends JFrame implements DisplayInterface {
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                appState = AppState.MENU;
-                addCommand(new Command(Com.DRAW));
+                setAppState(AppState.MENU);
             }
         });
         windowPanel.add(about);
@@ -203,7 +200,42 @@ public class GUI extends JFrame implements DisplayInterface {
     private void drawSettings() {
         windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
         
-        for (String s : pref.getColourKeys()) {
+        // Navigation panel across the top of the screen.
+        JPanel navPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        navPanel.setBackground(windowPanel.getBackground().darker());
+        windowPanel.add(navPanel);
+        
+        JButton backButton = new JButton("Reset to defaults");
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                pref.loadPreferences();
+                setAppState(AppState.SETTINGS);
+            }
+        });
+        JButton resetButton = new JButton("Back");
+        resetButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setAppState(AppState.MENU);
+            }
+        });
+        navPanel.add(resetButton);
+        navPanel.add(backButton);
+        
+        // Settings panel to display all settings
+        JPanel settingsPanel = new JPanel(new GridLayout(10,1)) {
+            @Override
+            public Dimension getPreferredSize() {
+                Dimension d = this.getParent().getSize();        
+                int windowHeight = d.height;
+                int windowWidth = d.width;
+                return new Dimension(windowWidth,windowHeight);
+            }
+        };
+        windowPanel.add(settingsPanel);
+        
+        for (String s : pref.getKeys("colour")) {
             Color c = pref.getColour(s);
             String red = String.format("%02X",c.getRed());
             String green = String.format("%02X",c.getGreen());
@@ -211,39 +243,34 @@ public class GUI extends JFrame implements DisplayInterface {
             String value = red+green+blue;
             
             // Create row for setting
-            JPanel settingRow = new JPanel();
-            settingRow.setLayout(new BoxLayout(settingRow, BoxLayout.X_AXIS));
-            JTextField settingName = new JTextField();
+            JPanel settingRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
+            JLabel settingName = new JLabel();
             JTextField settingValue = new JTextField();
+            JPanel settingColour = new JPanel() {
+//                @Override
+//                public Dimension getPreferredSize() {
+//                    Dimension d = this.getParent().getSize();
+//                    return new Dimension(d.height,d.height);
+//                }
+            };
+            
+            settingRow.setBorder(BorderFactory.createLineBorder(Color.black));
             settingValue.setColumns(6);
             settingValue.getDocument().addDocumentListener(new PrefUpdate("colour", s));
-            JPanel boxColour = new JPanel();
-            boxColour.setSize(10,10);
-            boxColour.setBackground(c);
+            settingColour.setBorder(BorderFactory.createLineBorder(Color.black));
             
             // Display
             settingName.setText(s);
             settingValue.setText(value);
             settingValue.setColumns(value.length());
-            settingName.setEditable(true);
+            settingColour.setBackground(c);
             
             // Add to parent panels
             settingRow.add(settingName);
             settingRow.add(settingValue);
-            settingRow.add(boxColour);
-            windowPanel.add(settingRow);
+            settingRow.add(settingColour);
+            settingsPanel.add(settingRow);
         }
-        
-        JButton backButton = new JButton("Back");
-        backButton.setMnemonic(KeyEvent.VK_W);
-        backButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                appState = AppState.MENU;
-                addCommand(new Command(Com.DRAW));
-            }
-        });
-        windowPanel.add(backButton);
     }
     
     private void drawGame() {
@@ -360,8 +387,7 @@ public class GUI extends JFrame implements DisplayInterface {
         closeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                appState = AppState.MENU;
-                addCommand(new Command(Com.DRAW));
+                setAppState(AppState.MENU);
             }
         });
         gameMenuPanel.add(new JLabel("Width"));
@@ -386,18 +412,18 @@ public class GUI extends JFrame implements DisplayInterface {
      * @param numPlayers 1 or 2, nothing else
      */
     private void newGame(int numPlayers) {
-        appState = AppState.GAME;
         int width = pref.getValue("defaultMapWidth");
         int height = pref.getValue("defaultMapHeight");
-        CommandMap c = new CommandMap(Com.NEW_MAP, width, height, numPlayers);
-        addCommand(c);
+        addCommand(new CommandMap(Com.NEW_MAP, width, height, numPlayers));
+        setAppState(AppState.GAME);
     }
     
     private void addCommand(Command c) {
         commands.add(c);
     }
-    private void setState(AppState s) {
+    private void setAppState(AppState s) {
         appState = s;
+        addCommand(new Command(Com.DRAW));
     }
     
     /*
@@ -420,14 +446,13 @@ public class GUI extends JFrame implements DisplayInterface {
         String prefName;
         
         public PrefUpdate(String s, String p) {
-            super();
             this.spaceName = s;
             this.prefName = p;
         }
 
         @Override
         public void changedUpdate(DocumentEvent e) {
-            update(e);
+            // update(e);
         }
         @Override
         public void insertUpdate(DocumentEvent e) {
@@ -435,7 +460,7 @@ public class GUI extends JFrame implements DisplayInterface {
         }
         @Override
         public void removeUpdate(DocumentEvent e) {
-            update(e);
+            // update(e);
         }
         private void update(DocumentEvent e) {
             try {

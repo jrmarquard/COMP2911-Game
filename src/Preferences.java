@@ -71,8 +71,15 @@ public class Preferences {
         }
     }
     
-    public Set<String> getColourKeys() {
-        return GUIcolours.keySet();
+    public Set<String> getKeys(String s) {
+        switch (s) {
+            case "colour": return GUIcolours.keySet();
+            case "value": return values.keySet();
+            case "text": return values.keySet();
+            case "bool": return values.keySet();
+            default:
+                return null;
+        }
     }
     
     
