@@ -1,10 +1,6 @@
-import java.applet.AudioClip;
 import java.awt.EventQueue;
-import java.io.*;
-import java.net.URL;
 import java.util.LinkedList;
 import java.util.Queue;
-import javax.sound.sampled.*;
 
 /**
  * MazePuzzleGame maintains and connects the different parts of the
@@ -60,18 +56,21 @@ public class MazePuzzleGame {
 	        
 	        // Get the command ID from the command and run appropriate game method
 	        switch (c.getCommandID()) {
-		        case NEW_MAP:       game.newMap(c);                     break;
-	            case DRAW:          game.refreshDisplay();              break;
-	            case EXIT:          game.close();	                    break;
-	            case ARROW_DOWN:    game.moveCharacterADown();          break;
-	            case ARROW_LEFT:    game.moveCharacterALeft();          break;
-	            case ARROW_RIGHT:   game.moveCharacterARight();         break;
-	            case ARROW_UP:      game.moveCharacterAUp();            break;
-	            case S_DOWN:        game.moveCharacterBDown();          break;
-	            case A_LEFT:        game.moveCharacterBLeft();          break;
-	            case D_RIGHT:       game.moveCharacterBRight();         break;
-	            case W_UP:          game.moveCharacterBUp();            break;
-	            case SOLVE:         game.solveCharacter();              break;
+		        case NEW_MAP:       game.newMap(c);                    break;
+	            case DRAW:          game.refreshDisplay();             break;
+	            case EXIT:          game.close();	                   break;
+	            case ARROW_DOWN:    game.moveCharacterADown();         break;
+	            case ARROW_LEFT:    game.moveCharacterALeft();         break;
+	            case ARROW_RIGHT:   game.moveCharacterARight();        break;
+	            case ARROW_UP:      game.moveCharacterAUp();           break;
+	            case S_DOWN:        game.moveCharacterBDown();         break;
+	            case A_LEFT:        game.moveCharacterBLeft();         break;
+	            case D_RIGHT:       game.moveCharacterBRight();        break;
+	            case W_UP:          game.moveCharacterBUp();           break;
+	            case SOLVE:         game.solveCharacter();             break;
+	            case IDLE:                                             break;
+	            default: 
+	                break;
 	        }
 	    }
 	}
