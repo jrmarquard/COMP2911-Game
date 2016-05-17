@@ -116,8 +116,16 @@ public class GUI extends JFrame implements DisplayInterface {
 	                case KeyEvent.VK_A:     addCommand(new Command(Com.A_LEFT));        break;
 	                case KeyEvent.VK_S:     addCommand(new Command(Com.S_DOWN));        break;
 	                case KeyEvent.VK_D:     addCommand(new Command(Com.D_RIGHT));       break;
+	                case KeyEvent.VK_T:     addCommand(new Command(Com.T_UP));          break;
+	                case KeyEvent.VK_F:     addCommand(new Command(Com.F_LEFT));        break;
+	                case KeyEvent.VK_G:     addCommand(new Command(Com.G_DOWN));        break;
+	                case KeyEvent.VK_H:     addCommand(new Command(Com.H_RIGHT));       break;
+	                case KeyEvent.VK_I:     addCommand(new Command(Com.I_UP));          break;
+	                case KeyEvent.VK_J:     addCommand(new Command(Com.J_LEFT));        break;
+	                case KeyEvent.VK_K:     addCommand(new Command(Com.K_DOWN));        break;
+	                case KeyEvent.VK_L:     addCommand(new Command(Com.L_RIGHT));       break;
                     case KeyEvent.VK_C:     addCommand(new Command(Com.SOLVE));         break;
-                    case KeyEvent.VK_N:     newGame(1);                                  break;
+                    case KeyEvent.VK_N:     newGame(1);                                 break;
                 }
             }
         });
