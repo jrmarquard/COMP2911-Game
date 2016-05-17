@@ -69,13 +69,13 @@ public class AI implements AIControl{
         }
         
         if (previous.getX() == next.getX()+1) {
-            return new Command(Com.MOVE_LEFT);
+            return new CommandMap(Com.MOVE_LEFT, 1);
         } else if (previous.getY() == next.getY()+1) {
-            return new Command(Com.MOVE_UP);
+            return new CommandMap(Com.MOVE_UP, 1);
         } else if (previous.getX() == next.getX()-1) {
-            return new Command(Com.MOVE_RIGHT);
+            return new CommandMap(Com.MOVE_RIGHT, 1);
         } else if (previous.getY() == next.getY()-1) {
-            return new Command(Com.MOVE_DOWN);
+            return new CommandMap(Com.MOVE_DOWN, 1);
         } else {
             System.out.println("invalid");
             return new Command(Com.IDLE);
