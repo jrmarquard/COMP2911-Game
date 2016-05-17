@@ -59,22 +59,10 @@ public class MazePuzzleGame {
 		        case NEW_MAP:       game.newMap(c);                    break;
 	            case DRAW:          game.refreshDisplay();             break;
 	            case EXIT:          game.close();	                   break;
-	            case ARROW_DOWN:    game.moveCharacterADown();         break;
-	            case ARROW_LEFT:    game.moveCharacterALeft();         break;
-	            case ARROW_RIGHT:   game.moveCharacterARight();        break;
-	            case ARROW_UP:      game.moveCharacterAUp();           break;
-	            case S_DOWN:        game.moveCharacterBDown();         break;
-	            case A_LEFT:        game.moveCharacterBLeft();         break;
-	            case D_RIGHT:       game.moveCharacterBRight();        break;
-	            case W_UP:          game.moveCharacterBUp();           break;
-	            case G_DOWN:        game.moveCharacterCDown();         break;
-	            case F_LEFT:        game.moveCharacterCLeft();         break;
-	            case H_RIGHT:       game.moveCharacterCRight();        break;
-	            case T_UP:          game.moveCharacterCUp();           break;
-	            case K_DOWN:        game.moveCharacterDDown();         break;
-	            case J_LEFT:        game.moveCharacterDLeft();         break;
-	            case L_RIGHT:       game.moveCharacterDRight();        break;
-	            case I_UP:          game.moveCharacterDUp();           break;
+	            case MOVE_DOWN:
+	            case MOVE_LEFT:
+	            case MOVE_RIGHT:
+	            case MOVE_UP:       game.moveCharacter(c);             break;
 	            case SOLVE:         game.solveCharacter();             break;
 	            case IDLE:                                             break;
 	            default: 
@@ -125,154 +113,19 @@ public class MazePuzzleGame {
     /**
      * Moves player up a coordinate
      */
-    private void moveCharacterAUp() {
-    	world.moveCharacterUp(world.getNumberOfPlayers() - 1);
+    private void moveCharacter(Command o) {
+        CommandMap c = (CommandMap)o;
+        int id = c.getPlayerID();
+        switch(c.getCommandID()) {
+            case MOVE_DOWN:     world.moveCharacterDown(id);    break;
+            case MOVE_UP:       world.moveCharacterUp(id);      break;
+            case MOVE_LEFT:     world.moveCharacterLeft(id);    break;
+            case MOVE_RIGHT:    world.moveCharacterRight(id);   break;
+            default: 
+                break;
+        }
         addCommand(new Command(Com.DRAW));
 	}
-    
-    /**
-     * Moves player left a coordinate
-     */
-    private void moveCharacterALeft() {
-    	world.moveCharacterLeft(world.getNumberOfPlayers() - 1);
-        addCommand(new Command(Com.DRAW));
-    }
-    
-    /**
-     * Moves player right a coordinate
-     */
-    private void moveCharacterARight() {
-    	world.moveCharacterRight(world.getNumberOfPlayers() - 1);
-        addCommand(new Command(Com.DRAW));
-    }
-    
-    /**
-     * Moves player down a coordinate
-     */
-    private void moveCharacterADown() {
-    	world.moveCharacterDown(world.getNumberOfPlayers() - 1);
-        addCommand(new Command(Com.DRAW));
-    }
-    
-    /**
-     * Moves player up a coordinate
-     */
-    private void moveCharacterBUp() {
-    	if(world.getNumberOfPlayers() > 1) {
-    		world.moveCharacterUp(0);
-            addCommand(new Command(Com.DRAW));
-    	}
-	}
-    
-    /**
-     * Moves player left a coordinate
-     */
-    private void moveCharacterBLeft() {
-    	if(world.getNumberOfPlayers() > 1) {
-	        world.moveCharacterLeft(0);
-	        addCommand(new Command(Com.DRAW));
-    	}
-    }
-    
-    /**
-     * Moves player right a coordinate
-     */
-    private void moveCharacterBRight() {
-    	if(world.getNumberOfPlayers() > 1) {
-	        world.moveCharacterRight(0);
-	        addCommand(new Command(Com.DRAW));
-    	}
-    }
-    
-    /**
-     * Moves player down a coordinate
-     */
-    private void moveCharacterBDown() {
-    	if(world.getNumberOfPlayers() > 1) {
-	        world.moveCharacterDown(0);
-	        addCommand(new Command(Com.DRAW));
-    	}
-    }
-    
-    /**
-     * Moves player up a coordinate
-     */
-    private void moveCharacterCUp() {
-    	if(world.getNumberOfPlayers() > 2) {
-    		world.moveCharacterUp(1);
-            addCommand(new Command(Com.DRAW));
-    	}
-	}
-    
-    /**
-     * Moves player left a coordinate
-     */
-    private void moveCharacterCLeft() {
-    	if(world.getNumberOfPlayers() > 2) {
-	        world.moveCharacterLeft(1);
-	        addCommand(new Command(Com.DRAW));
-    	}
-    }
-    
-    /**
-     * Moves player right a coordinate
-     */
-    private void moveCharacterCRight() {
-    	if(world.getNumberOfPlayers() > 2) {
-	        world.moveCharacterRight(1);
-	        addCommand(new Command(Com.DRAW));
-    	}
-    }
-    
-    /**
-     * Moves player down a coordinate
-     */
-    private void moveCharacterCDown() {
-    	if(world.getNumberOfPlayers() > 2) {
-	        world.moveCharacterDown(1);
-	        addCommand(new Command(Com.DRAW));
-    	}
-    }
-    
-    /**
-     * Moves player up a coordinate
-     */
-    private void moveCharacterDUp() {
-    	if(world.getNumberOfPlayers() > 3) {
-    		world.moveCharacterUp(2);
-            addCommand(new Command(Com.DRAW));
-    	}
-	}
-    
-    /**
-     * Moves player left a coordinate
-     */
-    private void moveCharacterDLeft() {
-    	if(world.getNumberOfPlayers() > 3) {
-	        world.moveCharacterLeft(2);
-	        addCommand(new Command(Com.DRAW));
-    	}
-    }
-    
-    /**
-     * Moves player right a coordinate
-     */
-    private void moveCharacterDRight() {
-    	if(world.getNumberOfPlayers() > 3) {
-	        world.moveCharacterRight(2);
-	        addCommand(new Command(Com.DRAW));
-    	}
-    }
-    
-    /**
-     * Moves player down a coordinate
-     */
-    private void moveCharacterDDown() {
-    	if(world.getNumberOfPlayers() > 3) {
-	        world.moveCharacterDown(2);
-	        addCommand(new Command(Com.DRAW));
-    	}
-    }
     
     /**
      * Moves the player once and checks if it has finished

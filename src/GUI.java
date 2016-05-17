@@ -78,22 +78,54 @@ public class GUI extends JFrame implements DisplayInterface {
         this.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 switch (e.getKeyCode()) {
-	                case KeyEvent.VK_DOWN:     addCommand(new Command(Com.ARROW_DOWN));    break;
-	                case KeyEvent.VK_LEFT:     addCommand(new Command(Com.ARROW_LEFT));    break;
-	                case KeyEvent.VK_RIGHT:    addCommand(new Command(Com.ARROW_RIGHT));   break;
-	                case KeyEvent.VK_UP:       addCommand(new Command(Com.ARROW_UP));      break;
-	                case KeyEvent.VK_W:        addCommand(new Command(Com.W_UP));          break;
-	                case KeyEvent.VK_A:        addCommand(new Command(Com.A_LEFT));        break;
-	                case KeyEvent.VK_S:        addCommand(new Command(Com.S_DOWN));        break;
-	                case KeyEvent.VK_D:        addCommand(new Command(Com.D_RIGHT));       break;
-	                case KeyEvent.VK_T:        addCommand(new Command(Com.T_UP));          break;
-	                case KeyEvent.VK_F:        addCommand(new Command(Com.F_LEFT));        break;
-	                case KeyEvent.VK_G:        addCommand(new Command(Com.G_DOWN));        break;
-	                case KeyEvent.VK_H:        addCommand(new Command(Com.H_RIGHT));       break;
-	                case KeyEvent.VK_I:        addCommand(new Command(Com.I_UP));          break;
-	                case KeyEvent.VK_J:        addCommand(new Command(Com.J_LEFT));        break;
-	                case KeyEvent.VK_K:        addCommand(new Command(Com.K_DOWN));        break;
-	                case KeyEvent.VK_L:        addCommand(new Command(Com.L_RIGHT));       break;
+                    case KeyEvent.VK_UP:       
+                        addCommand(new CommandMap(Com.MOVE_UP, 1));
+                        break;
+                    case KeyEvent.VK_LEFT:     
+                        addCommand(new CommandMap(Com.MOVE_LEFT, 1));    
+                        break;
+	                case KeyEvent.VK_DOWN:     
+	                    addCommand(new CommandMap(Com.MOVE_DOWN, 1));    
+	                    break;
+	                case KeyEvent.VK_RIGHT:    
+	                    addCommand(new CommandMap(Com.MOVE_RIGHT, 1));   
+	                    break;
+	                case KeyEvent.VK_W:        
+	                    addCommand(new CommandMap(Com.MOVE_UP, 2));          
+	                    break;
+	                case KeyEvent.VK_A:        
+	                    addCommand(new CommandMap(Com.MOVE_LEFT, 2));        
+	                    break;
+	                case KeyEvent.VK_S:        
+	                    addCommand(new CommandMap(Com.MOVE_DOWN, 2));        
+	                    break;
+	                case KeyEvent.VK_D:        
+	                    addCommand(new CommandMap(Com.MOVE_RIGHT, 2));      
+	                    break;
+                    case KeyEvent.VK_T:        
+                        addCommand(new CommandMap(Com.MOVE_UP, 3));          
+                        break;
+                    case KeyEvent.VK_F:        
+                        addCommand(new CommandMap(Com.MOVE_LEFT, 3));        
+                        break;
+                    case KeyEvent.VK_G:        
+                        addCommand(new CommandMap(Com.MOVE_DOWN, 3));        
+                        break;
+                    case KeyEvent.VK_H:        
+                        addCommand(new CommandMap(Com.MOVE_RIGHT, 3));      
+                        break;
+                    case KeyEvent.VK_I:        
+                        addCommand(new CommandMap(Com.MOVE_UP, 4));          
+                        break;
+                    case KeyEvent.VK_J:        
+                        addCommand(new CommandMap(Com.MOVE_LEFT, 4));        
+                        break;
+                    case KeyEvent.VK_K:        
+                        addCommand(new CommandMap(Com.MOVE_DOWN, 4));        
+                        break;
+                    case KeyEvent.VK_L:        
+                        addCommand(new CommandMap(Com.MOVE_RIGHT, 4));      
+                        break;
                     case KeyEvent.VK_C:        addCommand(new Command(Com.SOLVE));         break;
                     case KeyEvent.VK_ESCAPE:   setAppState(AppState.MENU);                 break; 
                     case KeyEvent.VK_N:        newGame(1);                                 break;

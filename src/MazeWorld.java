@@ -189,11 +189,12 @@ public class MazeWorld {
      * 
      * @return character's name
      */
-    public String getCharacterName(int player) {
-        return players.get(player).getName();
+    public String getCharacterName(int playerID) {
+        return players.get(playerID-1).getName();
     }
     
-    public void moveCharacterDown(int player) {
+    public void moveCharacterDown(int playerID) {
+        int player = -1 + playerID;
         if (lockPlayerControl) {
             return;
         }
@@ -202,7 +203,8 @@ public class MazeWorld {
         }
         update();
     }
-    public void moveCharacterLeft(int player) {
+    public void moveCharacterLeft(int playerID) {
+        int player = -1 + playerID;
         if (lockPlayerControl) {
             return;
         }
@@ -211,7 +213,8 @@ public class MazeWorld {
         }
         update();
     }
-    public void moveCharacterRight(int player) {
+    public void moveCharacterRight(int playerID) {
+        int player = -1 + playerID;
         if (lockPlayerControl) {
             return;
         }
@@ -220,7 +223,9 @@ public class MazeWorld {
         }
         update();
     }
-    public void moveCharacterUp(int player) {
+    public void moveCharacterUp(int playerID) {
+        
+        int player = -1 + playerID;
         if (lockPlayerControl) {
             return;
         }
