@@ -39,7 +39,11 @@ public class GUI extends JFrame implements DisplayInterface {
     AppState appState;
     
     JPanel windowPanel;
-    JPanel titlePanel;
+    JPanel titleMainPanel;
+    JPanel titlePanelA;
+    JPanel titlePanelB;
+    JPanel titlePanelC;
+    JPanel titlePanelD;
     JPanel gameMainPanelA;
     JPanel gameMainPanelB;
     JPanel gamePanelA;
@@ -233,7 +237,11 @@ public class GUI extends JFrame implements DisplayInterface {
 
         // This recreates the panels EVERYTIME the game is drawn.
         // Need to update this to something that is halfway efficient
-        titlePanel = new JPanel();
+        titleMainPanel = new JPanel();
+        titlePanelA = new JPanel();
+        titlePanelB = new JPanel();
+        titlePanelC = new JPanel();
+        titlePanelD = new JPanel();
         gameMainPanelA = new JPanel();
         gameMainPanelB = new JPanel();
         gamePanelA = new JPanel();
@@ -243,7 +251,11 @@ public class GUI extends JFrame implements DisplayInterface {
         gameMenuPanel = new JPanel();
         
         // Sets the layout for each component
-        titlePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
+        titleMainPanel.setLayout(new BoxLayout(titleMainPanel, BoxLayout.X_AXIS));
+        titlePanelA.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
+        titlePanelB.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
+        titlePanelC.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
+        titlePanelD.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
         gameMainPanelA.setLayout(new BoxLayout(gameMainPanelA, BoxLayout.X_AXIS));
         gameMainPanelB.setLayout(new BoxLayout(gameMainPanelB, BoxLayout.X_AXIS));
         gamePanelA.setLayout(new GridBagLayout());
@@ -252,6 +264,9 @@ public class GUI extends JFrame implements DisplayInterface {
         gamePanelD.setLayout(new GridBagLayout());
         gameMenuPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
         
+        windowPanel.add(titleMainPanel);
+        titleMainPanel.add(titlePanelA);
+        
         // Creates the GameMap for the world to be draw onto
         GameMap innerGamePanelA = new GameMap(world, pref, 0);
         
@@ -259,17 +274,20 @@ public class GUI extends JFrame implements DisplayInterface {
         gamePanelA.add(innerGamePanelA);
         gameMainPanelA.add(gamePanelA);  
               
-        if (world.getNumberOfPlayers() >= 2) {
+        if (world.getNumberOfPlayers() > 1) {
+        	titleMainPanel.add(titlePanelB);
         	GameMap innerGamePanelB = new GameMap(world, pref, 1);
         	gamePanelB.add(innerGamePanelB);
         	gameMainPanelA.add(gamePanelB);
         	
-        	if (world.getNumberOfPlayers() >= 3) {
+        	if (world.getNumberOfPlayers() > 2) {
+        		titleMainPanel.add(titlePanelC);
             	GameMap innerGamePanelC = new GameMap(world, pref, 2);
             	gamePanelC.add(innerGamePanelC);
             	gameMainPanelB.add(gamePanelC);
             	
             	if (world.getNumberOfPlayers() == 4) {
+            		titleMainPanel.add(titlePanelD);
                 	GameMap innerGamePanelD = new GameMap(world, pref, 3);
                 	gamePanelD.add(innerGamePanelD);
                 	gameMainPanelB.add(gamePanelD);
@@ -277,7 +295,6 @@ public class GUI extends JFrame implements DisplayInterface {
             }
         }
         
-        windowPanel.add(titlePanel);
         windowPanel.add(gameMainPanelA);
         if(world.getNumberOfPlayers() > 2) {
         	windowPanel.add(gameMainPanelB);
@@ -291,18 +308,46 @@ public class GUI extends JFrame implements DisplayInterface {
     }
 
     private void drawTitlePanel() {
-        titlePanel.removeAll();
+        //titleMainPanel.removeAll();
         
+    	titlePanelA.setBackground(pref.getColour("titleDefaultColour"));
+        titlePanelB.setBackground(pref.getColour("titleDefaultColour"));
+        titlePanelC.setBackground(pref.getColour("titleDefaultColour"));
+        titlePanelD.setBackground(pref.getColour("titleDefaultColour"));
+    	
         if (world.getWinStatus()) {
-            titlePanel.setBackground(pref.getColour("titleWinColour"));
-        } else {
-            titlePanel.setBackground(pref.getColour("titleDefaultColour"));
+        	if(world.getWinPlayer() == 0) {
+        		titlePanelA.setBackground(pref.getColour("titleWinColour"));
+        	} else if(world.getWinPlayer() == 1) {
+        		titlePanelB.setBackground(pref.getColour("titleWinColour"));
+        	} else if(world.getWinPlayer() == 2) {
+        		titlePanelC.setBackground(pref.getColour("titleWinColour"));
+        	} else if(world.getWinPlayer() == 3) {
+        		titlePanelD.setBackground(pref.getColour("titleWinColour"));
+        	}
         }
         
-        JLabel title = new JLabel();
-        title.setText("Coins: "+world.getPlayerCoins(0));
-
-        titlePanel.add(title);
+        JLabel titleA = new JLabel();
+        titleA.setText("Coins: "+world.getPlayerCoins(0));
+        titlePanelA.add(titleA);
+        
+        if(world.getNumberOfPlayers() > 1) {
+        	JLabel titleB = new JLabel();
+            titleB.setText("Coins: "+world.getPlayerCoins(1));
+        	titlePanelB.add(titleB);
+        	
+        	if(world.getNumberOfPlayers() > 2) {
+        		JLabel titleC = new JLabel();
+                titleC.setText("Coins: "+world.getPlayerCoins(2));
+            	titlePanelC.add(titleC);
+            	
+            	if(world.getNumberOfPlayers() == 4) {
+            		JLabel titleD = new JLabel();
+                    titleD.setText("Coins: "+world.getPlayerCoins(3));
+                	titlePanelD.add(titleD);
+            	}
+        	}
+        }
     }
     
     private void drawGameMenuPanel() {

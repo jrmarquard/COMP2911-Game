@@ -125,7 +125,7 @@ public class MazeWorld {
      * @return the player who won
      */
     public int getWinPlayer() {
-    	return this.winPlayer + 1;
+    	return this.winPlayer;
     }
     
     /**
