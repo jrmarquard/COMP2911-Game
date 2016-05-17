@@ -153,6 +153,16 @@ public class GUI extends JFrame implements DisplayInterface {
                 update();
             }
         });
+        
+        // Button will go to settings
+        JButton aboutButton = new JButton("About");
+        aboutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setState(AppState.ABOUT);
+                update();
+            }
+        });
         // Button will quit the game
         JButton exitButton = new JButton("Exit");
         exitButton.addActionListener(new ActionListener() {
@@ -164,17 +174,46 @@ public class GUI extends JFrame implements DisplayInterface {
 
         windowPanel.add(startGameButton);
         windowPanel.add(settingsButton);
+        windowPanel.add(aboutButton);
         windowPanel.add(exitButton);
         
     }
-    private void addCommand(Command c) {
-        commands.add(c);
+    
+    /**
+     *  
+     */
+    private void drawAbout() {
+        windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
+        JTextField about = new JTextField();
+        about.setText("Game written by: John, Joshua, Patrick, Tim, Tyler");
+        JButton backButton = new JButton("Back");
+        backButton.setMnemonic(KeyEvent.VK_W);
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                appState = AppState.MENU;
+                addCommand(new Command(Com.DRAW));
+            }
+        });
+        windowPanel.add(about);
+        windowPanel.add(backButton);
     }
     
-    private void drawAbout() {
-        
-    }
     private void drawSettings() {
+        windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
+        
+        
+        
+        JButton backButton = new JButton("Back");
+        backButton.setMnemonic(KeyEvent.VK_W);
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                appState = AppState.MENU;
+                addCommand(new Command(Com.DRAW));
+            }
+        });
+        windowPanel.add(backButton);
         
     }
     
@@ -202,19 +241,13 @@ public class GUI extends JFrame implements DisplayInterface {
         
         // Attaches the innerGamePanel onto the gamePanel
         gamePanelA.add(innerGamePanelA);
-        
-        // Maintains the size of the window when game panel is redrawn
-       // gamePanelA.setPreferredSize(gamePanelA.getSize());
-        
-        if(world.getIsMultiplayer()) {
+        gameMainPanel.add(gamePanelA);  
+              
+        if (world.getIsMultiplayer()) {
         	gameMainPanel.add(gamePanelB);
         	GameMap innerGamePanelB = new GameMap(world, pref, 1);
         	gamePanelB.add(innerGamePanelB);
-        //	gamePanelB.setPreferredSize(gamePanelA.getSize());
         }
-
-        gameMainPanel.add(gamePanelA);
-        // gameMainPanel.add(gamePanelB);
         
         windowPanel.add(titlePanel);
         windowPanel.add(gameMainPanel);
@@ -344,7 +377,7 @@ public class GUI extends JFrame implements DisplayInterface {
                 addCommand(new Command(Com.SOLVE));
             }
         });
-        JButton closeButton = new JButton("Exit Game");
+        JButton closeButton = new JButton("Exit to menu");
         closeButton.setMnemonic(KeyEvent.VK_W);
         closeButton.addActionListener(new ActionListener() {
             @Override
@@ -382,6 +415,9 @@ public class GUI extends JFrame implements DisplayInterface {
         addCommand(c);
     }
     
+    private void addCommand(Command c) {
+        commands.add(c);
+    }
     private void setState(AppState s) {
         appState = s;
     }
