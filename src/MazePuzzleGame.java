@@ -60,8 +60,7 @@ public class MazePuzzleGame {
 	        
 	        // Get the command ID from the command and run appropriate game method
 	        switch (c.getCommandID()) {
-		        case NEW_ONE_P_MAP: game.newOnePlayerMap(c);            break;
-	            case NEW_TWO_P_MAP: game.newTwoPlayersMap(c);           break;
+		        case NEW_MAP:       game.newMap(c);                     break;
 	            case DRAW:          game.refreshDisplay();              break;
 	            case EXIT:          game.close();	                    break;
 	            case ARROW_DOWN:    game.moveCharacterADown();          break;
@@ -92,30 +91,19 @@ public class MazePuzzleGame {
     }
 
 	/**
-	 * Executed when a new single player map is requested
+	 * Executed when a new map is requested
 	 * 
 	 * @param o the command object which ordered this method
 	 */
-    private void newOnePlayerMap(Command o) {
+    private void newMap(Command o) {
         CommandMap c = (CommandMap)o;
         int width = c.getWidth();
         int height = c.getHeight();
         world.generateWorld(width, height);
-         
-        addCommand(new Command(Com.DRAW));
-    }
-    
-    /**
-     * Executed when a new multiplayer player map is requested
-	 * 
-	 * @param o the command object which ordered this method
-	 */
-    private void newTwoPlayersMap(Command o) {
-        CommandMap c = (CommandMap)o;
-        int width = c.getWidth();
-        int height = c.getHeight();
-        world.generateWorld(width, height);
-        world.setMuptiplayer(true);
+        
+        if (c.getPlayers()==2) {
+            world.setMuptiplayer(true);
+        }
         addCommand(new Command(Com.DRAW));
     }
     

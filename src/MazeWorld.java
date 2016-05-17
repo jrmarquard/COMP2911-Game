@@ -20,7 +20,6 @@ public class MazeWorld {
     public MazeWorld (Queue<Command> commands, Preferences pref) {
         this.commands = commands;
         this.pref = pref;
-        this.players = new ArrayList<Character>();
         generateWorld(pref.getValue("defaultMapWidth"), pref.getValue("defaultMapHeight"));
     }
     
@@ -37,10 +36,16 @@ public class MazeWorld {
      * @param width width of the maze to be generated
      */
     public void generateWorld(int width, int height) {
-        maze = new Maze(width, height);
-        ai = new AI();
-        entities = new ArrayList<Entity>();
+        // Initialise local variables
+        this.maze = new Maze(width, height);
+        this.ai = new AI();
+        this.entities = new ArrayList<Entity>();
+        this.players = new ArrayList<Character>();
+        
+        // Generate maze
         maze.mazeGenerator();
+        
+        // Add players
         players.clear();
         players.add(new Character(new Coordinate(maze.getStart().getX(), maze.getStart().getY()), pref.getText("playerName")));
         

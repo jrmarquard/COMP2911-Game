@@ -132,7 +132,7 @@ public class GUI extends JFrame implements DisplayInterface {
         mainGamePanel.setPreferredSize(mainGamePanel.getSize());
     }
 
-    public void drawTitlePanel() {
+    private void drawTitlePanel() {
         titlePanel.removeAll();
         
         if (world.getWinStatus()) {
@@ -147,7 +147,7 @@ public class GUI extends JFrame implements DisplayInterface {
         titlePanel.add(title);
     }
     
-    public void drawMenuPanel() {
+    private void drawMenuPanel() {
         menuPanel.removeAll();
         menuPanel.setBackground(pref.getColour("menuColour"));
 
@@ -222,6 +222,11 @@ public class GUI extends JFrame implements DisplayInterface {
         this.dispose();
     }
     
+    /**
+     * Creates a new game for the specified number of players
+     * 
+     * @param numPlayers 1 or 2, nothing else
+     */
     private void newGame(int numPlayers) {
         JFormattedTextField box = (JFormattedTextField)menuPanel.getComponent(1);
         int width = Integer.parseInt(box.getText());
@@ -236,11 +241,9 @@ public class GUI extends JFrame implements DisplayInterface {
         pref.setPreference("value.defaultMapWidth="+width);
         pref.setPreference("value.defaultMapHeight="+height);
         
-        if (numPlayers == 1) {
-            addCommand(new CommandMap(Com.NEW_ONE_P_MAP, width, height));
-        } else if (numPlayers == 2) {
-            addCommand(new CommandMap(Com.NEW_TWO_P_MAP, width, height));
-        }
+        CommandMap c = new CommandMap(Com.NEW_MAP, width, height, numPlayers);
+        
+        addCommand(c);
     }
     
     /*

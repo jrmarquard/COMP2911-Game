@@ -1,6 +1,5 @@
 public enum Com {
-	NEW_ONE_P_MAP,
-    NEW_TWO_P_MAP,
+    NEW_MAP,
     DRAW, 
     EXIT, 
     ARROW_DOWN, 
