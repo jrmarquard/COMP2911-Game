@@ -102,9 +102,7 @@ public class GUI extends JFrame implements DisplayInterface {
     }
     
     public void update() {
-        System.out.println("Updating display");
-
-        // Reset game panels, remove them (hopefully clears memory)switch (state)
+        // Reset game panels, remove them (hopefully clears memory)
         windowPanel.removeAll();
         windowPanel.repaint();
 
@@ -137,7 +135,6 @@ public class GUI extends JFrame implements DisplayInterface {
      * drawMenu 
      */
     private void drawMenu() {
-        System.out.println("Drawing menu");
         windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
 
         // Button will start a new game
@@ -439,20 +436,6 @@ public class GUI extends JFrame implements DisplayInterface {
     public void close() {
         this.dispose();
     }
-    /*
-    private class MenuItemAction extends AbstractAction {
-        public MenuItemAction(String text, Integer mnemonic) {
-            super(text);
-            putValue(MNEMONIC_KEY, mnemonic);
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            String s = e.getActionCommand();
-            addCommand(new Command(Com.EXIT));
-        }
-    }
-    */
     
     private class PrefUpdate implements DocumentListener {
         String spaceName;
@@ -465,7 +448,7 @@ public class GUI extends JFrame implements DisplayInterface {
 
         @Override
         public void changedUpdate(DocumentEvent e) {
-            // update(e);
+            update(e);
         }
         @Override
         public void insertUpdate(DocumentEvent e) {
@@ -473,7 +456,7 @@ public class GUI extends JFrame implements DisplayInterface {
         }
         @Override
         public void removeUpdate(DocumentEvent e) {
-            // update(e);
+            update(e);
         }
         private void update(DocumentEvent e) {
             try {
