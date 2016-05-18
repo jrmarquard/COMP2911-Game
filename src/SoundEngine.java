@@ -16,50 +16,53 @@ public class SoundEngine {
 		this.files = new ArrayList<File>();
 		String fileName;
 		File soundFile;
-		
-		
+			
 		try {
 			fileName = new String("coin-sound.wav");
 		    soundFile = new File(fileName);
 		    
 		    this.files.add(soundFile);
 		    
-		    System.out.println("Loaded first file");
-
-	        fileName = new String("coin.wav");
+		    fileName = new String("intro.wav");
 		    soundFile = new File(fileName);
+		    
 		    this.files.add(soundFile);
+		    
+		    
 		    
 		} 
 		catch (Exception e){
 			this.soundEnabled = false;
 			System.out.println("Sound disabled");
 		}
-		if (soundEnabled == true) {
-			try {
-				AudioInputStream stream = AudioSystem.getAudioInputStream(this.files.get(1));
-		        AudioFormat format = stream.getFormat();
-		        DataLine.Info info = new DataLine.Info(Clip.class, format);
-		        Clip clip = (Clip) AudioSystem.getLine(info);
-		        clip.open(stream);
-		        clip.start();
-	        
-			/*try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				System.out.println("Didn't like sleeping");
-			}
-			stream = AudioSystem.getAudioInputStream(this.files.get(1));
-	        format = stream.getFormat();
-	        info = new DataLine.Info(Clip.class, format);
-	        clip = (Clip) AudioSystem.getLine(info);
-	        clip.open(stream);
-	        clip.start(); */
-			}
-			catch (Exception e) {
-				
-			}
-			
+	}
+	public void playSound(String soundName) {
+		if (this.soundEnabled) {
+			if (soundName.equals("coin")) {
+				try {
+					AudioInputStream stream = AudioSystem.getAudioInputStream(this.files.get(0));
+        	        AudioFormat format = stream.getFormat();
+        	        DataLine.Info info = new DataLine.Info(Clip.class, format);
+        	        Clip clip = (Clip) AudioSystem.getLine(info);
+        	        clip.open(stream);
+        	        clip.start();
+				}
+				catch (Exception e) {
+					
+				}
+			} else if (soundName.equals("intro")) {
+				try {
+					AudioInputStream stream = AudioSystem.getAudioInputStream(this.files.get(1));
+        	        AudioFormat format = stream.getFormat();
+        	        DataLine.Info info = new DataLine.Info(Clip.class, format);
+        	        Clip clip = (Clip) AudioSystem.getLine(info);
+        	        clip.open(stream);
+        	        clip.start();
+				}
+				catch (Exception e) {
+					
+				}
+			} 
 		}
 	}
 }

@@ -130,22 +130,7 @@ public class MazeWorld {
                 if (e instanceof Coins) {
                     player.addCoins(((Coins)e).getValue());
                     
-                    //Where tim is attempting to add coin sound
-                    try {
-            	    	String fileName = new String("coin-sound.wav");
-            		    File soundFile = new File(fileName);
-
-            	        AudioInputStream stream = AudioSystem.getAudioInputStream(soundFile);
-            	        AudioFormat format = stream.getFormat();
-            	        DataLine.Info info = new DataLine.Info(Clip.class, format);
-            	        Clip clip = (Clip) AudioSystem.getLine(info);
-            	        clip.open(stream);
-            	        clip.start();
-            	    }
-            	    catch (Exception eA) {
-            	        
-            	    }
-                    
+                    addCommand(new Command(Com.PLAY_COIN));
                     iter.remove();
                     updated = true;
                 }

@@ -54,7 +54,7 @@ public class MazePuzzleGame {
 	public static void main(String[] args) {
 	    
 	    MazePuzzleGame game = new MazePuzzleGame();
-	    
+	    game.addCommand(new Command(Com.PLAY_INTRO));
 	    
 	    
 	    for (Command c = null; ; c = game.pollCommands()) {
@@ -75,12 +75,22 @@ public class MazePuzzleGame {
 	            case MOVE_RIGHT:   game.moveCharacterRight();          break;
 	            case MOVE_UP:      game.moveCharacterUp();             break;
 	            case SOLVE:        game.solveCharacter();              break;
+	            case PLAY_COIN:    game.playCoin();					   break;
+	            case PLAY_INTRO:   game.playIntro();				   break;
 	        }
 	    }
 	}
 
 
-    /**
+    private void playCoin() {
+    	this.soundEngine.playSound("coin");		
+	}
+    
+    private void playIntro() {
+    	this.soundEngine.playSound("intro");
+    }
+
+	/**
      * Executed when the display needs to be refreshed.
      * Do this after the game has been updated in some way.
      */

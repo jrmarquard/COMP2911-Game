@@ -7,5 +7,8 @@ public enum Com {
     MOVE_LEFT, 
     MOVE_RIGHT, 
     IDLE,
-    SOLVE, 
+    SOLVE,
+    PLAY_COIN,
+    PLAY_INTRO
+    
 }
