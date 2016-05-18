@@ -35,9 +35,10 @@ In this assignment, the aim is to construct an interactive maze puzzle game that
         - Algorithm that generates interesting and challenging games
         - More than one type of extension (e.g. animation, multi-player, etc.)
     - Finalise menus, this includes their appearance and their functionality
-    - Finalise design and realted
+    - Finalise design
         - Create design documents (UML, 'design diaries' maybe?, anything else?)
-        - Implement threading and tidy up code
+        - Implement threading
+        - Tidy and refactor code
     - Generate mazes that distinguish ours from the rest
         - make it feature rich (e.g. door/keys, different routes, buttons)
         - demonstrate why our generation is 'hard', give it difficulties. Maybe compare different algos in a document
