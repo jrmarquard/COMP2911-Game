@@ -8,4 +8,6 @@ public enum Com {
     MOVE_RIGHT,
     IDLE,
     SOLVE, 
+    RUN_AI, 
+    CREATE_AI, 
 }

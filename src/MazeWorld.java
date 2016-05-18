@@ -9,7 +9,7 @@ public class MazeWorld {
     private Preferences pref;
     private Maze maze;
     private ArrayList<Character> players;
-    private AIControl ai;
+    private String aiName;
     private ArrayList<Entity> entities;
     private boolean lockPlayerControl;
     private boolean winStatus;
@@ -37,7 +37,8 @@ public class MazeWorld {
     public void generateWorld(int width, int height) {
         // Initialise local variables
         this.maze = new Maze(width, height);
-        this.ai = new AI();
+        this.aiName = "The Teamaker";
+        addCommand(new Command(Com.CREATE_AI));
         this.entities = new ArrayList<Entity>();
         this.players = new ArrayList<Character>();
         
@@ -246,7 +247,8 @@ public class MazeWorld {
     public void solveCharacter() {
         // Ask AI to make a move and add that to the command queue
         try {
-            addCommand(ai.makeMove(this));
+            // send a command to the AIAgency telling the AI of name "" to make a move
+            addCommand(new Command(Com.RUN_AI));
             Thread.sleep(50);
         } catch(InterruptedException ex) {
             Thread.currentThread().interrupt();

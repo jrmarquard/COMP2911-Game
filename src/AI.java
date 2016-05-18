@@ -4,8 +4,10 @@ import java.util.Queue;
 
 public class AI implements AIControl{
 	private ArrayList<Node> shortestPath;
+	private MazeWorld world;
 	
-	public AI() {
+	public AI(MazeWorld world) {
+	    this.world = world;
         this.shortestPath = new ArrayList<Node>();
     }
 	
@@ -55,7 +57,7 @@ public class AI implements AIControl{
 		}
 	}
 	
-	public Command makeMove(MazeWorld world) {
+	public Command makeMove() {
         Coordinate start = world.getPlayerCoordinate(0);
         
         // process path

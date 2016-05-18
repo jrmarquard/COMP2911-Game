@@ -16,6 +16,7 @@ public class MazePuzzleGame {
     DisplayInterface disp;
     MazeWorld world;
     Queue<Command> commands;
+    AIAgency aiAgency;
     
     /**
      * Initialises MazePuzzleGame.
@@ -29,6 +30,7 @@ public class MazePuzzleGame {
         this.commands = new LinkedList<Command>();
         this.world = new MazeWorld(commands, pref);
         this.disp = new GUI(this.pref, this.world, this.commands);
+        this.aiAgency = new AIAgency(commands);
         
         this.addCommand(new Command(Com.DRAW, null));
     }
@@ -64,6 +66,8 @@ public class MazePuzzleGame {
 	            case MOVE_RIGHT:
 	            case MOVE_UP:       game.moveCharacter(c);             break;
 	            case SOLVE:         game.solveCharacter();             break;
+	            case RUN_AI:        game.runAI();                      break;
+	            case CREATE_AI:     game.createAI();                   break;
 	            case IDLE:                                             break;
 	            default: 
 	                break;
@@ -71,6 +75,21 @@ public class MazePuzzleGame {
 	    }
 	}
 
+	/**
+	 * Asks the aiAgency to create an AI of a given name.
+	 */
+    private void createAI() {
+        aiAgency.createAI("The Teamaker", world);
+    }
+
+    /**
+     * Asks the aiAgency to run the AI of a given name.
+     * It is expected that this AI will return a command 
+     * to update itself in the game.
+     */
+    private void runAI() {
+        aiAgency.makeMove("The Teamaker");
+    }
 
     /**
      * Executed when the display needs to be refreshed.
