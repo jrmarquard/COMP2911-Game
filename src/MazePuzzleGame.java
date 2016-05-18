@@ -64,11 +64,20 @@ public class MazePuzzleGame {
 	            case MOVE_DOWN:
 	            case MOVE_LEFT:
 	            case MOVE_RIGHT:
-	            case MOVE_UP:       game.moveCharacter(c);             break;
-	            case SOLVE:         game.solveCharacter();             break;
-	            case RUN_AI:        game.runAI();                      break;
-	            case CREATE_AI:     game.createAI();                   break;
-	            case IDLE:                                             break;
+	            case MOVE_UP:
+	                game.moveCharacter(c);
+	                break;
+	            case TOGGLE_AI:
+	                game.turnAIOn();             
+	                break;
+	            case RUN_AI:        
+	                game.runAI();
+	                break;
+	            case CREATE_AI:
+	                game.createAI();
+	                break;
+	            case IDLE:
+	                break;
 	            default: 
 	                break;
 	        }
@@ -147,12 +156,10 @@ public class MazePuzzleGame {
 	}
     
     /**
-     * Moves the player once and checks if it has finished
+     * Turns AI on
      */
-    private void solveCharacter() {
-        // Move the character 1 spot and redraw
-        world.solveCharacter();
-        addCommand(new Command(Com.DRAW));
+    private void turnAIOn() {
+        world.turnAIOn();
     }
     
     /**

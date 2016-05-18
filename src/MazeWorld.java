@@ -2,6 +2,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 
 public class MazeWorld {
@@ -20,6 +23,22 @@ public class MazeWorld {
         this.commands = commands;
         this.pref = pref;
         generateWorld(pref.getValue("defaultMapWidth"), pref.getValue("defaultMapHeight"));
+        
+        // Creates a runable to add the the Scheduled Executor Service
+        Runnable aiRunnable = new Runnable() {
+            public void run() {
+                runAI();
+            }
+        };
+
+        // Creates a thread pool that can schedule commands to run after a given delay.
+        // executor is a scheduled thread pool
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+        
+        // Adds the runnable to the scheduler to run
+        // Waits 1 second before running it every 500 miliseconds
+        executor.scheduleAtFixedRate(aiRunnable, 1000, 500, TimeUnit.MILLISECONDS);
+        
     }
     
     /**
@@ -58,6 +77,8 @@ public class MazeWorld {
         winPlayer = -1;
         lockPlayerControl = false;
         updated = false;
+        
+        
     }
     
     private void generateCoins(int instances) {
@@ -244,26 +265,26 @@ public class MazeWorld {
         commands.add(c);
     }
     
-    public void solveCharacter() {
-        // Ask AI to make a move and add that to the command queue
-        try {
-            // send a command to the AIAgency telling the AI of name "" to make a move
-            addCommand(new Command(Com.RUN_AI));
-            Thread.sleep(50);
-        } catch(InterruptedException ex) {
-            Thread.currentThread().interrupt();
+    public void turnAIOn() {
+        players.get(0).toggleAIControl();
+    }
+
+    public void runAI() {
+        for (Character c : players) {
+            if (c.isAIControl()) {
+                try {
+                    // send a command to the AIAgency telling the AI of name "" to make a move
+                    Thread.sleep(50);
+                    addCommand(new Command(Com.RUN_AI));
+                } catch(InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                }
+            }
         }
-        
-        // if the player has reached the end
         if (winStatus) {
             pref.toggleBool("autoComplete");
         }
         
-        // if the player is set to auto complete, send another solve command
-        if (pref.getBool("autoComplete")) {
-            addCommand(new Command(Com.SOLVE));
-        }
-        update();
     }
 
     public int getPlayerCoins(int player) {
@@ -284,5 +305,4 @@ public class MazeWorld {
     public Coordinate getFinish() {
         return new Coordinate(maze.getFinish().getX(), maze.getFinish().getY());
     }
-    
 }

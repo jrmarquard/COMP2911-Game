@@ -7,7 +7,7 @@ public enum Com {
     MOVE_LEFT, 
     MOVE_RIGHT,
     IDLE,
-    SOLVE, 
+    TOGGLE_AI, 
     RUN_AI, 
     CREATE_AI, 
 }

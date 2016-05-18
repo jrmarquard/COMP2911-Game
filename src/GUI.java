@@ -126,7 +126,7 @@ public class GUI extends JFrame implements DisplayInterface {
                     case KeyEvent.VK_L:        
                         addCommand(new CommandMap(Com.MOVE_RIGHT, 4));      
                         break;
-                    case KeyEvent.VK_C:        addCommand(new Command(Com.SOLVE));         break;
+                    case KeyEvent.VK_C:        addCommand(new Command(Com.TOGGLE_AI));         break;
                     case KeyEvent.VK_ESCAPE:   setAppState(AppState.MENU);                 break; 
                     case KeyEvent.VK_N:        newGame(1);                                 break;
                 }
@@ -473,10 +473,10 @@ public class GUI extends JFrame implements DisplayInterface {
         auto.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // Toggle the setting
                 pref.toggleBool("autoComplete");
-                if (pref.getBool("autoComplete")) {
-                    addCommand(new Command(Com.SOLVE));
-                }
+                // Send message to MazeWorld and toggle the AI Control
+                addCommand(new Command(Com.TOGGLE_AI));
             }
         });
         
