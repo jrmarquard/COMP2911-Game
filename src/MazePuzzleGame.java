@@ -23,6 +23,7 @@ public class MazePuzzleGame {
     DisplayInterface disp;
     MazeWorld world;
     Queue<Command> commands;
+    SoundEngine soundEngine;
     
     /**
      * Initialises MazePuzzleGame.
@@ -36,6 +37,7 @@ public class MazePuzzleGame {
         this.commands = new LinkedList<Command>();
         this.world = new MazeWorld(commands, pref);
         this.disp = new GUI(this.pref, this.world, this.commands);
+        this.soundEngine = new SoundEngine();
         
         this.addCommand(new Command(Com.DRAW, null));
     }
@@ -52,28 +54,6 @@ public class MazePuzzleGame {
 	public static void main(String[] args) {
 	    
 	    MazePuzzleGame game = new MazePuzzleGame();
-	    
-	    //Where tim is playing around with sound
-	
-	    try {
-	    	String fileName = new String("coin-sound.wav");
-		    File soundFile = new File(fileName);
-	        File yourFile;
-	        AudioInputStream stream;
-	        AudioFormat format;
-	        DataLine.Info info;
-	        Clip clip; 
-
-	        stream = AudioSystem.getAudioInputStream(soundFile);
-	        format = stream.getFormat();
-	        info = new DataLine.Info(Clip.class, format);
-	        clip = (Clip) AudioSystem.getLine(info);
-	        clip.open(stream);
-	        clip.start();
-	    }
-	    catch (Exception e) {
-	        
-	    }
 	    
 	    
 	    
