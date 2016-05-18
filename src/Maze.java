@@ -9,6 +9,8 @@ public class Maze {
 	
 	private Node start;
 	private Node finish;
+	private Node doorStart;
+	private Node doorFinish;
 	
 	private int width;
 	private int height;
@@ -107,6 +109,17 @@ public class Maze {
 
     public boolean isFinish(int x, int y) {
         return getFinish().equals(new Node(x,y));
+    }
+    
+    public boolean isDoor(Coordinate coorA, Coordinate coorB) {
+    	if((this.doorStart.getCoordinate().equals(coorA) && 
+    			this.doorFinish.getCoordinate().equals(coorB)) ||
+    			(this.doorStart.getCoordinate().equals(coorB) && 
+    			this.doorFinish.getCoordinate().equals(coorA))) {
+    		return true;
+    	} else {
+    		return false;
+    	}
     }
     
 	public void makePath(int xA, int yA, int xB, int yB) {
@@ -249,14 +262,123 @@ public class Maze {
 		this.findAndSetFinish();
 	}
 	
-	private void findAndSetFinish() {
-		Queue<Node> newExplore = new LinkedList<Node>();
-		LinkedList<Node> newVisited = new LinkedList<Node>();
+	public void KeyAndDoorGenerator() {
+		ArrayList<Node> path = new ArrayList<Node>();
+		ArrayList<Node> shortestPath = new ArrayList<Node>();
+		Node deadEnd = null;
+		boolean pathFound = false;
+		boolean deadEndFound = false;
 		
-		newExplore.add(getStart());
-		while (!newExplore.isEmpty()){
-			Node n = newExplore.remove();
-			newVisited.add(n);
+		Queue<Node> q = new LinkedList<Node>();
+		Queue<Node> visited = new LinkedList<Node>();
+		
+		q.add(start);
+		while (!q.isEmpty()){
+			Node n = q.remove();
+			visited.add(n);
+			
+			ArrayList<Node> reachable = new ArrayList<Node>();
+			if (n.getLeft() != null) reachable.add(n.getLeft());
+			if (n.getDown() != null) reachable.add(n.getDown());
+			if (n.getRight() != null) reachable.add(n.getRight());
+			if (n.getUp() != null) reachable.add(n.getUp());
+			
+			if(!deadEndFound && !n.equals(this.start)) {
+				if(reachable.size() == 1) {
+					deadEnd = n;
+					deadEndFound = true;
+				}
+			}
+			
+			int i = 0;
+			while(i != reachable.size()){
+				Node neighbour = reachable.get(i);
+				path.add(neighbour);
+				path.add(n);
+				
+				if (neighbour.equals(this.finish)){
+					processPath(shortestPath, path, start, this.finish);
+					pathFound = true;
+					break;
+				} else if (!visited.contains(neighbour)){
+					q.add(neighbour);
+				}
+				i++;
+			}
+			
+			if(pathFound) {
+				break;
+			}
+		}
+		
+		int halfPoint = shortestPath.size() / 2;
+		Node nodeA = shortestPath.get(halfPoint);
+		Node nodeB = shortestPath.get(halfPoint + 1);
+		this.doorStart = nodeA;
+		this.doorFinish = nodeB;
+		System.out.print("Start ");
+		this.start.print();
+		System.out.print("Finish ");
+		this.finish.print();
+		System.out.print("Door ");
+		nodeA.print();
+		System.out.print("Door ");
+		nodeB.print();
+		System.out.print("Key ");
+		deadEnd.print();
+		
+		int xA = nodeA.getX();
+		int yA = nodeA.getY();
+		int xB = nodeB.getX();
+		int yB = nodeB.getY();
+		
+		// If nodeA is above nodeB
+		if(xA == xB && yA == yB - 1) {
+			nodeA.setDown(null);
+			nodeB.setUp(null);
+		} 
+		
+		// If nodeA is below nodeB
+		else if(xA == xB && yA == yB + 1) {
+			nodeA.setUp(null);
+			nodeB.setDown(null);
+		} 
+		
+		// If nodeA is left to nodeB
+		else if(xA == xB - 1 && yA == yB) {
+			nodeA.setRight(null);
+			nodeB.setLeft(null);
+		} 
+		
+		// If nodeA is right to nodeB
+		else if(xA == xB + 1 && yA == yB) {
+			nodeA.setLeft(null);
+			nodeB.setRight(null);
+		}
+	}
+	
+	private void processPath(ArrayList<Node> shortestPath, ArrayList<Node> path, 
+			Node start, Node dest){
+		int i = path.indexOf(dest);
+		Node source = path.get(i + 1);
+		
+		shortestPath.add(0, dest);
+		if (source.equals(start)) {
+		    shortestPath.add(0, start);
+		    return;
+		} else {
+		    processPath(shortestPath, path, start, source);
+		}
+	}
+	
+	private void findAndSetFinish() {
+		Queue<Node> explore = new LinkedList<Node>();
+		LinkedList<Node> visited = new LinkedList<Node>();
+		
+		explore.add(getStart());
+		while (!explore.isEmpty()){
+			Node n = explore.remove();
+			visited.add(n);
 			
 			ArrayList<Node> reachable = new ArrayList<Node>();
 			if (n.getLeft() != null) reachable.add(n.getLeft());
@@ -265,13 +387,13 @@ public class Maze {
 			if (n.getUp() != null) reachable.add(n.getUp());
 			
 			for(Node neighbour: reachable){
-				if (!newVisited.contains(neighbour)){
-					newExplore.add(neighbour);
+				if (!visited.contains(neighbour)){
+					explore.add(neighbour);
 				}
 			}
 		}
 		
-		Node node = newVisited.getLast();
+		Node node = visited.getLast();
 		this.finish = this.getNode(node.getX(), node.getY());
 	}
 	

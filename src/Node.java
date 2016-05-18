@@ -114,7 +114,7 @@ public class Node {
     }
 	
 	public void print() {
-		System.out.println("Node: " + this.x + " " + this.y);
+		System.out.println(this.x + " " + this.y);
 	}
 	
 	public boolean isAdjacent(Node n) {
