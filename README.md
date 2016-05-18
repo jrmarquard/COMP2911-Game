@@ -27,6 +27,32 @@ In this assignment, the aim is to construct an interactive maze puzzle game that
     - Implement a menu system
     - Add a second game mode
     - Improve display of maze
+- **Week 11**: Finish a maze which meets all the critea of the assignment.
+    - Assignment criteria:
+        - No bugs seen during demo/testing
+        - Smooth, responsive, intuitive, well designed user interface
+        - Clear design and diagrams fully adhering to design principles and conforming to code
+        - Algorithm that generates interesting and challenging games
+        - More than one type of extension (e.g. animation, multi-player, etc.)
+    - Finalise menus, this includes their appearance and their functionality
+    - Finalise design and realted
+        - Create design documents (UML, 'design diaries' maybe?, anything else?)
+        - Implement threading and tidy up code
+    - Generate mazes that distinguish ours from the rest
+        - make it feature rich (e.g. door/keys, different routes, buttons)
+        - demonstrate why our generation is 'hard', give it difficulties. Maybe compare different algos in a document
+    - Extension suggestions:
+        - Polish multiplayer
+        - Add other game modes
+        - Animation
+        - Add sprites
+        - Add textures
+        - Add enemies
+        - Add countdown/timer
+        - Add highscores
+    - Personal goals!
+        - Have a complete diary, showing your contribution week to week (or just something)
+        - Be able to explain your code, don't just copy paste of SO without knowing what it does
 
 #### Goals (bastardised user stories):
 - User needs to be able to start game, change settings, exit application
