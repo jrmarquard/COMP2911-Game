@@ -1,4 +1,5 @@
 import java.awt.EventQueue;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -79,7 +80,7 @@ public class MazePuzzleGame {
 	 */
     private void createAI(Command c) {
         CommandAI cAI = (CommandAI) c;
-        aiAgency.createAI(cAI.getName(), cAI.getWorld());
+        aiAgency.createAI(cAI.getName(), cAI.getWorld(), cAI.getSettings());
     }
 
     /**

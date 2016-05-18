@@ -64,7 +64,11 @@ public class MazeWorld {
         // Add player
         Character p = new Character(new Coordinate(maze.getStart().getX(), maze.getStart().getY()), pref.getText("Moneymaker"));
         players.add(p);
-        addCommand(new CommandAI(Com.CREATE_AI, this, p.getName()));
+        ArrayList<AIAgency.AISetting> settings = new ArrayList<AIAgency.AISetting>();
+        settings.add(AIAgency.AISetting.EASY);
+        settings.add(AIAgency.AISetting.MAZE_SOLVE);
+        
+        addCommand(new CommandAI(Com.CREATE_AI, this, p.getName(), settings));
         
         float h = (float)maze.getHeight();
         float w = (float)maze.getWidth();
