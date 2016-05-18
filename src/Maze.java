@@ -265,12 +265,10 @@ public class Maze {
 	public void KeyAndDoorGenerator() {
 		ArrayList<Node> path = new ArrayList<Node>();
 		ArrayList<Node> shortestPath = new ArrayList<Node>();
-		Node deadEnd = null;
 		boolean pathFound = false;
-		boolean deadEndFound = false;
 		
 		Queue<Node> q = new LinkedList<Node>();
-		Queue<Node> visited = new LinkedList<Node>();
+		LinkedList<Node> visited = new LinkedList<Node>();
 		
 		q.add(start);
 		while (!q.isEmpty()){
@@ -282,13 +280,6 @@ public class Maze {
 			if (n.getDown() != null) reachable.add(n.getDown());
 			if (n.getRight() != null) reachable.add(n.getRight());
 			if (n.getUp() != null) reachable.add(n.getUp());
-			
-			if(!deadEndFound && !n.equals(this.start)) {
-				if(reachable.size() == 1) {
-					deadEnd = n;
-					deadEndFound = true;
-				}
-			}
 			
 			int i = 0;
 			while(i != reachable.size()){
@@ -324,8 +315,6 @@ public class Maze {
 		nodeA.print();
 		System.out.print("Door ");
 		nodeB.print();
-		System.out.print("Key ");
-		deadEnd.print();
 		
 		int xA = nodeA.getX();
 		int yA = nodeA.getY();
@@ -355,6 +344,30 @@ public class Maze {
 			nodeA.setLeft(null);
 			nodeB.setRight(null);
 		}
+		
+		q.clear();
+		visited.clear();
+		q.add(getStart());
+		while (!q.isEmpty()){
+			Node n = q.remove();
+			visited.add(n);
+			
+			ArrayList<Node> reachable = new ArrayList<Node>();
+			if (n.getLeft() != null) reachable.add(n.getLeft());
+			if (n.getDown() != null) reachable.add(n.getDown());
+			if (n.getRight() != null) reachable.add(n.getRight());
+			if (n.getUp() != null) reachable.add(n.getUp());
+			
+			for(Node neighbour: reachable){
+				if (!visited.contains(neighbour)){
+					q.add(neighbour);
+				}
+			}
+		}
+		
+		Node node = visited.getLast();
+		System.out.print("Key ");
+		node.print();
 	}
 	
 	private void processPath(ArrayList<Node> shortestPath, ArrayList<Node> path, 
