@@ -12,7 +12,6 @@ public class MazeWorld {
     private Preferences pref;
     private Maze maze;
     private ArrayList<Character> players;
-    private String aiName;
     private ArrayList<Entity> entities;
     private boolean lockPlayerControl;
     private boolean winStatus;
@@ -37,7 +36,7 @@ public class MazeWorld {
         
         // Adds the runnable to the scheduler to run
         // Waits 1 second before running it every 500 miliseconds
-        executor.scheduleAtFixedRate(aiRunnable, 1000, 500, TimeUnit.MILLISECONDS);
+        executor.scheduleAtFixedRate(aiRunnable, 1000, 100, TimeUnit.MILLISECONDS);
         
     }
     
@@ -56,8 +55,6 @@ public class MazeWorld {
     public void generateWorld(int width, int height) {
         // Initialise local variables
         this.maze = new Maze(width, height);
-        this.aiName = "The Teamaker";
-        addCommand(new Command(Com.CREATE_AI));
         this.entities = new ArrayList<Entity>();
         this.players = new ArrayList<Character>();
         
@@ -65,7 +62,9 @@ public class MazeWorld {
         maze.mazeGenerator();
         
         // Add player
-        players.add(new Character(new Coordinate(maze.getStart().getX(), maze.getStart().getY()), pref.getText("playerName")));
+        Character p = new Character(new Coordinate(maze.getStart().getX(), maze.getStart().getY()), pref.getText("Moneymaker"));
+        players.add(p);
+        addCommand(new CommandAI(Com.CREATE_AI, this, p.getName()));
         
         float h = (float)maze.getHeight();
         float w = (float)maze.getWidth();
@@ -275,14 +274,14 @@ public class MazeWorld {
                 try {
                     // send a command to the AIAgency telling the AI of name "" to make a move
                     Thread.sleep(50);
-                    addCommand(new Command(Com.RUN_AI));
+                    addCommand(new CommandAI(Com.RUN_AI, c.getName()));
                 } catch(InterruptedException ex) {
                     Thread.currentThread().interrupt();
                 }
             }
         }
         if (winStatus) {
-            pref.toggleBool("autoComplete");
+            pref.setPreference("bool.autoComplete=false");
         }
         
     }

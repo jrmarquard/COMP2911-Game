@@ -32,7 +32,7 @@ public class MazePuzzleGame {
         this.disp = new GUI(this.pref, this.world, this.commands);
         this.aiAgency = new AIAgency(commands);
         
-        this.addCommand(new Command(Com.DRAW, null));
+        this.addCommand(new Command(Com.DRAW));
     }
 
     /**
@@ -58,28 +58,18 @@ public class MazePuzzleGame {
 	        
 	        // Get the command ID from the command and run appropriate game method
 	        switch (c.getCommandID()) {
-		        case NEW_MAP:       game.newMap(c);                    break;
-	            case DRAW:          game.refreshDisplay();             break;
-	            case EXIT:          game.close();	                   break;
+		        case NEW_MAP:      game.newMap(c);                     break;
+	            case DRAW:         game.refreshDisplay();              break;
+	            case EXIT:         game.close();	                   break;
 	            case MOVE_DOWN:
 	            case MOVE_LEFT:
 	            case MOVE_RIGHT:
-	            case MOVE_UP:
-	                game.moveCharacter(c);
-	                break;
-	            case TOGGLE_AI:
-	                game.turnAIOn();             
-	                break;
-	            case RUN_AI:        
-	                game.runAI();
-	                break;
-	            case CREATE_AI:
-	                game.createAI();
-	                break;
-	            case IDLE:
-	                break;
-	            default: 
-	                break;
+	            case MOVE_UP:      game.moveCharacter(c);              break;
+	            case TOGGLE_AI:    game.turnAIOn();                    break;
+	            case RUN_AI:       game.runAI(c);                       break;
+	            case CREATE_AI:    game.createAI(c);                    break;
+	            case IDLE:                                             break;
+	            default:                                               break;
 	        }
 	    }
 	}
@@ -87,8 +77,9 @@ public class MazePuzzleGame {
 	/**
 	 * Asks the aiAgency to create an AI of a given name.
 	 */
-    private void createAI() {
-        aiAgency.createAI("The Teamaker", world);
+    private void createAI(Command c) {
+        CommandAI cAI = (CommandAI) c;
+        aiAgency.createAI(cAI.getName(), cAI.getWorld());
     }
 
     /**
@@ -96,8 +87,9 @@ public class MazePuzzleGame {
      * It is expected that this AI will return a command 
      * to update itself in the game.
      */
-    private void runAI() {
-        aiAgency.makeMove("The Teamaker");
+    private void runAI(Command c) {
+        CommandAI cAI = (CommandAI) c;
+        aiAgency.makeMove(cAI.getName());
     }
 
     /**
