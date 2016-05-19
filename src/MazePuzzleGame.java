@@ -94,7 +94,7 @@ public class MazePuzzleGame {
         CommandMap c = (CommandMap)o;
         int width = c.getWidth();
         int height = c.getHeight();
-        world.generateWorld(width, height);
+        world.generateWorld(width, height, c.getGameMode());
         
         if (c.getPlayers() > 1) {
             world.setMuptiplayer(c.getPlayers());

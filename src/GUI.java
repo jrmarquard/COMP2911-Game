@@ -134,7 +134,7 @@ public class GUI extends JFrame implements DisplayInterface {
                         break;
                     case KeyEvent.VK_C:        addCommand(new Command(Com.SOLVE));         break;
                     case KeyEvent.VK_ESCAPE:   setAppState(AppState.MENU);                 break; 
-                    case KeyEvent.VK_N:        newGame(1);                                 break;
+                    case KeyEvent.VK_N:        newGame(1, 0);                                 break;
                 }
             }
         });
@@ -194,7 +194,6 @@ public class GUI extends JFrame implements DisplayInterface {
         startGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                newGame(1);
                 setAppState(AppState.GAME_NUM_PLAYERS);
             }
         });
@@ -382,6 +381,7 @@ public class GUI extends JFrame implements DisplayInterface {
         easyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+            	newGame(1, 0);
                 setAppState(AppState.GAME);
             }
         });
@@ -390,6 +390,7 @@ public class GUI extends JFrame implements DisplayInterface {
         mediumButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+            	newGame(1, 1);
                 setAppState(AppState.GAME);
             }
         });
@@ -398,6 +399,16 @@ public class GUI extends JFrame implements DisplayInterface {
         hardButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+            	newGame(1, 2);
+                setAppState(AppState.GAME);
+            }
+        });
+        
+        JButton veryHardButton = new JButton("Very Hard");
+        veryHardButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	newGame(1, 3);
                 setAppState(AppState.GAME);
             }
         });
@@ -406,6 +417,7 @@ public class GUI extends JFrame implements DisplayInterface {
         customButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+            	newGame(1, 9);
                 setAppState(AppState.GAME);
             }
         });
@@ -413,6 +425,7 @@ public class GUI extends JFrame implements DisplayInterface {
         windowPanel.add(easyButton);
         windowPanel.add(mediumButton);
         windowPanel.add(hardButton);
+        windowPanel.add(veryHardButton);
         windowPanel.add(customButton);
     }
     
@@ -426,7 +439,7 @@ public class GUI extends JFrame implements DisplayInterface {
             public void actionPerformed(ActionEvent e) {
             	JComboBox<Integer> box = (JComboBox<Integer>)windowPanel.getComponent(0);
             	int num = (int)box.getSelectedItem();
-            	newGame(num);
+            	newGame(num, 10);
                 setAppState(AppState.GAME);
             }
         });
@@ -437,7 +450,7 @@ public class GUI extends JFrame implements DisplayInterface {
             public void actionPerformed(ActionEvent e) {
             	JComboBox<Integer> box = (JComboBox<Integer>)windowPanel.getComponent(0);
             	int num = (int)box.getSelectedItem();
-            	newGame(num);
+            	newGame(num, 11);
                 setAppState(AppState.GAME);
             }
         });
@@ -587,34 +600,34 @@ public class GUI extends JFrame implements DisplayInterface {
             }
         });
         
-        final JPopupMenu newMazePopup = new JPopupMenu();
-        newMazePopup.add(new JMenuItem(new AbstractAction("One Player") {
-        	public void actionPerformed(ActionEvent event) {
-        	    newGame(1);
-            }
-        }));
-        newMazePopup.add(new JMenuItem(new AbstractAction("Two Players") {
-        	public void actionPerformed(ActionEvent event) {
-        	    newGame(2);
-            }
-        }));
-        newMazePopup.add(new JMenuItem(new AbstractAction("Three Players") {
-        	public void actionPerformed(ActionEvent event) {
-        	    newGame(3);
-            }
-        }));
-        newMazePopup.add(new JMenuItem(new AbstractAction("Four Players") {
-        	public void actionPerformed(ActionEvent event) {
-        	    newGame(4);
-            }
-        }));
-        
-        JButton newMazeButton = new JButton("New Maze");
-        newMazeButton.addMouseListener(new MouseAdapter() {
-        	public void mousePressed(MouseEvent e) {
-                newMazePopup.show(e.getComponent(), e.getX(), e.getY());
-            }
-        });
+//        final JPopupMenu newMazePopup = new JPopupMenu();
+//        newMazePopup.add(new JMenuItem(new AbstractAction("One Player") {
+//        	public void actionPerformed(ActionEvent event) {
+//        	    newGame(1);
+//            }
+//        }));
+//        newMazePopup.add(new JMenuItem(new AbstractAction("Two Players") {
+//        	public void actionPerformed(ActionEvent event) {
+//        	    newGame(2);
+//            }
+//        }));
+//        newMazePopup.add(new JMenuItem(new AbstractAction("Three Players") {
+//        	public void actionPerformed(ActionEvent event) {
+//        	    newGame(3);
+//            }
+//        }));
+//        newMazePopup.add(new JMenuItem(new AbstractAction("Four Players") {
+//        	public void actionPerformed(ActionEvent event) {
+//        	    newGame(4);
+//            }
+//        }));
+//        
+//        JButton newMazeButton = new JButton("New Maze");
+//        newMazeButton.addMouseListener(new MouseAdapter() {
+//        	public void mousePressed(MouseEvent e) {
+//                newMazePopup.show(e.getComponent(), e.getX(), e.getY());
+//            }
+//        });
         
         JButton closeButton = new JButton("Exit to menu");
         closeButton.setMnemonic(KeyEvent.VK_W);
@@ -624,14 +637,17 @@ public class GUI extends JFrame implements DisplayInterface {
                 setAppState(AppState.MENU);
             }
         });
-        gameMenuPanel.add(new JLabel("Width"));
-        gameMenuPanel.add(widthSize);
-        gameMenuPanel.add(new JLabel("Height"));
-        gameMenuPanel.add(heightSize);
-        if(world.getNumberOfPlayers() == 1) {
-            gameMenuPanel.add(auto);
+        
+        if(world.getGameMode() == 9) {
+        	gameMenuPanel.add(new JLabel("Width"));
+            gameMenuPanel.add(widthSize);
+            gameMenuPanel.add(new JLabel("Height"));
+            gameMenuPanel.add(heightSize);
         }
-        gameMenuPanel.add(newMazeButton);
+//        if(world.getNumberOfPlayers() == 1) {
+//            gameMenuPanel.add(auto);
+//        }
+        //gameMenuPanel.add(newMazeButton);
         gameMenuPanel.add(closeButton);
     }
     
@@ -640,10 +656,10 @@ public class GUI extends JFrame implements DisplayInterface {
      * 
      * @param numPlayers 1 or 2, nothing else
      */
-    private void newGame(int numPlayers) {
+    private void newGame(int numPlayers, int gameMode) {
         int width = pref.getValue("defaultMapWidth");
         int height = pref.getValue("defaultMapHeight");
-        addCommand(new CommandMap(Com.NEW_MAP, width, height, numPlayers));
+        addCommand(new CommandMap(Com.NEW_MAP, width, height, numPlayers, gameMode));
         setAppState(AppState.GAME);
     }
     

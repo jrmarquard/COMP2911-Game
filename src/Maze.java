@@ -64,7 +64,11 @@ public class Maze {
     }
     
     public Coordinate getKeyCoordinate() {
-        return key.getCoordinate();
+    	if(this.key!= null) {
+    		return key.getCoordinate();
+    	} else {
+    		return null;
+    	}
     }
 	
 	public int getWidth() {

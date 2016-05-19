@@ -171,9 +171,11 @@ public class GameMap extends JPanel {
         }
         
         c = world.getKey();
-        g2d.setColor(pref.getColour("keyColour"));
-        g2d.fillRect(wallWidth+(c.getX()*(wallWidth+tileSize)), wallWidth+(c.getY()*(wallWidth+tileSize)), tileSize, tileSize);
-
+        if(c != null) {
+        	g2d.setColor(pref.getColour("keyColour"));
+            g2d.fillRect(wallWidth+(c.getX()*(wallWidth+tileSize)), wallWidth+(c.getY()*(wallWidth+tileSize)), tileSize, tileSize);
+        }
+        
     }
     
     /*

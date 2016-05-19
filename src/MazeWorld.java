@@ -8,6 +8,7 @@ public class MazeWorld {
     private Queue<Command> commands;
     private Preferences pref;
     private Maze maze;
+    private int gameMode;
     private ArrayList<Character> players;
     private AIControl ai;
     private ArrayList<Entity> entities;
@@ -19,7 +20,7 @@ public class MazeWorld {
     public MazeWorld (Queue<Command> commands, Preferences pref) {
         this.commands = commands;
         this.pref = pref;
-        generateWorld(pref.getValue("defaultMapWidth"), pref.getValue("defaultMapHeight"));
+        //generateWorld(pref.getValue("defaultMapWidth"), pref.getValue("defaultMapHeight"));
     }
     
     /**
@@ -34,16 +35,39 @@ public class MazeWorld {
      * @param height height of the maze to be generated
      * @param width width of the maze to be generated
      */
-    public void generateWorld(int width, int height) {
+    public void generateWorld(int width, int height, int gameMode) {
         // Initialise local variables
-        this.maze = new Maze(width, height);
+    	this.gameMode = gameMode;
         this.ai = new AI();
         this.entities = new ArrayList<Entity>();
         this.players = new ArrayList<Character>();
+
+        // Single player easy
+        if(gameMode == 0) {
+        	this.maze = new Maze(6, 6);
+        }
+        
+        // Single player medium
+        else if(gameMode == 1) {
+        	this.maze = new Maze(10, 10);
+        }
+        
+        // Single player hard or very hard
+        else if(gameMode == 2 || gameMode == 3) {
+        	this.maze = new Maze(20, 20);
+        } 
+        
+        // Custom mode
+        else {
+        	this.maze = new Maze(width, height);
+        }
         
         // Generate maze
         maze.mazeGenerator();
-        maze.DoorAndKeyGenerator();
+        // Single player very hard
+        if(gameMode == 3) {
+        	maze.DoorAndKeyGenerator();
+        }
         
         // Add player
         players.add(new Character(new Coordinate(maze.getStart().getX(), maze.getStart().getY()), pref.getText("playerName")));
@@ -52,7 +76,12 @@ public class MazeWorld {
         float w = (float)maze.getWidth();
         float r = (float)pref.getValue("defaultCoinRatio");
         int numberOfCoins = (int)(h*w*(r/100));
-        generateCoins(numberOfCoins);
+        // Game mode 10 is multiplayer race to finish mode
+        // Not going to have coins in this mode
+        if(gameMode != 10) {
+        	generateCoins(numberOfCoins);
+        }
+        
 
         winStatus = false;
         winPlayer = -1;
@@ -94,6 +123,10 @@ public class MazeWorld {
      */
     public Maze getMaze() {
         return maze;
+    }
+    
+    public int getGameMode() {
+    	return this.gameMode;
     }
     
     public int getNumberOfPlayers() {

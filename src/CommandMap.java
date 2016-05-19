@@ -3,13 +3,15 @@ public class CommandMap extends Command {
     private int height;
     private int width;
     private int players;
+    private int gameMode;
     int playerID;
     
-    public CommandMap(Com id, int width, int height, int players) {
+    public CommandMap(Com id, int width, int height, int players, int gameMode) {
         super(id);
         this.width = width;
         this.height = height;
         this.players = players;
+        this.gameMode = gameMode;
     }
     /**
      * This constructor is used to move a player
@@ -54,4 +56,7 @@ public class CommandMap extends Command {
         this.width = width;
     }
   
+    public int getGameMode() {
+    	return this.gameMode;
+    }
 }
