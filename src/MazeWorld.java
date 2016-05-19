@@ -116,6 +116,7 @@ public class MazeWorld {
             winStatus = true;
             lockPlayerControl = true;
             updated = true;
+            addCommand(new Command(Com.PLAY_FINISH));
         }
         entityCollision();
         

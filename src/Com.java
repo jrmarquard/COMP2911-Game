@@ -9,6 +9,7 @@ public enum Com {
     IDLE,
     SOLVE,
     PLAY_COIN,
-    PLAY_INTRO
+    PLAY_INTRO,
+    PLAY_FINISH
     
 }
