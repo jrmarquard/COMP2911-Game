@@ -16,6 +16,12 @@ public class GUI extends JFrame implements DisplayInterface {
         /* Menu displays the main menu */
         MENU, 
         
+        GAME_NUM_PLAYERS,
+        
+        GAME_SINGLE_MODE,
+        
+        GAME_MULTI_MODE,
+        
         /* Game displays the game state, this can currently
          * be several came states, will likely seperate this into
          * different game modes
@@ -148,16 +154,22 @@ public class GUI extends JFrame implements DisplayInterface {
 
         // Draws whatever mode the GUI is currently in
         switch(appState) {
-            case MENU:      drawMenu();         
-                            break;
-            case GAME:      drawGame();         
-                            break;
-            case SETTINGS:  drawSettings();     
-                            break;
-            case ABOUT:     drawAbout();        
-                            break;
-            case EXIT:      addCommand(new Command(Com.EXIT));
-                            break;
+            case MENU:     			drawMenu();         
+                        			break;
+            case GAME_NUM_PLAYERS:	drawNumPlayers();
+            						break;
+            case GAME_SINGLE_MODE:	drawSingleMode();
+            						break;
+            case GAME_MULTI_MODE:	drawMultiMode();
+            						break;
+            case GAME:      		drawGame();         
+                            		break;
+            case SETTINGS:  		drawSettings();     
+                            		break;
+            case ABOUT:     		drawAbout();        
+                            		break;
+            case EXIT:      		addCommand(new Command(Com.EXIT));
+                            		break;
         }
         
         // Refocuses the window so keystrokes are registered
@@ -183,7 +195,7 @@ public class GUI extends JFrame implements DisplayInterface {
             @Override
             public void actionPerformed(ActionEvent e) {
                 newGame(1);
-                setAppState(AppState.GAME);
+                setAppState(AppState.GAME_NUM_PLAYERS);
             }
         });
 
@@ -338,6 +350,101 @@ public class GUI extends JFrame implements DisplayInterface {
             settingRow.add(settingColour);
             settingsPanel.add(settingRow);
         }
+    }
+    
+    private void drawNumPlayers() {
+    	windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
+
+        JButton singlePlayerButton = new JButton("Single Player");
+        singlePlayerButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setAppState(AppState.GAME_SINGLE_MODE);
+            }
+        });
+        
+        JButton multiPlayerButton = new JButton("Multiplayer");
+        multiPlayerButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setAppState(AppState.GAME_MULTI_MODE);
+            }
+        });
+        
+        windowPanel.add(singlePlayerButton);
+        windowPanel.add(multiPlayerButton);
+    }
+    
+    private void drawSingleMode() {
+    	windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
+
+        JButton easyButton = new JButton("Easy");
+        easyButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setAppState(AppState.GAME);
+            }
+        });
+        
+        JButton mediumButton = new JButton("Medium");
+        mediumButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setAppState(AppState.GAME);
+            }
+        });
+        
+        JButton hardButton = new JButton("Hard");
+        hardButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setAppState(AppState.GAME);
+            }
+        });
+        
+        JButton customButton = new JButton("Custom");
+        customButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setAppState(AppState.GAME);
+            }
+        });
+        
+        windowPanel.add(easyButton);
+        windowPanel.add(mediumButton);
+        windowPanel.add(hardButton);
+        windowPanel.add(customButton);
+    }
+    
+    private void drawMultiMode() {
+    	Integer[] numPlayers = new Integer[]{2,3,4};
+    	JComboBox<Integer> numPlayersSelect = new JComboBox<>(numPlayers);
+    	
+    	JButton raceButton = new JButton("Race To Finish");
+    	raceButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	JComboBox<Integer> box = (JComboBox<Integer>)windowPanel.getComponent(0);
+            	int num = (int)box.getSelectedItem();
+            	newGame(num);
+                setAppState(AppState.GAME);
+            }
+        });
+    	
+    	JButton coinsHuntButton = new JButton("Coins Hunting");
+    	coinsHuntButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	JComboBox<Integer> box = (JComboBox<Integer>)windowPanel.getComponent(0);
+            	int num = (int)box.getSelectedItem();
+            	newGame(num);
+                setAppState(AppState.GAME);
+            }
+        });
+    	
+    	windowPanel.add(numPlayersSelect);
+    	windowPanel.add(raceButton);
+    	windowPanel.add(coinsHuntButton);
     }
     
     private void drawGame() {

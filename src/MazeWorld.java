@@ -43,6 +43,7 @@ public class MazeWorld {
         
         // Generate maze
         maze.mazeGenerator();
+        maze.KeyAndDoorGenerator();
         
         // Add player
         players.add(new Character(new Coordinate(maze.getStart().getX(), maze.getStart().getY()), pref.getText("playerName")));
@@ -282,5 +283,7 @@ public class MazeWorld {
     public Coordinate getFinish() {
         return new Coordinate(maze.getFinish().getX(), maze.getFinish().getY());
     }
-    
+    public Coordinate getKey() {
+        return maze.getKeyCoordinate();
+    }
 }

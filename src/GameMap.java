@@ -120,13 +120,21 @@ public class GameMap extends JPanel {
                 } else {
                     // Vertical walls
                     if (col%2 == 0) {
-                        if (!m.isAdjacent((col/2)-1, (row-1)/2, col/2, (row-1)/2)){
+                    	if(m.isDoor((col/2)-1, (row-1)/2, col/2, (row-1)/2)) {
+                    		g2d.setColor(pref.getColour("doorColour"));
+                    		g2d.fillRect((tileSize+wallWidth)*((col/2)), wallWidth + (tileSize+wallWidth)*((row-1)/2), wallWidth, tileSize);
+                    		g2d.setColor(pref.getColour("wallColour"));
+                    	} else if (!m.isAdjacent((col/2)-1, (row-1)/2, col/2, (row-1)/2)){
                             g2d.fillRect((tileSize+wallWidth)*((col/2)), wallWidth + (tileSize+wallWidth)*((row-1)/2), wallWidth, tileSize);   
                         }
                     }
                     // Horizontal walls
                     else if (row%2 == 0) {
-                        if (!m.isAdjacent((col-1)/2, (row/2)-1, (col-1)/2, (row/2))){
+                    	if(m.isDoor((col-1)/2, (row/2)-1, (col-1)/2, (row/2))) {
+                    		g2d.setColor(pref.getColour("doorColour"));
+                    		g2d.fillRect(wallWidth + (tileSize+wallWidth)*((col-1)/2), (tileSize+wallWidth)*(row/2), tileSize, wallWidth);
+                    		g2d.setColor(pref.getColour("wallColour"));
+                    	} else if (!m.isAdjacent((col-1)/2, (row/2)-1, (col-1)/2, (row/2))){
                             g2d.fillRect(wallWidth + (tileSize+wallWidth)*((col-1)/2), (tileSize+wallWidth)*(row/2), tileSize, wallWidth);   
                         }
                     }
@@ -161,6 +169,11 @@ public class GameMap extends JPanel {
         for (Coordinate s : coords) {
             g2d.fillRect(wallWidth+(s.getX()*(wallWidth+tileSize)), wallWidth+(s.getY()*(wallWidth+tileSize)), tileSize, tileSize);
         }
+        
+        c = world.getKey();
+        g2d.setColor(pref.getColour("keyColour"));
+        g2d.fillRect(wallWidth+(c.getX()*(wallWidth+tileSize)), wallWidth+(c.getY()*(wallWidth+tileSize)), tileSize, tileSize);
+
     }
     
     /*

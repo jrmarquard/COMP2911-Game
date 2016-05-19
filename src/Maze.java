@@ -11,6 +11,7 @@ public class Maze {
 	private Node finish;
 	private Node doorStart;
 	private Node doorFinish;
+	private Node key;
 	
 	private int width;
 	private int height;
@@ -50,6 +51,10 @@ public class Maze {
 	}
     public Coordinate getFinishCoordinate() {
         return finish.getCoordinate();
+    }
+    
+    public Coordinate getKeyCoordinate() {
+        return key.getCoordinate();
     }
 	
 	public int getWidth() {
@@ -111,11 +116,11 @@ public class Maze {
         return getFinish().equals(new Node(x,y));
     }
     
-    public boolean isDoor(Coordinate coorA, Coordinate coorB) {
-    	if((this.doorStart.getCoordinate().equals(coorA) && 
-    			this.doorFinish.getCoordinate().equals(coorB)) ||
-    			(this.doorStart.getCoordinate().equals(coorB) && 
-    			this.doorFinish.getCoordinate().equals(coorA))) {
+    public boolean isDoor(int xA, int yA, int xB, int yB) {
+    	if((this.getNode(xA, yA).equals(this.doorStart) &&
+    			this.getNode(xB, yB).equals(this.doorFinish)) ||
+    			(this.getNode(xA, yA).equals(this.doorFinish) &&
+    			this.getNode(xB, yB).equals(this.doorStart))) {
     		return true;
     	} else {
     		return false;
@@ -366,6 +371,7 @@ public class Maze {
 		}
 		
 		Node node = visited.getLast();
+		this.key = node;
 		System.out.print("Key ");
 		node.print();
 	}
