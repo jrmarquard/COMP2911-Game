@@ -43,7 +43,7 @@ public class MazeWorld {
         
         // Generate maze
         maze.mazeGenerator();
-        maze.KeyAndDoorGenerator();
+        maze.DoorAndKeyGenerator();
         
         // Add player
         players.add(new Character(new Coordinate(maze.getStart().getX(), maze.getStart().getY()), pref.getText("playerName")));

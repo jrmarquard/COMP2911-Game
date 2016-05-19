@@ -34,6 +34,9 @@ public class Maze {
 		
 		this.start = null;
 		this.finish = null;
+		this.doorStart = null;
+		this.doorFinish = null;
+		this.key = null;
 		
 		this.width = width;
 		this.height = height;
@@ -267,7 +270,7 @@ public class Maze {
 		this.findAndSetFinish();
 	}
 	
-	public void KeyAndDoorGenerator() {
+	public void DoorAndKeyGenerator() {
 		ArrayList<Node> path = new ArrayList<Node>();
 		ArrayList<Node> shortestPath = new ArrayList<Node>();
 		boolean pathFound = false;
@@ -350,6 +353,8 @@ public class Maze {
 			nodeB.setRight(null);
 		}
 		
+		this.resetNodeCost();
+		int i = 1;
 		q.clear();
 		visited.clear();
 		q.add(getStart());
@@ -365,15 +370,51 @@ public class Maze {
 			
 			for(Node neighbour: reachable){
 				if (!visited.contains(neighbour)){
+					neighbour.addCost(i);
 					q.add(neighbour);
+				}
+			}
+			
+			i++;
+		}
+		
+		i = 1;
+		q.clear();
+		visited.clear();
+		q.add(this.doorStart);
+		while (!q.isEmpty()){
+			Node n = q.remove();
+			visited.add(n);
+			
+			ArrayList<Node> reachable = new ArrayList<Node>();
+			if (n.getLeft() != null) reachable.add(n.getLeft());
+			if (n.getDown() != null) reachable.add(n.getDown());
+			if (n.getRight() != null) reachable.add(n.getRight());
+			if (n.getUp() != null) reachable.add(n.getUp());
+			
+			for(Node neighbour: reachable){
+				if (!visited.contains(neighbour)){
+					neighbour.addCost(i);
+					q.add(neighbour);
+				}
+			}
+			
+			i++;
+		}
+		
+		for(ArrayList<Node> aList: this.nodes) {
+			for(Node node: aList) {
+				if(this.key == null) {
+					this.key = node;
+				} else if(node.getCost() > this.key.getCost()) {
+					this.key = node;
 				}
 			}
 		}
 		
-		Node node = visited.getLast();
-		this.key = node;
 		System.out.print("Key ");
-		node.print();
+		this.key.print();
+		System.out.println(this.key.getCost());
 	}
 	
 	private void processPath(ArrayList<Node> shortestPath, ArrayList<Node> path, 
@@ -387,6 +428,14 @@ public class Maze {
 		    return;
 		} else {
 		    processPath(shortestPath, path, start, source);
+		}
+	}
+	
+	private void resetNodeCost() {
+		for(ArrayList<Node> aList: this.nodes) {
+			for(Node node: aList) {
+				node.resetCost();
+			}
 		}
 	}
 	
