@@ -1,5 +1,7 @@
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -9,35 +11,32 @@ import javax.sound.sampled.DataLine;
 
 public class SoundEngine {
 	private boolean soundEnabled;
-	private ArrayList<File> files;
+	private Map<String, Clip> sounds;
 	
 	public SoundEngine() {
 		this.soundEnabled = true;
-		this.files = new ArrayList<File>();
-		String fileName;
+		this.sounds = new HashMap<String, Clip>();
 		File soundFile;
-			
+	
+		ArrayList<String> soundFileNames = new ArrayList<String>();
+		soundFileNames.add("coin.wav");
+        soundFileNames.add("intro.wav");
+        soundFileNames.add("finish.wav");
+        soundFileNames.add("step.wav");
+        
 		try {
-			fileName = new String("coin-sound.wav");
-		    soundFile = new File(fileName);
-		    
-		    this.files.add(soundFile);
-		    
-		    fileName = new String("intro.wav");
-		    soundFile = new File(fileName);
-		    
-		    this.files.add(soundFile);
-		    
-		    fileName = new String("finish.wav");
-		    soundFile = new File(fileName);
-		    
-		    this.files.add(soundFile);
-		    
-		    fileName = new String("step.wav");
-		    soundFile = new File(fileName);
-		    
-		    this.files.add(soundFile);
-		    
+		    for (String s : soundFileNames) {
+		        String fileName = s;
+	            String fileLocation = fileName;
+	            fileName = fileName.split("\\.")[0];
+	            soundFile = new File(fileLocation);
+                AudioInputStream stream = AudioSystem.getAudioInputStream(soundFile);
+                AudioFormat format = stream.getFormat();
+                DataLine.Info info = new DataLine.Info(Clip.class, format);
+                Clip clip = (Clip) AudioSystem.getLine(info);
+                clip.open(stream);
+                sounds.put(fileName, clip);
+            }
 		} 
 		catch (Exception e){
 			this.soundEnabled = false;
@@ -46,55 +45,8 @@ public class SoundEngine {
 	}
 	public void playSound(String soundName) {
 		if (this.soundEnabled) {
-			if (soundName.equals("coin")) {
-				try {
-					AudioInputStream stream = AudioSystem.getAudioInputStream(this.files.get(0));
-        	        AudioFormat format = stream.getFormat();
-        	        DataLine.Info info = new DataLine.Info(Clip.class, format);
-        	        Clip clip = (Clip) AudioSystem.getLine(info);
-        	        clip.open(stream);
-        	        clip.start();
-				}
-				catch (Exception e) {
-					
-				}
-			} else if (soundName.equals("intro")) {
-				try {
-					AudioInputStream stream = AudioSystem.getAudioInputStream(this.files.get(1));
-        	        AudioFormat format = stream.getFormat();
-        	        DataLine.Info info = new DataLine.Info(Clip.class, format);
-        	        Clip clip = (Clip) AudioSystem.getLine(info);
-        	        clip.open(stream);
-        	        clip.start();
-				}
-				catch (Exception e) {
-					
-				}
-			} else if (soundName.equals("finish")) {
-				try {
-					AudioInputStream stream = AudioSystem.getAudioInputStream(this.files.get(2));
-        	        AudioFormat format = stream.getFormat();
-        	        DataLine.Info info = new DataLine.Info(Clip.class, format);
-        	        Clip clip = (Clip) AudioSystem.getLine(info);
-        	        clip.open(stream);
-        	        clip.start();
-				}
-				catch (Exception e) {
-					
-				}
-			} else if (soundName.equals("step")) {
-				try {
-					AudioInputStream stream = AudioSystem.getAudioInputStream(this.files.get(3));
-        	        AudioFormat format = stream.getFormat();
-        	        DataLine.Info info = new DataLine.Info(Clip.class, format);
-        	        Clip clip = (Clip) AudioSystem.getLine(info);
-        	        clip.open(stream);
-        	        clip.start();
-				}
-				catch (Exception e) {
-					
-				}
-			}
+		    sounds.get(soundName).setFramePosition(0); 
+	        sounds.get(soundName).start();
 		}
 	}
 }
