@@ -131,6 +131,20 @@ public class Maze {
         return getFinish().equals(new Node(x,y));
     }
     
+    public Coordinate getDoorCoordinate() {
+    	if(this.doorStart != null) {
+    		return this.doorStart.getCoordinate();
+    	} else {
+    		return null;
+    	}
+    }
+    
+    public void openDoor() {
+    	this.connectNodes(this.doorStart, this.doorFinish);
+    	this.doorStart = null;
+    	this.doorFinish = null;
+    }
+    
     public boolean isDoor(int xA, int yA, int xB, int yB) {
     	if((this.getNode(xA, yA).equals(this.doorStart) &&
     			this.getNode(xB, yB).equals(this.doorFinish)) ||

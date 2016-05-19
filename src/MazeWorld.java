@@ -234,6 +234,8 @@ public class MazeWorld {
         }
         if (maze.isDown(players.get(player).getCoordinate())) {
         	players.get(player).setY(players.get(player).getY()+1);
+        	pickUpKey(player);
+        	openDoor(player);
         }
         update();
     }
@@ -244,6 +246,8 @@ public class MazeWorld {
         }
         if (maze.isLeft(players.get(player).getCoordinate())) {
         	players.get(player).setX(players.get(player).getX()-1);
+        	pickUpKey(player);
+        	openDoor(player);
         }
         update();
     }
@@ -254,6 +258,8 @@ public class MazeWorld {
         }
         if (maze.isRight(players.get(player).getCoordinate())) {
         	players.get(player).setX(players.get(player).getX()+1);
+        	pickUpKey(player);
+        	openDoor(player);
         }
         update();
     }
@@ -266,8 +272,25 @@ public class MazeWorld {
         
         if (maze.isUp(players.get(player).getCoordinate())) {
         	players.get(player).setY(players.get(player).getY()-1);
+        	pickUpKey(player);
+        	openDoor(player);
         }
         update();
+    }
+    
+    private void pickUpKey(int player) {
+    	Character character = players.get(player);
+    	if(character.getCoordinate().equals(maze.getKeyCoordinate())) {
+    		character.setKey(true);
+    	}
+    }
+    
+    private void openDoor(int player) {
+    	Character character = players.get(player);
+    	if(character.getCoordinate().equals(maze.getDoorCoordinate()) &&
+    			character.getKey()) {
+    		maze.openDoor();
+    	}
     }
 
     public boolean hasCharacterWon(int player) {
