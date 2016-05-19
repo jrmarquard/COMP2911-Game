@@ -25,9 +25,8 @@ public class SoundEngine {
         soundFileNames.add("step.wav");
         
 		try {
-		    for (String s : soundFileNames) {
-		        String fileName = s;
-	            String fileLocation = fileName;
+		    for (String fileName : soundFileNames) {
+	            String fileLocation = "sounds/"+fileName;
 	            fileName = fileName.split("\\.")[0];
 	            soundFile = new File(fileLocation);
                 AudioInputStream stream = AudioSystem.getAudioInputStream(soundFile);
