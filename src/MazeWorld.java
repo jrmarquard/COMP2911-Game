@@ -172,22 +172,34 @@ public class MazeWorld {
     
     public void moveCharacterDown() {
         if (lockPlayerControl) return;
-        if (maze.isDown(player.getX(), player.getY())) player.setY(player.getY()+1);
+        if (maze.isDown(player.getX(), player.getY())) {
+        	player.setY(player.getY()+1);
+        	addCommand(new Command(Com.PLAY_STEP));
+        }
         update();
     }
     public void moveCharacterLeft() {
         if (lockPlayerControl) return;
-        if (maze.isLeft(player.getX(), player.getY())) player.setX(player.getX()-1);
+        if (maze.isLeft(player.getX(), player.getY())) {
+        	player.setX(player.getX()-1);
+        	addCommand(new Command(Com.PLAY_STEP));
+        }
         update();
     }
     public void moveCharacterRight() {
         if (lockPlayerControl) return;
-        if (maze.isRight(player.getX(), player.getY())) player.setX(player.getX()+1);
+        if (maze.isRight(player.getX(), player.getY())) {
+        	player.setX(player.getX()+1);
+        	addCommand(new Command(Com.PLAY_STEP));
+        }
         update();
     }
     public void moveCharacterUp() {
         if (lockPlayerControl) return;
-        if (maze.isUp(player.getX(), player.getY())) player.setY(player.getY()-1);
+        if (maze.isUp(player.getX(), player.getY())) {
+        	player.setY(player.getY()-1);
+        	addCommand(new Command(Com.PLAY_STEP));
+        }
         update();
     }
 

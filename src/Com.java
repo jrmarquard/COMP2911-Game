@@ -10,6 +10,7 @@ public enum Com {
     SOLVE,
     PLAY_COIN,
     PLAY_INTRO,
-    PLAY_FINISH
+    PLAY_FINISH,
+    PLAY_STEP
     
 }

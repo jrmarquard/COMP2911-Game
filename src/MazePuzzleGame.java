@@ -78,6 +78,7 @@ public class MazePuzzleGame {
 	            case PLAY_COIN:    game.playCoin();					   break;
 	            case PLAY_INTRO:   game.playIntro();				   break;
 	            case PLAY_FINISH:  game.playFinish();                  break;
+	            case PLAY_STEP:    game.playStep(); 				   break;
 	        }
 	    }
 	}
@@ -93,6 +94,10 @@ public class MazePuzzleGame {
     
     private void playFinish() {
     	this.soundEngine.playSound("finish");
+    }
+    
+    private void playStep() {
+    	this.soundEngine.playSound("step");
     }
 
 	/**
