@@ -282,6 +282,7 @@ public class MazeWorld {
     	Character character = players.get(player);
     	if(character.getCoordinate().equals(maze.getKeyCoordinate())) {
     		character.setKey(true);
+    		maze.removeKey();
     	}
     }
     

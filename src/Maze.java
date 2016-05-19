@@ -145,6 +145,10 @@ public class Maze {
     	this.doorFinish = null;
     }
     
+    public void removeKey() {
+    	this.key = null;
+    }
+    
     public boolean isDoor(int xA, int yA, int xB, int yB) {
     	if((this.getNode(xA, yA).equals(this.doorStart) &&
     			this.getNode(xB, yB).equals(this.doorFinish)) ||
