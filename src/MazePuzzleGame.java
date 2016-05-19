@@ -29,7 +29,7 @@ public class MazePuzzleGame {
     public MazePuzzleGame() {
         this.pref = new Preferences();
         this.commands = new LinkedList<Command>();
-        this.world = new MazeWorld(commands, pref);
+        this.world = new MazeWorld(this, pref);
         this.disp = new GUI(this.pref, this.world, this.commands);
         this.aiAgency = new AIAgency(commands);
         
@@ -75,6 +75,13 @@ public class MazePuzzleGame {
 	    }
 	}
 
+	/**
+	 * A public method to tell the MazePuzzleGame to do something.
+	 */
+	public void notify(Command c) {
+	    addCommand(c);
+	}
+	
 	/**
 	 * Asks the aiAgency to create an AI of a given name.
 	 */
@@ -159,7 +166,7 @@ public class MazePuzzleGame {
      * Adds command c to the command queue
      * @param c
      */
-	public void addCommand(Command c) {
+	private void addCommand(Command c) {
 	    commands.add(c);
 	}
 	
@@ -168,7 +175,7 @@ public class MazePuzzleGame {
 	 * 
 	 * @return
 	 */
-	public Command pollCommands() {
+	private Command pollCommands() {
 	    return commands.poll();
 	}
 	

@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 
 public class MazeWorld {
-    private Queue<Command> commands;
+    private MazePuzzleGame manager;
     private Preferences pref;
     private Maze maze;
     private ArrayList<Character> players;
@@ -18,8 +18,8 @@ public class MazeWorld {
     private int winPlayer;
     private boolean updated;
     
-    public MazeWorld (Queue<Command> commands, Preferences pref) {
-        this.commands = commands;
+    public MazeWorld (MazePuzzleGame manager, Preferences pref) {
+        this.manager = manager;
         this.pref = pref;
         generateWorld(pref.getValue("defaultMapWidth"), pref.getValue("defaultMapHeight"));
         
@@ -265,7 +265,7 @@ public class MazeWorld {
         return maze.getFinishCoordinate().equals(getPlayerCoordinate(player));
     }
     public void addCommand (Command c) {
-        commands.add(c);
+        manager.notify(c);
     }
     
     public void turnAIOn() {
