@@ -16,10 +16,13 @@ public class GUI extends JFrame implements DisplayInterface {
         /* Menu displays the main menu */
         MENU, 
         
+        // Displays the number of players to choose from
         GAME_NUM_PLAYERS,
         
+        // Displays the different game modes for single player
         GAME_SINGLE_MODE,
         
+        // Displays the different game modes for multiplayer
         GAME_MULTI_MODE,
         
         /* Game displays the game state, this can currently
@@ -492,8 +495,15 @@ public class GUI extends JFrame implements DisplayInterface {
         gamePanelD.setLayout(new GridBagLayout());
         gameMenuPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
         
+        // Adds the main title panel and the title panel A attched with it
+        titlePanelA.setBackground(pref.getColour("titleDefaultColour"));
         windowPanel.add(titleMainPanel);
         titleMainPanel.add(titlePanelA);
+        
+        // Adds some description for player 1's title panel
+        JLabel titleA = new JLabel();
+        titleA.setText("Player 1 Coins: "+world.getPlayerCoins(0));
+        titlePanelA.add(titleA);
         
         // Creates the GameMap for the world to be draw onto
         GameMap innerGamePanelA = new GameMap(world, pref, 0);
@@ -501,20 +511,47 @@ public class GUI extends JFrame implements DisplayInterface {
         // Attaches the innerGamePanel onto the gamePanel
         gamePanelA.add(innerGamePanelA);
         gameMainPanelA.add(gamePanelA);  
-              
+        
+        /*
+         * If there are more than 1 player,
+         * adds the description for player 2's title panel,
+         * adds an extra title panel to display information about player 2,
+         * and attaches the innerGamePanel onto the gamePanel for player 2
+         */
         if (world.getNumberOfPlayers() > 1) {
+        	JLabel titleB = new JLabel();
+            titleB.setText("Player 2 Coins: "+world.getPlayerCoins(1));
+            titlePanelB.add(titleB);
         	titleMainPanel.add(titlePanelB);
         	GameMap innerGamePanelB = new GameMap(world, pref, 1);
         	gamePanelB.add(innerGamePanelB);
         	gameMainPanelA.add(gamePanelB);
         	
+        	/*
+             * If there are more than 2 player,
+             * adds the description for player 3's title panel,
+             * adds an extra title panel to display information about player 3,
+             * and attaches the innerGamePanel onto the gamePanel for player 3
+             */
         	if (world.getNumberOfPlayers() > 2) {
+        		JLabel titleC = new JLabel();
+                titleC.setText("Player 3 Coins: "+world.getPlayerCoins(2));
+                titlePanelC.add(titleC);
         		titleMainPanel.add(titlePanelC);
             	GameMap innerGamePanelC = new GameMap(world, pref, 2);
             	gamePanelC.add(innerGamePanelC);
             	gameMainPanelB.add(gamePanelC);
             	
+            	/*
+                 * If there are 4 players,
+                 * adds the description for player 3's title panel,
+                 * adds an extra title panel to display information about player 4,
+                 * and attaches the innerGamePanel onto the gamePanel for player 4
+                 */
             	if (world.getNumberOfPlayers() == 4) {
+            		JLabel titleD = new JLabel();
+                    titleD.setText("Player 4 Coins: "+world.getPlayerCoins(3));
+                    titlePanelD.add(titleD);
             		titleMainPanel.add(titlePanelD);
                 	GameMap innerGamePanelD = new GameMap(world, pref, 3);
                 	gamePanelD.add(innerGamePanelD);
@@ -528,6 +565,7 @@ public class GUI extends JFrame implements DisplayInterface {
         titlePanelC.setBackground(pref.getColour("titleDefaultColour"));
         titlePanelD.setBackground(pref.getColour("titleDefaultColour"));
         
+        // Changes the title panel colour of the winning player
         if (world.getWinStatus()) {
             if(world.getWinPlayer() == 0) {
                 titlePanelA.setBackground(pref.getColour("titleWinColour"));
@@ -540,30 +578,12 @@ public class GUI extends JFrame implements DisplayInterface {
             }
         }
         
-        JLabel titleA = new JLabel();
-        titleA.setText("Coins: "+world.getPlayerCoins(0));
-        titlePanelA.add(titleA);
-        
-        if(world.getNumberOfPlayers() > 1) {
-            JLabel titleB = new JLabel();
-            titleB.setText("Coins: "+world.getPlayerCoins(1));
-            titlePanelB.add(titleB);
-            
-            if(world.getNumberOfPlayers() > 2) {
-                JLabel titleC = new JLabel();
-                titleC.setText("Coins: "+world.getPlayerCoins(2));
-                titlePanelC.add(titleC);
-                
-                if(world.getNumberOfPlayers() == 4) {
-                    JLabel titleD = new JLabel();
-                    titleD.setText("Coins: "+world.getPlayerCoins(3));
-                    titlePanelD.add(titleD);
-                }
-            }
-        }
-        
-        
+        // Adds the main game panel to the window panel
         windowPanel.add(gameMainPanelA);
+        /*
+         *  Adds the extra game panel to the window panel 
+         *  if there are more than 2 players
+         */
         if(world.getNumberOfPlayers() > 2) {
         	windowPanel.add(gameMainPanelB);
         }
@@ -600,34 +620,14 @@ public class GUI extends JFrame implements DisplayInterface {
             }
         });
         
-//        final JPopupMenu newMazePopup = new JPopupMenu();
-//        newMazePopup.add(new JMenuItem(new AbstractAction("One Player") {
-//        	public void actionPerformed(ActionEvent event) {
-//        	    newGame(1);
-//            }
-//        }));
-//        newMazePopup.add(new JMenuItem(new AbstractAction("Two Players") {
-//        	public void actionPerformed(ActionEvent event) {
-//        	    newGame(2);
-//            }
-//        }));
-//        newMazePopup.add(new JMenuItem(new AbstractAction("Three Players") {
-//        	public void actionPerformed(ActionEvent event) {
-//        	    newGame(3);
-//            }
-//        }));
-//        newMazePopup.add(new JMenuItem(new AbstractAction("Four Players") {
-//        	public void actionPerformed(ActionEvent event) {
-//        	    newGame(4);
-//            }
-//        }));
-//        
-//        JButton newMazeButton = new JButton("New Maze");
-//        newMazeButton.addMouseListener(new MouseAdapter() {
-//        	public void mousePressed(MouseEvent e) {
-//                newMazePopup.show(e.getComponent(), e.getX(), e.getY());
-//            }
-//        });
+        JButton newMazeButton = new JButton("New Maze");
+        newMazeButton.setMnemonic(KeyEvent.VK_N);
+        newMazeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                newGame(1, 9);
+            }
+        });
         
         JButton closeButton = new JButton("Exit to menu");
         closeButton.setMnemonic(KeyEvent.VK_W);
@@ -643,11 +643,12 @@ public class GUI extends JFrame implements DisplayInterface {
             gameMenuPanel.add(widthSize);
             gameMenuPanel.add(new JLabel("Height"));
             gameMenuPanel.add(heightSize);
+            gameMenuPanel.add(newMazeButton);
         }
 //        if(world.getNumberOfPlayers() == 1) {
 //            gameMenuPanel.add(auto);
 //        }
-        //gameMenuPanel.add(newMazeButton);
+        //
         gameMenuPanel.add(closeButton);
     }
     
