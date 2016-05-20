@@ -35,7 +35,7 @@ public class MazeWorld {
      * @param height height of the maze to be generated
      * @param width width of the maze to be generated
      */
-    public void generateWorld(int width, int height, int gameMode) {
+    public void generateWorld(int width, int height, int numPlayers, int gameMode) {
         // Initialise local variables
     	this.gameMode = gameMode;
         this.ai = new AI();
@@ -69,19 +69,22 @@ public class MazeWorld {
         	maze.DoorAndKeyGenerator();
         }
         
-        // Add player
-        players.add(new Character(new Coordinate(maze.getStart().getX(), maze.getStart().getY()), pref.getText("playerName")));
+        // Add players
+        int i;
+        for(i = 0; i < numPlayers; i++) {
+        	players.add(new Character(new Coordinate(maze.getStart().getX(), maze.getStart().getY()), pref.getText("playerName")));
+        }
         
         float h = (float)maze.getHeight();
         float w = (float)maze.getWidth();
         float r = (float)pref.getValue("defaultCoinRatio");
         int numberOfCoins = (int)(h*w*(r/100));
+        
         // Game mode 10 is multiplayer race to finish mode
         // Not going to have coins in this mode
         if(gameMode != 10) {
         	generateCoins(numberOfCoins);
         }
-        
 
         winStatus = false;
         winPlayer = -1;
@@ -94,7 +97,7 @@ public class MazeWorld {
         Random rand = new Random();
         int xC = rand.nextInt(maze.getWidth());
         int yC = rand.nextInt(maze.getHeight());
-        int coinValue = 5+rand.nextInt(80);
+        int coinValue = 10;
         
         for (int x = 0; x < instances; x++) {
             while (!uniqueCoordinates(xC, yC)) {
@@ -125,24 +128,20 @@ public class MazeWorld {
         return maze;
     }
     
+    /**
+     * Returns the game mode as an int
+     * @return the game mode
+     */
     public int getGameMode() {
     	return this.gameMode;
     }
     
+    /**
+     * Returns the number of players
+     * @return the number of players
+     */
     public int getNumberOfPlayers() {
     	return this.players.size();
-    }
-    
-    /**
-     * Sets the maze to multiplayer and adds an extra player
-     * @param multiplayer the boolean to tell if it is a multiplayer maze
-     */
-    public void setMuptiplayer(int numPlayers) {
-    	int i;
-    	
-    	for(i = 1; i < numPlayers; i++) {
-    		players.add(new Character(new Coordinate(maze.getStart().getX(), maze.getStart().getY()), pref.getText("playerName")));
-    	}
     }
     
     /**
@@ -193,6 +192,11 @@ public class MazeWorld {
         }
     }
     
+    /**
+     * Checks if the players collide with coins
+     * If they do, remove the coin from the map and 
+     * add the coins to the players
+     */
     private void entityCollision () {
         Iterator<Entity> iter = entities.iterator();
         while (iter.hasNext()) {
