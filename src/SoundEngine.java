@@ -11,12 +11,11 @@ import javax.sound.sampled.DataLine;
 
 public class SoundEngine {
 	private boolean soundEnabled;
-	private Map<String, Clip> sounds;
+	private Map<String, File> sounds;
 	
 	public SoundEngine() {
 		this.soundEnabled = true;
-		this.sounds = new HashMap<String, Clip>();
-		File soundFile;
+		this.sounds = new HashMap<String, File>();
 	
 		ArrayList<String> soundFileNames = new ArrayList<String>();
 		soundFileNames.add("coin.wav");
@@ -28,13 +27,7 @@ public class SoundEngine {
 		    for (String fileName : soundFileNames) {
 	            String fileLocation = "sounds/"+fileName;
 	            fileName = fileName.split("\\.")[0];
-	            soundFile = new File(fileLocation);
-                AudioInputStream stream = AudioSystem.getAudioInputStream(soundFile);
-                AudioFormat format = stream.getFormat();
-                DataLine.Info info = new DataLine.Info(Clip.class, format);
-                Clip clip = (Clip) AudioSystem.getLine(info);
-                clip.open(stream);
-                sounds.put(fileName, clip);
+	            sounds.put(fileName, new File(fileLocation));
             }
 		} 
 		catch (Exception e){
@@ -44,8 +37,17 @@ public class SoundEngine {
 	}
 	public void playSound(String soundName) {
 		if (this.soundEnabled) {
-		    sounds.get(soundName).setFramePosition(0); 
-	        sounds.get(soundName).start();
+			try {
+				AudioInputStream stream = AudioSystem.getAudioInputStream(this.sounds.get(soundName));
+	            AudioFormat format = stream.getFormat();
+	            DataLine.Info info = new DataLine.Info(Clip.class, format);
+	            Clip clip = (Clip) AudioSystem.getLine(info);
+	            clip.open(stream);
+			    clip.start();
+			}
+			catch (Exception e){
+				
+			}
 		}
 	}
 }
