@@ -47,7 +47,7 @@ public class MazePuzzleGame {
 	public static void main(String[] args) {
 	    
 	    MazePuzzleGame game = new MazePuzzleGame();
-	    game.addCommand(new Command(Com.PLAY_INTRO));
+	    game.addCommand(new Command(Com.PLAY_MENU));
 	    
 	    for (Command c = null; ; c = game.pollCommands()) {
 	        // Adds a delay to stop the program hanging
@@ -72,6 +72,8 @@ public class MazePuzzleGame {
 	            case PLAY_FINISH:  game.playFinish();                  break;
 	            case PLAY_STEP:    game.playStep(); 				   break;
 	            case PLAY_CLICK:   game.playClick();                   break;
+	            case PLAY_MENU:    game.playMenu();                    break;
+	            case STOP_MENU:    game.stopMenu();                    break;
 
 	            default: 
 	                break;
@@ -100,6 +102,13 @@ public class MazePuzzleGame {
     	this.soundEngine.playSound("click");
     }
 
+    private void playMenu() {
+    	this.soundEngine.startMenuMusic();
+    }
+    
+    private void stopMenu() {
+    	this.soundEngine.endMenuMusic();
+    }
 	/**
      * Executed when the display needs to be refreshed.
      * Do this after the game has been updated in some way.

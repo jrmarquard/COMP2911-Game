@@ -12,6 +12,7 @@ import javax.sound.sampled.DataLine;
 public class SoundEngine {
 	private boolean soundEnabled;
 	private Map<String, File> sounds;
+	private Clip menuMusic;
 	
 	public SoundEngine() {
 		this.soundEnabled = true;
@@ -30,12 +31,19 @@ public class SoundEngine {
 	            fileName = fileName.split("\\.")[0];
 	            sounds.put(fileName, new File(fileLocation));
             }
+		    String menuSound = new String("sounds/menu.wav");
+		    AudioInputStream stream = AudioSystem.getAudioInputStream(new File(menuSound));
+            AudioFormat format = stream.getFormat();
+            DataLine.Info info = new DataLine.Info(Clip.class, format);
+            this.menuMusic = (Clip) AudioSystem.getLine(info);
+            menuMusic.open(stream);
 		} 
 		catch (Exception e){
 			this.soundEnabled = false;
 			System.out.println("Sound disabled");
 		}
 	}
+	
 	public void playSound(String soundName) {
 		if (this.soundEnabled) {
 			try {
@@ -51,4 +59,18 @@ public class SoundEngine {
 			}
 		}
 	}
+	
+	public void startMenuMusic() {
+		if (this.soundEnabled) {
+			this.menuMusic.setFramePosition(0);
+			this.menuMusic.loop(Clip.LOOP_CONTINUOUSLY);
+		}
+	}
+	
+	public void endMenuMusic() {
+		if (this.soundEnabled) {
+			this.menuMusic.stop();
+		}
+	}
+	
 }

@@ -183,6 +183,7 @@ public class GUI extends JFrame implements DisplayInterface {
             @Override
             public void actionPerformed(ActionEvent e) {
             	addCommand(new Command(Com.PLAY_CLICK));
+            	addCommand(new Command(Com.STOP_MENU));
                 newGame(1);
                 setAppState(AppState.GAME);
             }
@@ -213,6 +214,7 @@ public class GUI extends JFrame implements DisplayInterface {
             @Override
             public void actionPerformed(ActionEvent e) {
             	addCommand(new Command(Com.PLAY_CLICK));
+            	addCommand(new Command(Com.STOP_MENU));
                 setAppState(AppState.EXIT);
             }
         });
@@ -529,6 +531,7 @@ public class GUI extends JFrame implements DisplayInterface {
             @Override
             public void actionPerformed(ActionEvent e) {
             	addCommand(new Command(Com.PLAY_CLICK));
+            	addCommand(new Command(Com.PLAY_MENU));
                 setAppState(AppState.MENU);
             }
         });
