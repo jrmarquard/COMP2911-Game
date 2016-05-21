@@ -182,6 +182,7 @@ public class GUI extends JFrame implements DisplayInterface {
         startGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+            	addCommand(new Command(Com.PLAY_CLICK));
                 newGame(1);
                 setAppState(AppState.GAME);
             }
@@ -192,6 +193,7 @@ public class GUI extends JFrame implements DisplayInterface {
         settingsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+            	addCommand(new Command(Com.PLAY_CLICK));
                 setAppState(AppState.SETTINGS);
             }
         });
@@ -201,6 +203,7 @@ public class GUI extends JFrame implements DisplayInterface {
         aboutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+            	addCommand(new Command(Com.PLAY_CLICK));
                 setAppState(AppState.ABOUT);
             }
         });
@@ -209,6 +212,7 @@ public class GUI extends JFrame implements DisplayInterface {
         exitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+            	addCommand(new Command(Com.PLAY_CLICK));
                 setAppState(AppState.EXIT);
             }
         });
@@ -235,6 +239,7 @@ public class GUI extends JFrame implements DisplayInterface {
             @Override
             public void actionPerformed(ActionEvent e) {
                 pref.loadPreferences();
+                addCommand(new Command(Com.PLAY_CLICK));
                 setAppState(AppState.SETTINGS);
             }
         });
@@ -242,6 +247,7 @@ public class GUI extends JFrame implements DisplayInterface {
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+            	addCommand(new Command(Com.PLAY_CLICK));
                 setAppState(AppState.MENU);
             }
         });
@@ -277,6 +283,7 @@ public class GUI extends JFrame implements DisplayInterface {
             @Override
             public void actionPerformed(ActionEvent e) {
                 pref.loadPreferences();
+                addCommand(new Command(Com.PLAY_CLICK));
                 setAppState(AppState.SETTINGS);
             }
         });
@@ -284,6 +291,7 @@ public class GUI extends JFrame implements DisplayInterface {
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+            	addCommand(new Command(Com.PLAY_CLICK));
                 setAppState(AppState.MENU);
             }
         });
@@ -474,6 +482,7 @@ public class GUI extends JFrame implements DisplayInterface {
             @Override
             public void actionPerformed(ActionEvent e) {
                 pref.toggleBool("autoComplete");
+                addCommand(new Command(Com.PLAY_CLICK));
                 if (pref.getBool("autoComplete")) {
                     addCommand(new Command(Com.SOLVE));
                 }
@@ -483,21 +492,25 @@ public class GUI extends JFrame implements DisplayInterface {
         final JPopupMenu newMazePopup = new JPopupMenu();
         newMazePopup.add(new JMenuItem(new AbstractAction("One Player") {
         	public void actionPerformed(ActionEvent event) {
+        		addCommand(new Command(Com.PLAY_CLICK));
         	    newGame(1);
             }
         }));
         newMazePopup.add(new JMenuItem(new AbstractAction("Two Players") {
         	public void actionPerformed(ActionEvent event) {
+        		addCommand(new Command(Com.PLAY_CLICK));
         	    newGame(2);
             }
         }));
         newMazePopup.add(new JMenuItem(new AbstractAction("Three Players") {
         	public void actionPerformed(ActionEvent event) {
+        		addCommand(new Command(Com.PLAY_CLICK));
         	    newGame(3);
             }
         }));
         newMazePopup.add(new JMenuItem(new AbstractAction("Four Players") {
         	public void actionPerformed(ActionEvent event) {
+        		addCommand(new Command(Com.PLAY_CLICK));
         	    newGame(4);
             }
         }));
@@ -505,6 +518,7 @@ public class GUI extends JFrame implements DisplayInterface {
         JButton newMazeButton = new JButton("New Maze");
         newMazeButton.addMouseListener(new MouseAdapter() {
         	public void mousePressed(MouseEvent e) {
+        		addCommand(new Command(Com.PLAY_CLICK));
                 newMazePopup.show(e.getComponent(), e.getX(), e.getY());
             }
         });
@@ -514,6 +528,7 @@ public class GUI extends JFrame implements DisplayInterface {
         closeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+            	addCommand(new Command(Com.PLAY_CLICK));
                 setAppState(AppState.MENU);
             }
         });

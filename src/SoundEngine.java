@@ -22,6 +22,7 @@ public class SoundEngine {
         soundFileNames.add("intro.wav");
         soundFileNames.add("finish.wav");
         soundFileNames.add("step.wav");
+        soundFileNames.add("click.wav");
         
 		try {
 		    for (String fileName : soundFileNames) {

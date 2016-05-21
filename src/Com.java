@@ -11,6 +11,7 @@ public enum Com {
     PLAY_COIN,
     PLAY_INTRO,
     PLAY_FINISH,
-    PLAY_STEP
+    PLAY_STEP,
+    PLAY_CLICK
     
 }
