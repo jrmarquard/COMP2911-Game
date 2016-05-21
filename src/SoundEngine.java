@@ -13,6 +13,7 @@ public class SoundEngine {
 	private boolean soundEnabled;
 	private Map<String, File> sounds;
 	private Clip menuMusic;
+	private Clip backgroundMusic;
 	
 	public SoundEngine() {
 		this.soundEnabled = true;
@@ -37,6 +38,12 @@ public class SoundEngine {
             DataLine.Info info = new DataLine.Info(Clip.class, format);
             this.menuMusic = (Clip) AudioSystem.getLine(info);
             menuMusic.open(stream);
+            String backgroundSound = new String("sounds/background.wav");
+		    stream = AudioSystem.getAudioInputStream(new File(backgroundSound));
+            format = stream.getFormat();
+            info = new DataLine.Info(Clip.class, format);
+            this.backgroundMusic = (Clip) AudioSystem.getLine(info);
+            backgroundMusic.open(stream);
 		} 
 		catch (Exception e){
 			this.soundEnabled = false;
@@ -72,5 +79,19 @@ public class SoundEngine {
 			this.menuMusic.stop();
 		}
 	}
+	
+	public void startBackgroundMusic() {
+		if (this.soundEnabled) {
+			this.backgroundMusic.setFramePosition(0);
+			this.backgroundMusic.loop(Clip.LOOP_CONTINUOUSLY);
+		}
+	}
+	
+	public void endBackgroundMusic() {
+		if (this.soundEnabled) {
+			this.backgroundMusic.stop();
+		}
+	}
+	
 	
 }

@@ -14,6 +14,8 @@ public enum Com {
     PLAY_STEP,
     PLAY_CLICK,
     PLAY_MENU,
-    STOP_MENU
+    STOP_MENU,
+    PLAY_BACKGROUND,
+    STOP_BACKGROUND
     
 }

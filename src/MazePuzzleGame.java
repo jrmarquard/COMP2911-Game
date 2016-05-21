@@ -74,6 +74,8 @@ public class MazePuzzleGame {
 	            case PLAY_CLICK:   game.playClick();                   break;
 	            case PLAY_MENU:    game.playMenu();                    break;
 	            case STOP_MENU:    game.stopMenu();                    break;
+	            case PLAY_BACKGROUND: game.playBackground();           break;
+	            case STOP_BACKGROUND: game.stopBackground();           break;
 
 	            default: 
 	                break;
@@ -109,6 +111,15 @@ public class MazePuzzleGame {
     private void stopMenu() {
     	this.soundEngine.endMenuMusic();
     }
+    
+    private void playBackground() {
+    	this.soundEngine.startBackgroundMusic();
+    }
+    
+    private void stopBackground() {
+    	this.soundEngine.endBackgroundMusic();
+    }
+    
 	/**
      * Executed when the display needs to be refreshed.
      * Do this after the game has been updated in some way.
