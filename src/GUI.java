@@ -2,21 +2,44 @@ import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
 
 import java.util.Queue;
-import java.util.Random;
 
 @SuppressWarnings("serial")
 public class GUI extends JFrame implements DisplayInterface {
     
+    enum AppState {
+        /* Menu displays the main menu */
+        MENU, 
+        
+        /* Game displays the game state, this can currently
+         * be several came states, will likely seperate this into
+         * different game modes
+         */
+        GAME, 
+        
+        /* Setting state allows user to change settings like
+         * controls and colours.
+         */
+        SETTINGS, 
+        
+        /* About displays information about the game. */
+        ABOUT, 
+        
+        /* Unused at the moment, but left in just because it's another state */
+        EXIT
+    }
+    
     Preferences pref;
     MazeWorld world;
     Queue<Command> commands;
+    AppState appState;
     
     JPanel windowPanel;
-    JPanel titlePanel;
-    JPanel gamePanel;
-    JPanel menuPanel;
     
     public GUI (Preferences pref, MazeWorld world, Queue<Command> commands) {
         this.pref = pref;
@@ -31,39 +54,19 @@ public class GUI extends JFrame implements DisplayInterface {
         });
     }
     
-    public void initGUI() {
-        initUI();
-    }
-
-    public void update() {
-        drawTitlePanel();
-        drawGamePanel();
-        drawMenuPanel();
-        setFocusable(true);
-        pack();
-    }
-    
     private void initUI() {
         /* Any layout information that should never be changed
          * should be contained in here. Anything that can be redrawn
          * must be added into the draw*() functions. 
          */
         
-        // Define layout for windowPanel and add it this object (JFrame)
+        // Defaults to display the main menu first
+        setAppState(AppState.MENU); 
+        
+        // windowPanel is the root panel within this object
         windowPanel = new JPanel();
-        windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
+        windowPanel.setPreferredSize(new Dimension(600, 600));
         this.add(windowPanel);
-        
-        // Define Layouts for each panel
-        titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
-        gamePanel = new JPanel(new GridBagLayout());
-        gamePanel.setPreferredSize(new Dimension(600, 600));
-        menuPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        
-        // Add children panels to the parent windowPanel
-        windowPanel.add(titlePanel);
-        windowPanel.add(gamePanel);
-        windowPanel.add(menuPanel);
         
         // Set more information
         setTitle(pref.getText("appName"));
@@ -71,32 +74,61 @@ public class GUI extends JFrame implements DisplayInterface {
         setLocationRelativeTo(null);
         setVisible(true);
         
-        
         // Register a keystroke
         this.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 switch (e.getKeyCode()) {
-                    case KeyEvent.VK_DOWN:  addCommand(new Command(Com.MOVE_DOWN));     break;
-                    case KeyEvent.VK_LEFT:  addCommand(new Command(Com.MOVE_LEFT));     break;
-                    case KeyEvent.VK_RIGHT: addCommand(new Command(Com.MOVE_RIGHT));    break;
-                    case KeyEvent.VK_UP:    addCommand(new Command(Com.MOVE_UP));       break;
-                    case KeyEvent.VK_C:     addCommand(new Command(Com.SOLVE));         break;
-                    case KeyEvent.VK_N: 
-                        JFormattedTextField box = (JFormattedTextField)menuPanel.getComponent(1);
-                        int width = Integer.parseInt(box.getText());
-                        
-                        box = (JFormattedTextField)menuPanel.getComponent(3);
-                        int height = Integer.parseInt(box.getText());
-                        
-                        int maxSize = pref.getValue("maxMazeSize");
-                        if (height>maxSize) height=maxSize;
-                        if (width>maxSize) width=maxSize;
-                        
-                        pref.setPreference("value.defaultMapWidth="+width);
-                        pref.setPreference("value.defaultMapHeight="+height);
-                        
-                        addCommand(new CommandMap(Com.NEW_MAP, width, height));         
+                    case KeyEvent.VK_UP:       
+                        addCommand(new CommandMap(Com.MOVE_UP, 1));
                         break;
+                    case KeyEvent.VK_LEFT:     
+                        addCommand(new CommandMap(Com.MOVE_LEFT, 1));    
+                        break;
+	                case KeyEvent.VK_DOWN:     
+	                    addCommand(new CommandMap(Com.MOVE_DOWN, 1));    
+	                    break;
+	                case KeyEvent.VK_RIGHT:    
+	                    addCommand(new CommandMap(Com.MOVE_RIGHT, 1));   
+	                    break;
+	                case KeyEvent.VK_W:        
+	                    addCommand(new CommandMap(Com.MOVE_UP, 2));          
+	                    break;
+	                case KeyEvent.VK_A:        
+	                    addCommand(new CommandMap(Com.MOVE_LEFT, 2));        
+	                    break;
+	                case KeyEvent.VK_S:        
+	                    addCommand(new CommandMap(Com.MOVE_DOWN, 2));        
+	                    break;
+	                case KeyEvent.VK_D:        
+	                    addCommand(new CommandMap(Com.MOVE_RIGHT, 2));      
+	                    break;
+                    case KeyEvent.VK_T:        
+                        addCommand(new CommandMap(Com.MOVE_UP, 3));          
+                        break;
+                    case KeyEvent.VK_F:        
+                        addCommand(new CommandMap(Com.MOVE_LEFT, 3));        
+                        break;
+                    case KeyEvent.VK_G:        
+                        addCommand(new CommandMap(Com.MOVE_DOWN, 3));        
+                        break;
+                    case KeyEvent.VK_H:        
+                        addCommand(new CommandMap(Com.MOVE_RIGHT, 3));      
+                        break;
+                    case KeyEvent.VK_I:        
+                        addCommand(new CommandMap(Com.MOVE_UP, 4));          
+                        break;
+                    case KeyEvent.VK_J:        
+                        addCommand(new CommandMap(Com.MOVE_LEFT, 4));        
+                        break;
+                    case KeyEvent.VK_K:        
+                        addCommand(new CommandMap(Com.MOVE_DOWN, 4));        
+                        break;
+                    case KeyEvent.VK_L:        
+                        addCommand(new CommandMap(Com.MOVE_RIGHT, 4));      
+                        break;
+                    case KeyEvent.VK_C:        addCommand(new Command(Com.SOLVE));         break;
+                    case KeyEvent.VK_ESCAPE:   setAppState(AppState.MENU);                 break; 
+                    case KeyEvent.VK_N:        newGame(1);                                 break;
                 }
             }
         });
@@ -109,274 +141,461 @@ public class GUI extends JFrame implements DisplayInterface {
         });
     }
     
-    private void addCommand(Command c) {
-        commands.add(c);
+    public void update() {
+        // Reset game panels, remove them (hopefully clears memory)
+        windowPanel.removeAll();
+        windowPanel.repaint();
+
+        // Draws whatever mode the GUI is currently in
+        switch(appState) {
+            case MENU:      drawMenu();         
+                            break;
+            case GAME:      drawGame();         
+                            break;
+            case SETTINGS:  drawSettings();     
+                            break;
+            case ABOUT:     drawAbout();        
+                            break;
+            case EXIT:      addCommand(new Command(Com.EXIT));
+                            break;
+        }
+        
+        // Refocuses the window so keystrokes are registered
+        setFocusable(true);
+        
+        // Will retain window size when switching between menus
+        windowPanel.setPreferredSize(windowPanel.getSize());
+        
+        // Packs
+        pack();
     }
     
     
-    private void drawGamePanel() {
-        // Need to fix this later as to not break encapsulation
-        Maze m = world.getMaze();
+    /**
+     * drawMenu 
+     */
+    private void drawMenu() {
+        windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
 
-        Color wallColour = pref.getColour("wallColour");
-        Color floorColour = pref.getColour("tileColour");
-        Color startColour = pref.getColour("startColour");
-        Color finishColour = pref.getColour("finishColour");
-        Color playerColour = pref.getColour("playerColour");
-        Color tileColour = pref.getColour("tileColor");
+        // Button will start a new game
+        JButton startGameButton = new JButton("Play");
+        startGameButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                newGame(1);
+                setAppState(AppState.GAME);
+            }
+        });
+
+        // Button will go to settings
+        JButton settingsButton = new JButton("Settings");
+        settingsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setAppState(AppState.SETTINGS);
+            }
+        });
         
-        gamePanel.removeAll();
+        // Button will go to settings
+        JButton aboutButton = new JButton("About");
+        aboutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setAppState(AppState.ABOUT);
+            }
+        });
+        // Button will quit the game
+        JButton exitButton = new JButton("Exit");
+        exitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setAppState(AppState.EXIT);
+            }
+        });
+
+        windowPanel.add(startGameButton);
+        windowPanel.add(settingsButton);
+        windowPanel.add(aboutButton);
+        windowPanel.add(exitButton);
+    }
+    
+    /**
+     *  
+     */
+    private void drawAbout() {
+        windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
         
-        /*
-         * This creates a new JPanel with the gePreferredSize() method
-         * @Overriden by the code inside. This code is called when java builds
-         * the swing interface (I think).
-         * This method relies on the JPanel being the only component inside
-         * the parent container.
-         */
-        JPanel innerGamePanel = new JPanel() {
+        // Navigation panel across the top of the screen.
+        JPanel navPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        navPanel.setBackground(windowPanel.getBackground().darker());
+        windowPanel.add(navPanel);
+        
+        JButton resetButton = new JButton("Reset to defaults");
+        resetButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                pref.loadPreferences();
+                setAppState(AppState.SETTINGS);
+            }
+        });
+        JButton backButton = new JButton("Back");
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setAppState(AppState.MENU);
+            }
+        });
+        navPanel.add(resetButton);
+        navPanel.add(backButton);
+        
+        JPanel aboutTextPanel = new JPanel() {
+                @Override
+                public Dimension getPreferredSize() {
+                    Dimension d = this.getParent().getSize();
+                    return new Dimension(d.height,d.height);
+                }
+            };
+        aboutTextPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        JTextField aboutText = new JTextField();
+        aboutText.setMargin(new Insets(10,10,10,10));
+        aboutText.setText("Game written by: John, Joshua, Patrick, Tim, Tyler");
+        aboutTextPanel.add(aboutText);
+        
+        windowPanel.add(aboutTextPanel);
+    }
+    
+    private void drawSettings() {
+        windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
+        
+        // Navigation panel across the top of the screen.
+        JPanel navPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        navPanel.setBackground(windowPanel.getBackground().darker());
+        windowPanel.add(navPanel);
+        
+        JButton resetButton = new JButton("Reset to defaults");
+        resetButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                pref.loadPreferences();
+                setAppState(AppState.SETTINGS);
+            }
+        });
+        JButton backButton = new JButton("Back");
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setAppState(AppState.MENU);
+            }
+        });
+        navPanel.add(resetButton);
+        navPanel.add(backButton);
+        
+        // Settings panel to display all settings
+        JPanel settingsPanel = new JPanel(new GridLayout(10,1)) {
             @Override
             public Dimension getPreferredSize() {
-                // Get the dimensions of the parent
-                Dimension d = this.getParent().getSize();
-                
-                Maze m = world.getMaze();
-                double height = m.getHeight();
-                double width = m.getWidth();
-                
-                double windowHeight = d.height;
-                double windowWidth = d.width;
-
-                // if < 1, there should be extra space on the left/right
-                // if > 1, there should be extra space on the top/bottom
-                // do the maths yourself, it just works (tm)
-                double magic = (windowWidth/windowHeight) * (height/width);
-                if (magic <= 1) {
-                    int returnHeight = (int) (windowWidth*(height/width));
-                    int returnWidth = (int) windowWidth;
-                    return new Dimension(returnWidth,returnHeight);
-                } else {
-                    int returnHeight = (int) windowHeight;
-                    int returnWidth = (int) (windowHeight*(width/height));
-                    return new Dimension(returnWidth,returnHeight);
-                }
+                Dimension d = this.getParent().getSize();        
+                int windowHeight = d.height;
+                int windowWidth = d.width;
+                return new Dimension(windowWidth,windowHeight);
             }
         };
-        innerGamePanel.setLayout(new GridBagLayout());
-
-        GridBagConstraints panelConstraints = new GridBagConstraints();
+        windowPanel.add(settingsPanel);
         
-        int cols = m.getWidth()*2;
-        int rows = m.getHeight()*2;
+        for (String s : pref.getKeys("colour")) {
+            Color c = pref.getColour(s);
+            String red = String.format("%02X",c.getRed());
+            String green = String.format("%02X",c.getGreen());
+            String blue = String.format("%02X",c.getBlue());
+            String value = red+green+blue;
+            
+            // Create row for setting
+            JPanel settingRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
+            JLabel settingName = new JLabel();
+            JTextField settingValue = new JTextField();
+            JPanel settingColour = new JPanel() {
+//                @Override
+//                public Dimension getPreferredSize() {
+//                    Dimension d = this.getParent().getSize();
+//                    return new Dimension(d.height,d.height);
+//                }
+            };
+            
+            settingRow.setBorder(BorderFactory.createLineBorder(Color.black));
+            settingValue.setColumns(6);
+            settingValue.getDocument().addDocumentListener(new PrefUpdate("colour", s));
+            settingColour.setBorder(BorderFactory.createLineBorder(Color.black));
+            
+            // Display
+            settingName.setText(s);
+            settingValue.setText(value);
+            settingValue.setColumns(value.length());
+            settingColour.setBackground(c);
+            
+            // Add to parent panels
+            settingRow.add(settingName);
+            settingRow.add(settingValue);
+            settingRow.add(settingColour);
+            settingsPanel.add(settingRow);
+        }
+    }
+    
+    private void drawGame() {
+        windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
         
-        // Iterate over the columns
-        for (int col = 0; col <= cols; col++) {
-            // Iterate over the rows
-            for (int row = 0; row <= rows; row++) {
-                JPanel panel = new JPanel();
-
-                // Defaults for a floor tile
-                panel.setBackground(floorColour);
-                panelConstraints.fill = GridBagConstraints.BOTH;
-                panelConstraints.weightx = 1;
-                panelConstraints.weighty = 1;
-                panelConstraints.gridx = col;
-                panelConstraints.gridy = row;
-                
-                // If on a wall column
-                if (col%2 == 0) {
-                    panelConstraints.weightx = 0.1;
+        // This recreates the panels EVERYTIME the game is drawn.
+        // Need to update this to something that is halfway efficient
+        JPanel titleMainPanel = new JPanel();
+        JPanel titlePanelA = new JPanel();
+        JPanel titlePanelB = new JPanel();
+        JPanel titlePanelC = new JPanel();
+        JPanel titlePanelD = new JPanel();
+        JPanel gameMainPanelA = new JPanel();
+        JPanel gameMainPanelB = new JPanel();
+        JPanel gamePanelA = new JPanel();
+        JPanel gamePanelB = new JPanel();
+        JPanel gamePanelC = new JPanel();
+        JPanel gamePanelD = new JPanel();
+        JPanel gameMenuPanel = new JPanel();
+        
+        // Sets the layout for each component
+        titleMainPanel.setLayout(new BoxLayout(titleMainPanel, BoxLayout.X_AXIS));
+        titlePanelA.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
+        titlePanelB.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
+        titlePanelC.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
+        titlePanelD.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
+        gameMainPanelA.setLayout(new BoxLayout(gameMainPanelA, BoxLayout.X_AXIS));
+        gameMainPanelB.setLayout(new BoxLayout(gameMainPanelB, BoxLayout.X_AXIS));
+        gamePanelA.setLayout(new GridBagLayout());
+        gamePanelB.setLayout(new GridBagLayout());
+        gamePanelC.setLayout(new GridBagLayout());
+        gamePanelD.setLayout(new GridBagLayout());
+        gameMenuPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        
+        windowPanel.add(titleMainPanel);
+        titleMainPanel.add(titlePanelA);
+        
+        // Creates the GameMap for the world to be draw onto
+        GameMap innerGamePanelA = new GameMap(world, pref, 0);
+        
+        // Attaches the innerGamePanel onto the gamePanel
+        gamePanelA.add(innerGamePanelA);
+        gameMainPanelA.add(gamePanelA);  
+              
+        if (world.getNumberOfPlayers() > 1) {
+        	titleMainPanel.add(titlePanelB);
+        	GameMap innerGamePanelB = new GameMap(world, pref, 1);
+        	gamePanelB.add(innerGamePanelB);
+        	gameMainPanelA.add(gamePanelB);
+        	
+        	if (world.getNumberOfPlayers() > 2) {
+        		titleMainPanel.add(titlePanelC);
+            	GameMap innerGamePanelC = new GameMap(world, pref, 2);
+            	gamePanelC.add(innerGamePanelC);
+            	gameMainPanelB.add(gamePanelC);
+            	
+            	if (world.getNumberOfPlayers() == 4) {
+            		titleMainPanel.add(titlePanelD);
+                	GameMap innerGamePanelD = new GameMap(world, pref, 3);
+                	gamePanelD.add(innerGamePanelD);
+                	gameMainPanelB.add(gamePanelD);
                 }
+            }
+        }
                 
-                // If on a wall row
-                if (row%2 == 0) {
-                    panelConstraints.weighty = 0.1;
-                }
-                
-                // If there is a wall intersection
-                if (col%2 == 0 && row%2 == 0) {
-                    // Wall intersection
-                    panel.setBackground(wallColour);                    
-                } else if (col == 0 || col == cols || row == 0 || row == rows) {
-                    //top, bottom, left, right boundaries
-                    panel.setBackground(wallColour);
-                } else {
-                    // Vertical walls
-                    if (row%2 == 0) {
-                        // Check if the wall exists
-                        if (!m.isAdjacent((col-1)/2, (row/2)-1, (col-1)/2, (row/2))){
-                            panel.setBackground(wallColour);
-                        }
-                    } // Horizontal walls
-                    else if (col%2 == 0) {
-                        if (!m.isAdjacent((col/2)-1, (row-1)/2, col/2, (row-1)/2)){
-                            panel.setBackground(wallColour);
-                        }
-                    }
-                }
-                
-                // Tile blocks
-                if (col%2 != 0 && row%2 != 0) {
-                    innerGamePanel.setBackground(tileColour);
-                    
-                    if (world.isChatacterHere((col-1)/2, (row-1)/2)) {
-                        panel.setBackground(playerColour);
-                    } else if (m.isStart((col-1)/2, (row-1)/2)) {
-                        panel.setBackground(startColour);
-                    } else if (m.isFinish((col-1)/2, (row-1)/2)) {
-                        panel.setBackground(finishColour);
-                    } else if (world.isCoins((col-1)/2, (row-1)/2)) {
-                        panel.setBackground(Color.yellow);
-                    }
-                }
-                innerGamePanel.add(panel, panelConstraints);
+        titlePanelA.setBackground(pref.getColour("titleDefaultColour"));
+        titlePanelB.setBackground(pref.getColour("titleDefaultColour"));
+        titlePanelC.setBackground(pref.getColour("titleDefaultColour"));
+        titlePanelD.setBackground(pref.getColour("titleDefaultColour"));
+        
+        if (world.getWinStatus()) {
+            if(world.getWinPlayer() == 0) {
+                titlePanelA.setBackground(pref.getColour("titleWinColour"));
+            } else if(world.getWinPlayer() == 1) {
+                titlePanelB.setBackground(pref.getColour("titleWinColour"));
+            } else if(world.getWinPlayer() == 2) {
+                titlePanelC.setBackground(pref.getColour("titleWinColour"));
+            } else if(world.getWinPlayer() == 3) {
+                titlePanelD.setBackground(pref.getColour("titleWinColour"));
             }
         }
         
-        gamePanel.add(innerGamePanel);
-        gamePanel.setBackground(tileColour);
-        gamePanel.setPreferredSize(gamePanel.getSize());
-    }
-
-    public void drawTitlePanel() {
-        titlePanel.removeAll();
+        JLabel titleA = new JLabel();
+        titleA.setText("Coins: "+world.getPlayerCoins(0));
+        titlePanelA.add(titleA);
         
-        if (world.getWinStatus()) {
-            titlePanel.setBackground(pref.getColour("titleWinColour"));
-        } else {
-            titlePanel.setBackground(pref.getColour("titleDefaultColour"));
+        if(world.getNumberOfPlayers() > 1) {
+            JLabel titleB = new JLabel();
+            titleB.setText("Coins: "+world.getPlayerCoins(1));
+            titlePanelB.add(titleB);
+            
+            if(world.getNumberOfPlayers() > 2) {
+                JLabel titleC = new JLabel();
+                titleC.setText("Coins: "+world.getPlayerCoins(2));
+                titlePanelC.add(titleC);
+                
+                if(world.getNumberOfPlayers() == 4) {
+                    JLabel titleD = new JLabel();
+                    titleD.setText("Coins: "+world.getPlayerCoins(3));
+                    titlePanelD.add(titleD);
+                }
+            }
         }
         
-        JLabel title = new JLabel();
-        title.setText("Coins: "+world.getPlayerCoins());
-
-        titlePanel.add(title);
         
+        windowPanel.add(gameMainPanelA);
+        if(world.getNumberOfPlayers() > 2) {
+        	windowPanel.add(gameMainPanelB);
+        }
+        windowPanel.add(gameMenuPanel);
+        
+        drawGameMenuPanel(gameMenuPanel);
+        
+        windowPanel.setPreferredSize(windowPanel.getSize());
     }
-    public void drawMenuPanel() {
-        menuPanel.removeAll();
-        menuPanel.setBackground(pref.getColour("menuColour"));
+    
+    private void drawGameMenuPanel(JPanel gameMenuPanel) {
+        gameMenuPanel.removeAll();
+        gameMenuPanel.setBackground(pref.getColour("menuColour"));
 
         JFormattedTextField widthSize = new JFormattedTextField();
         widthSize.setValue(Integer.toString(pref.getValue("defaultMapWidth")));
         widthSize.setColumns(2);
+        widthSize.getDocument().addDocumentListener(new PrefUpdate("value", "defaultMapWidth"));
+        
         JFormattedTextField heightSize = new JFormattedTextField();
         heightSize.setValue(Integer.toString(pref.getValue("defaultMapHeight")));
         heightSize.setColumns(2);
-
-        JButton newMazeButton = new JButton("New Maze");
-        newMazeButton.setMnemonic(KeyEvent.VK_N);
-        newMazeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                JFormattedTextField box = (JFormattedTextField)menuPanel.getComponent(1);
-                int width = Integer.parseInt(box.getText());
-                
-                box = (JFormattedTextField)menuPanel.getComponent(3);
-                int height = Integer.parseInt(box.getText());
-                
-                int maxSize = pref.getValue("maxMazeSize");
-                if (height>maxSize) height=maxSize;
-                if (width>maxSize) width=maxSize;
-                
-                pref.setPreference("value.defaultMapWidth="+width);
-                pref.setPreference("value.defaultMapHeight="+height);
-                
-                addCommand(new CommandMap(Com.NEW_MAP, width, height));
-            }
-        });
+        heightSize.getDocument().addDocumentListener(new PrefUpdate("value", "defaultMapHeight"));
+        
+        
         JCheckBox auto = new JCheckBox("Auto", pref.getBool("autoComplete"));
         auto.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                
                 pref.toggleBool("autoComplete");
                 if (pref.getBool("autoComplete")) {
-                    // if the preference is now on, solve the maze
                     addCommand(new Command(Com.SOLVE));
                 }
             }
         });
         
-        JButton solveButton = new JButton("Solve");
-        solveButton.setMnemonic(KeyEvent.VK_S);
-        solveButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                addCommand(new Command(Com.SOLVE));
+        final JPopupMenu newMazePopup = new JPopupMenu();
+        newMazePopup.add(new JMenuItem(new AbstractAction("One Player") {
+        	public void actionPerformed(ActionEvent event) {
+        	    newGame(1);
+            }
+        }));
+        newMazePopup.add(new JMenuItem(new AbstractAction("Two Players") {
+        	public void actionPerformed(ActionEvent event) {
+        	    newGame(2);
+            }
+        }));
+        newMazePopup.add(new JMenuItem(new AbstractAction("Three Players") {
+        	public void actionPerformed(ActionEvent event) {
+        	    newGame(3);
+            }
+        }));
+        newMazePopup.add(new JMenuItem(new AbstractAction("Four Players") {
+        	public void actionPerformed(ActionEvent event) {
+        	    newGame(4);
+            }
+        }));
+        
+        JButton newMazeButton = new JButton("New Maze");
+        newMazeButton.addMouseListener(new MouseAdapter() {
+        	public void mousePressed(MouseEvent e) {
+                newMazePopup.show(e.getComponent(), e.getX(), e.getY());
             }
         });
-        JButton closeButton = new JButton("Exit");
+        
+        JButton closeButton = new JButton("Exit to menu");
         closeButton.setMnemonic(KeyEvent.VK_W);
         closeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                addCommand(new Command(Com.EXIT));
+                setAppState(AppState.MENU);
             }
         });
-        menuPanel.add(new JLabel("Width"));
-        menuPanel.add(widthSize);
-        menuPanel.add(new JLabel("Height"));
-        menuPanel.add(heightSize);
-        menuPanel.add(solveButton);
-        menuPanel.add(auto);
-        menuPanel.add(newMazeButton);
-        menuPanel.add(closeButton);
+        gameMenuPanel.add(new JLabel("Width"));
+        gameMenuPanel.add(widthSize);
+        gameMenuPanel.add(new JLabel("Height"));
+        gameMenuPanel.add(heightSize);
+        if(world.getNumberOfPlayers() == 1) {
+            gameMenuPanel.add(auto);
+        }
+        gameMenuPanel.add(newMazeButton);
+        gameMenuPanel.add(closeButton);
     }
     
+    /**
+     * Creates a new game for the specified number of players
+     * 
+     * @param numPlayers 1 or 2, nothing else
+     */
+    private void newGame(int numPlayers) {
+        int width = pref.getValue("defaultMapWidth");
+        int height = pref.getValue("defaultMapHeight");
+        addCommand(new CommandMap(Com.NEW_MAP, width, height, numPlayers));
+        setAppState(AppState.GAME);
+    }
+    
+    private void addCommand(Command c) {
+        commands.add(c);
+    }
+    private void setAppState(AppState s) {
+        appState = s;
+        addCommand(new Command(Com.DRAW));
+    }
     public void close() {
         this.dispose();
     }
     
-    /*
-    private class MenuItemAction extends AbstractAction {
-        public MenuItemAction(String text, Integer mnemonic) {
-            super(text);
-            putValue(MNEMONIC_KEY, mnemonic);
+    private class PrefUpdate implements DocumentListener {
+        String spaceName;
+        String prefName;
+        
+        public PrefUpdate(String s, String p) {
+            this.spaceName = s;
+            this.prefName = p;
         }
 
         @Override
-        public void actionPerformed(ActionEvent e) {
-            String s = e.getActionCommand();
-            addCommand(new Command(Com.EXIT));
+        public void changedUpdate(DocumentEvent e) {
+            update(e);
+        }
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            update(e);    
+        }
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            update(e);
+        }
+        private void update(DocumentEvent e) {
+            try {
+                String value = "";
+                int textLength = e.getDocument().getLength();
+                switch(spaceName) {
+                    case "value":
+                        if (textLength == 1 || textLength == 2)  {
+                            value = e.getDocument().getText(0,textLength);
+                            pref.setPreference(spaceName+"."+prefName+"="+value);
+                        }
+                        break;
+                    case "colour":
+                        if (textLength == 6) {
+                            value = e.getDocument().getText(0,textLength);
+                            pref.setPreference(spaceName+"."+prefName+"="+value);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            } catch (NumberFormatException | BadLocationException e1) {
+                // Do nothing
+            }
         }
     }
-    */
-}
-
-@SuppressWarnings("serial")
-class DrawPanel extends JPanel {
-
-    private void doDrawing(Graphics g) {
-
-        Graphics2D g2d = (Graphics2D) g;
-
-        g2d.setColor(Color.blue);
-        
-        g2d.setColor(Color.black);
-        g2d.drawRect(0, 0, 15, 15);
-        g2d.fillRect(0, 0, 10, 10);
-        
-        /*
-        for (int i = 0; i <= 1000; i++) {  
-            Dimension size = getSize();
-            Insets insets = getInsets();
-
-            int w = size.width - insets.left - insets.right;
-            int h = size.height - insets.top - insets.bottom;
-
-            Random r = new Random();
-            int x = Math.abs(r.nextInt()) % w;
-            int y = Math.abs(r.nextInt()) % h;
-            g2d.drawLine(x, y, x, y);
-        }
-        */
-    }
-
-    @Override
-    public void paintComponent(Graphics g) {
-        
-        super.paintComponent(g);
-        doDrawing(g);
-    }
+    
 }

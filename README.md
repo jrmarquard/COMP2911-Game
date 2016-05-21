@@ -22,7 +22,38 @@ In this assignment, the aim is to construct an interactive maze puzzle game that
 - **Week 9**: Have a working application to present to the tutorial by week 10. A working application means:
     - Application needs to be displayed on screen 
     - At least one maze design implemented
-    - User needs to be able to play at least one game mode 
+    - User needs to be able to play at least one game mode
+- **Week 10**: Imrprove the application with functional features; appearance is secondary.
+    - Implement a menu system
+    - Add a second game mode
+    - Improve display of maze
+- **Week 11**: Finish a maze which meets all the critea of the assignment.
+    - Assignment criteria:
+        - No bugs seen during demo/testing
+        - Smooth, responsive, intuitive, well designed user interface
+        - Clear design and diagrams fully adhering to design principles and conforming to code
+        - Algorithm that generates interesting and challenging games
+        - More than one type of extension (e.g. animation, multi-player, etc.)
+    - Finalise menus, this includes their appearance and their functionality
+    - Finalise design
+        - Create design documents (UML, 'design diaries' maybe?, anything else?)
+        - Implement threading
+        - Tidy and refactor code
+    - Generate mazes that distinguish ours from the rest
+        - make it feature rich (e.g. door/keys, different routes, buttons)
+        - demonstrate why our generation is 'hard', give it difficulties. Maybe compare different algos in a document
+    - Extension suggestions:
+        - Polish multiplayer
+        - Add other game modes
+        - Animation
+        - Add sprites
+        - Add textures
+        - Add enemies
+        - Add countdown/timer
+        - Add highscores
+    - Personal goals!
+        - Have a complete diary, showing your contribution week to week (or just something)
+        - Be able to explain your code, don't just copy paste of SO without knowing what it does
 
 #### Goals (bastardised user stories):
 - User needs to be able to start game, change settings, exit application
@@ -31,9 +62,7 @@ In this assignment, the aim is to construct an interactive maze puzzle game that
 - User needs to have different game modes, such as solving it individually, against a timer, with enemies, against another player, ... etc
 
 #### Week 10 Discussion of medium range game:
-- Menu on startup (after a "splash screen")
 - Easy, Medium, Hard, Custom (sizes)
-- Ratio restriction (with columns to adjust window size)
 - AI which doesnt update
 - Viewing limitations (dark everywhere else)
 - Step counter
@@ -52,7 +81,6 @@ In this assignment, the aim is to construct an interactive maze puzzle game that
     - different game types (multiple exits, teleporting tiles that transfer players from one spot to another etc.)
     - multiplayer
     - different difficulties
-    - Sound
     - hints for users when they are stuck (ie a maze solving algorithm)
     - enemies in the maze to avoid
 - John
@@ -60,14 +88,19 @@ In this assignment, the aim is to construct an interactive maze puzzle game that
     - backend and how it interfaces with each component
 - Joshua
     - maze generation
+    - multiplayer game mode
 - Patrick
     - 
 - Tim
     - maze implementation
+    - Sound
 - Tyler
     - AI implementation
+    - Main menu
 
 #### Completed Goals
 - Basic GUI
 - Basic Game Mode
 - Maze genration with different sizes
+- Menu (functional but not pretty)
+- Ratio restriction (with columns to adjust window size)

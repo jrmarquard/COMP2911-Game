@@ -11,9 +11,4 @@ public interface DisplayInterface {
      * Closes the interface.
      */
     public void close();
-
-    /** 
-     * Initlialises the 
-     */
-    public void initGUI();
 }

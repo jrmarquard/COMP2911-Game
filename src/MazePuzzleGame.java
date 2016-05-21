@@ -1,13 +1,6 @@
-import java.applet.AudioClip;
 import java.awt.EventQueue;
-import java.io.*;
-import java.net.URL;
 import java.util.LinkedList;
 import java.util.Queue;
-
-import javax.sound.sampled.*;
-
-
 
 /**
  * MazePuzzleGame maintains and connects the different parts of the
@@ -56,7 +49,6 @@ public class MazePuzzleGame {
 	    MazePuzzleGame game = new MazePuzzleGame();
 	    game.addCommand(new Command(Com.PLAY_INTRO));
 	    
-	    
 	    for (Command c = null; ; c = game.pollCommands()) {
 	        // Adds a delay to stop the program hanging
 	        try {Thread.sleep(0);} 
@@ -70,15 +62,18 @@ public class MazePuzzleGame {
 	            case NEW_MAP:      game.newMap(c);                     break;
 	            case DRAW:         game.refreshDisplay();              break;
 	            case EXIT:         game.close();	                   break;
-	            case MOVE_DOWN:    game.moveCharacterDown();           break;
-	            case MOVE_LEFT:    game.moveCharacterLeft();           break;
-	            case MOVE_RIGHT:   game.moveCharacterRight();          break;
-	            case MOVE_UP:      game.moveCharacterUp();             break;
+	            case MOVE_DOWN:										   
+	            case MOVE_LEFT:										   
+	            case MOVE_RIGHT:								
+	            case MOVE_UP:      game.moveCharacter(c);			   break;
 	            case SOLVE:        game.solveCharacter();              break;
 	            case PLAY_COIN:    game.playCoin();					   break;
 	            case PLAY_INTRO:   game.playIntro();				   break;
 	            case PLAY_FINISH:  game.playFinish();                  break;
 	            case PLAY_STEP:    game.playStep(); 				   break;
+
+	            default: 
+	                break;
 	        }
 	    }
 	}
@@ -123,14 +118,17 @@ public class MazePuzzleGame {
         int width = c.getWidth();
         int height = c.getHeight();
         world.generateWorld(width, height);
-         
+        
+        if (c.getPlayers() > 1) {
+            world.setMuptiplayer(c.getPlayers());
+        }
         addCommand(new Command(Com.DRAW));
     }
     
     /**
      * Executed when asked to close.
      */
-    public void close () {
+    private void close () {
         disp.close();
         System.exit(0);
     }
@@ -138,34 +136,19 @@ public class MazePuzzleGame {
     /**
      * Moves player up a coordinate
      */
-    private void moveCharacterUp() {
-	    world.moveCharacterUp();
+    private void moveCharacter(Command o) {
+        CommandMap c = (CommandMap)o;
+        int id = c.getPlayerID();
+        switch(c.getCommandID()) {
+            case MOVE_DOWN:     world.moveCharacterDown(id);    break;
+            case MOVE_UP:       world.moveCharacterUp(id);      break;
+            case MOVE_LEFT:     world.moveCharacterLeft(id);    break;
+            case MOVE_RIGHT:    world.moveCharacterRight(id);   break;
+            default: 
+                break;
+        }
         addCommand(new Command(Com.DRAW));
 	}
-    
-    /**
-     * Moves player left a coordinate
-     */
-    private void moveCharacterLeft() {
-        world.moveCharacterLeft();
-        addCommand(new Command(Com.DRAW));
-    }
-    
-    /**
-     * Moves player right a coordinate
-     */
-    private void moveCharacterRight() {
-        world.moveCharacterRight();
-        addCommand(new Command(Com.DRAW));
-    }
-    
-    /**
-     * Moves player down a coordinate
-     */
-    private void moveCharacterDown() {
-        world.moveCharacterDown();
-        addCommand(new Command(Com.DRAW));
-    }
     
     /**
      * Moves the player once and checks if it has finished
