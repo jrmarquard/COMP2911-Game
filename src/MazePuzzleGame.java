@@ -17,6 +17,7 @@ public class MazePuzzleGame extends Thread {
     GUI gui;
     Game game;
     Queue<Command> commands;
+    SoundEngine soundEngine;
     
     /**
      * Initialises MazePuzzleGame.
@@ -30,12 +31,14 @@ public class MazePuzzleGame extends Thread {
         this.commands = new LinkedList<Command>();
         this.game = new Game(commands, pref);
         this.gui = new GUI(this.pref, this.game, this.commands);
-        
+        this.soundEngine = new SoundEngine();        
     }
     
     public void run() {
         // Draws the GUI
         this.addCommand(new Command(Com.DRAW));
+
+        this.addCommand(new Command(Com.PLAY_MENU));
     }
 
     /**
@@ -47,8 +50,7 @@ public class MazePuzzleGame extends Thread {
      * 
      * @param args Arguments for the program. Unused.
      */
-	public static void main(String[] args) {
-	    
+	public static void main(String[] args) {	    
 	    MazePuzzleGame game = new MazePuzzleGame();
 	    game.start();
 	    
@@ -65,6 +67,15 @@ public class MazePuzzleGame extends Thread {
 	            case DRAW:          game.refreshDisplay();              break;
 	            case EXIT:          game.close();	                   break;
 	            case GAME_MESSAGE:  game.gameMessage(c);              break;
+                case PLAY_COIN:    game.playCoin();                    break;
+                case PLAY_INTRO:   game.playIntro();                   break;
+                case PLAY_FINISH:  game.playFinish();                  break;
+                case PLAY_STEP:    game.playStep();                    break;
+                case PLAY_CLICK:   game.playClick();                   break;
+                case PLAY_MENU:    game.playMenu();                    break;
+                case STOP_MENU:    game.stopMenu();                    break;
+                case PLAY_BACKGROUND: game.playBackground();           break;
+                case STOP_BACKGROUND: game.stopBackground();           break;
 	            default:                                               break;
 	        }
 	    }
@@ -77,7 +88,43 @@ public class MazePuzzleGame extends Thread {
 	    addCommand(c);
 	}
 
-    /**
+    private void playCoin() {
+    	this.soundEngine.playSound("coin");		
+	}
+    
+    private void playIntro() {
+    	this.soundEngine.playSound("intro");
+    }
+    
+    private void playFinish() {
+    	this.soundEngine.playSound("finish");
+    }
+    
+    private void playStep() {
+    	this.soundEngine.playSound("step");
+    }
+    
+    private void playClick() {
+    	this.soundEngine.playSound("click");
+    }
+
+    private void playMenu() {
+    	this.soundEngine.startMenuMusic();
+    }
+    
+    private void stopMenu() {
+    	this.soundEngine.endMenuMusic();
+    }
+    
+    private void playBackground() {
+    	this.soundEngine.startBackgroundMusic();
+    }
+    
+    private void stopBackground() {
+    	this.soundEngine.endBackgroundMusic();
+    }
+    
+	/**
      * Executed when the display needs to be refreshed.
      * Do this after the game has been updated in some way.
      */

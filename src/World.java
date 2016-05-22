@@ -19,6 +19,8 @@ import java.util.Stack;
 public class World {
     
     private String name;
+    private Queue<Command> commands;
+    private boolean updateFlag;
     
     // Maze data
     private ArrayList<ArrayList<Node>> nodes;
@@ -35,8 +37,11 @@ public class World {
     // Items are stationary objects that can be interacted with by 
     private ArrayList<Item> items;
     
-    public World (String name, int width, int height) {
+    public World (Queue<Command> commands, String name, int width, int height) {
+        this.commands = commands;
         this.name = name;
+        this.updateFlag = false;
+        
         this.nodes = new ArrayList<ArrayList<Node>>();
         this.beings = new HashMap<String, Being>();
         this.items = new ArrayList<Item>();
@@ -103,13 +108,21 @@ public class World {
         Node n = b.getNode();
         if (b != null) {
             if (dir == "up" && n.getUp() != null) {
-                b.setNode(n.getUp());
+                b.setNode(n.getUp()); 
+                updateFlag = true;
             } else if (dir == "down" && n.getDown() != null) {
-                b.setNode(n.getDown());
+                b.setNode(n.getDown()); 
+                updateFlag = true;
             } else if (dir == "left" && n.getLeft() != null) {
                 b.setNode(n.getLeft());
+                updateFlag = true;
             } else if (dir == "right" && n.getRight() != null) {
                 b.setNode(n.getRight());
+                updateFlag = true;
+            }
+            if (updateFlag) {
+                addCommand(new Command(Com.PLAY_STEP));
+                updateFlag = false;
             }
         }
         update();
@@ -124,10 +137,23 @@ public class World {
      *     - player dies
      */
     public void update() {
-        entityCollision();
+        
+        // Check if there are any winnders
+        beingCollision();
+        itemCollision();
     }
-    
-    private void entityCollision () {
+    private void beingCollision() {
+        Iterator<String> iter = beings.keySet().iterator();
+        while (iter.hasNext()) {
+            Being b = beings.get(iter.next());
+            if (b.getName().equals(start)) {
+                // winner winner chicken dinner
+                addCommand(new Command(Com.PLAY_FINISH));
+                
+            }
+        }
+    }
+    private void itemCollision () {
         Iterator<Item> iter = items.iterator();
         while (iter.hasNext()) {
             Entity e = iter.next();
@@ -138,10 +164,15 @@ public class World {
                     if (e instanceof Coins) {
                         b.addCoins(((Coins)e).getValue());
                         iter.remove();
+                        addCommand(new Command(Com.PLAY_COIN));
                     }
                 }
             }
         }
+    }
+    
+    private void addCommand (Command c) {
+        commands.add(c);
     }
     
     /**

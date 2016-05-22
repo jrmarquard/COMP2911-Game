@@ -180,6 +180,7 @@ public class GUI extends JFrame  {
         settingsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+            	addCommand(new Command(Com.PLAY_CLICK));
                 setAppState(AppState.SETTINGS);
             }
         });
@@ -189,6 +190,7 @@ public class GUI extends JFrame  {
         aboutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+            	addCommand(new Command(Com.PLAY_CLICK));
                 setAppState(AppState.ABOUT);
             }
         });
@@ -197,6 +199,8 @@ public class GUI extends JFrame  {
         exitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+            	addCommand(new Command(Com.PLAY_CLICK));
+            	addCommand(new Command(Com.STOP_MENU));
                 setAppState(AppState.EXIT);
             }
         });
@@ -364,6 +368,7 @@ public class GUI extends JFrame  {
             @Override
             public void actionPerformed(ActionEvent e) {
                 pref.loadPreferences();
+                addCommand(new Command(Com.PLAY_CLICK));
                 setAppState(AppState.SETTINGS);
             }
         });
@@ -371,6 +376,7 @@ public class GUI extends JFrame  {
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+            	addCommand(new Command(Com.PLAY_CLICK));
                 setAppState(AppState.MENU);
             }
         });
@@ -406,6 +412,7 @@ public class GUI extends JFrame  {
             @Override
             public void actionPerformed(ActionEvent e) {
                 pref.loadPreferences();
+                addCommand(new Command(Com.PLAY_CLICK));
                 setAppState(AppState.SETTINGS);
             }
         });
@@ -413,6 +420,7 @@ public class GUI extends JFrame  {
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+            	addCommand(new Command(Com.PLAY_CLICK));
                 setAppState(AppState.MENU);
             }
         });
@@ -545,6 +553,9 @@ public class GUI extends JFrame  {
             @Override
             public void actionPerformed(ActionEvent e) {
                 addCommand(new Command(Com.GAME_MESSAGE, new String[]{"endGame"}));
+            	addCommand(new Command(Com.PLAY_CLICK));
+            	addCommand(new Command(Com.STOP_BACKGROUND));
+            	addCommand(new Command(Com.PLAY_MENU));
                 setAppState(AppState.MENU);
             }
         });
@@ -557,6 +568,9 @@ public class GUI extends JFrame  {
      * @param numPlayers 1 or 2, nothing else
      */
     private void newGame() {
+        addCommand(new Command(Com.PLAY_CLICK));
+        addCommand(new Command(Com.STOP_MENU));
+        addCommand(new Command(Com.PLAY_BACKGROUND));
         addCommand(new Command(Com.GAME_MESSAGE, new String[]{"newGame"}));
         setAppState(AppState.GAME);
     }
