@@ -69,7 +69,7 @@ public class World {
         // Maze generator connects nodes together and sets start/finish.
         mazeGenerator();
         generateCoins();
-        // doorAndKeyGenerator();
+        doorAndKeyGenerator();
     }
     
     public void addPlayer(String name) {
@@ -160,7 +160,13 @@ public class World {
             if (b.getNode().equals(finish)) {
                 // winner winner chicken dinner
                 addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "finish"}));
-                
+            }
+            if (b.getNode().equals(key)) {
+                addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "finish"}));
+                key = null;
+                connectNodes(doorStart, doorFinish);
+                doorStart = null;
+                doorFinish = null;
             }
         }
     }
