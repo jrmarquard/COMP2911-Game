@@ -121,7 +121,7 @@ public class World {
                 updateFlag = true;
             }
             if (updateFlag) {
-                addCommand(new Command(Com.PLAY_STEP));
+                addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "step"}));
                 updateFlag = false;
             }
         }
@@ -148,7 +148,7 @@ public class World {
             Being b = beings.get(iter.next());
             if (b.getName().equals(start)) {
                 // winner winner chicken dinner
-                addCommand(new Command(Com.PLAY_FINISH));
+                addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "finish"}));
                 
             }
         }
@@ -164,7 +164,7 @@ public class World {
                     if (e instanceof Coins) {
                         b.addCoins(((Coins)e).getValue());
                         iter.remove();
-                        addCommand(new Command(Com.PLAY_COIN));
+                        addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "coin"}));
                     }
                 }
             }

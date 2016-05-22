@@ -50,7 +50,7 @@ public class AISolve implements AI {
             default:    message[3] = "";        break;
         }
         
-        return new Command(Com.GAME_MESSAGE, message);
+        return new Command(Com.GAME_MSG, message);
     }
 
     /**

@@ -1,20 +1,6 @@
 public enum Com {
     DRAW,
     EXIT,
-    GAME_MESSAGE, 
-    MOVE_DOWN, 
-    MOVE_UP, 
-    MOVE_LEFT, 
-    MOVE_RIGHT,
-    IDLE,
-    SOLVE,
-    PLAY_COIN,
-    PLAY_INTRO,
-    PLAY_FINISH,
-    PLAY_STEP,
-    PLAY_CLICK,
-    PLAY_MENU,
-    STOP_MENU,
-    PLAY_BACKGROUND,
-    STOP_BACKGROUND
+    GAME_MSG,
+    SOUND_MSG
 }

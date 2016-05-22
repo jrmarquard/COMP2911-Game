@@ -38,7 +38,7 @@ public class MazePuzzleGame extends Thread {
         // Draws the GUI
         this.addCommand(new Command(Com.DRAW));
 
-        this.addCommand(new Command(Com.PLAY_MENU));
+        addCommand(new Command(Com.SOUND_MSG, new String[]{"loop", "menu"}));
     }
 
     /**
@@ -64,18 +64,10 @@ public class MazePuzzleGame extends Thread {
 	        
 	        // Get the command ID from the command and run appropriate game method
 	        switch (c.getCommandID()) {
-	            case DRAW:          game.refreshDisplay();              break;
-	            case EXIT:          game.close();	                   break;
-	            case GAME_MESSAGE:  game.gameMessage(c);              break;
-                case PLAY_COIN:    game.playCoin();                    break;
-                case PLAY_INTRO:   game.playIntro();                   break;
-                case PLAY_FINISH:  game.playFinish();                  break;
-                case PLAY_STEP:    game.playStep();                    break;
-                case PLAY_CLICK:   game.playClick();                   break;
-                case PLAY_MENU:    game.playMenu();                    break;
-                case STOP_MENU:    game.stopMenu();                    break;
-                case PLAY_BACKGROUND: game.playBackground();           break;
-                case STOP_BACKGROUND: game.stopBackground();           break;
+	            case DRAW:         game.refreshDisplay();              break;
+	            case EXIT:         game.close();	                   break;
+	            case GAME_MSG:     game.gameMessage(c);              break;
+	            case SOUND_MSG:    game.soundMessage(c);               break;
 	            default:                                               break;
 	        }
 	    }
@@ -87,42 +79,11 @@ public class MazePuzzleGame extends Thread {
 	public void notify(Command c) {
 	    addCommand(c);
 	}
-
-    private void playCoin() {
-    	this.soundEngine.playSound("coin");		
+	
+	private void soundMessage(Command c) {
+        String[] message = c.getMessage();
+        soundEngine.inbox(message);
 	}
-    
-    private void playIntro() {
-    	this.soundEngine.playSound("intro");
-    }
-    
-    private void playFinish() {
-    	this.soundEngine.playSound("finish");
-    }
-    
-    private void playStep() {
-    	this.soundEngine.playSound("step");
-    }
-    
-    private void playClick() {
-    	this.soundEngine.playSound("click");
-    }
-
-    private void playMenu() {
-    	this.soundEngine.startMenuMusic();
-    }
-    
-    private void stopMenu() {
-    	this.soundEngine.endMenuMusic();
-    }
-    
-    private void playBackground() {
-    	this.soundEngine.startBackgroundMusic();
-    }
-    
-    private void stopBackground() {
-    	this.soundEngine.endBackgroundMusic();
-    }
     
 	/**
      * Executed when the display needs to be refreshed.

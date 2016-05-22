@@ -110,7 +110,7 @@ public class GUI extends JFrame  {
                 
                 String[] message = controls.get(keyPressed);
                 if (message != null) {
-                    addCommand(new Command(Com.GAME_MESSAGE, message));
+                    addCommand(new Command(Com.GAME_MSG, message));
                 }
                 
                 switch (e.getKeyCode()) {
@@ -180,7 +180,7 @@ public class GUI extends JFrame  {
         settingsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	addCommand(new Command(Com.PLAY_CLICK));
+                addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "click"}));
                 setAppState(AppState.SETTINGS);
             }
         });
@@ -190,7 +190,6 @@ public class GUI extends JFrame  {
         aboutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	addCommand(new Command(Com.PLAY_CLICK));
                 setAppState(AppState.ABOUT);
             }
         });
@@ -199,8 +198,7 @@ public class GUI extends JFrame  {
         exitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	addCommand(new Command(Com.PLAY_CLICK));
-            	addCommand(new Command(Com.STOP_MENU));
+                addCommand(new Command(Com.SOUND_MSG, new String[]{"stop", "menu"}));
                 setAppState(AppState.EXIT);
             }
         });
@@ -363,24 +361,13 @@ public class GUI extends JFrame  {
         navPanel.setBackground(windowPanel.getBackground().darker());
         windowPanel.add(navPanel);
         
-        JButton resetButton = new JButton("Reset to defaults");
-        resetButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                pref.loadPreferences();
-                addCommand(new Command(Com.PLAY_CLICK));
-                setAppState(AppState.SETTINGS);
-            }
-        });
         JButton backButton = new JButton("Back");
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	addCommand(new Command(Com.PLAY_CLICK));
                 setAppState(AppState.MENU);
             }
         });
-        navPanel.add(resetButton);
         navPanel.add(backButton);
         
         JPanel aboutTextPanel = new JPanel() {
@@ -412,7 +399,6 @@ public class GUI extends JFrame  {
             @Override
             public void actionPerformed(ActionEvent e) {
                 pref.loadPreferences();
-                addCommand(new Command(Com.PLAY_CLICK));
                 setAppState(AppState.SETTINGS);
             }
         });
@@ -420,7 +406,6 @@ public class GUI extends JFrame  {
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	addCommand(new Command(Com.PLAY_CLICK));
                 setAppState(AppState.MENU);
             }
         });
@@ -552,10 +537,9 @@ public class GUI extends JFrame  {
         closeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                addCommand(new Command(Com.GAME_MESSAGE, new String[]{"endGame"}));
-            	addCommand(new Command(Com.PLAY_CLICK));
-            	addCommand(new Command(Com.STOP_BACKGROUND));
-            	addCommand(new Command(Com.PLAY_MENU));
+                addCommand(new Command(Com.GAME_MSG, new String[]{"endGame"}));
+                addCommand(new Command(Com.SOUND_MSG, new String[]{"stop", "background"}));
+                addCommand(new Command(Com.SOUND_MSG, new String[]{"loop", "menu"}));
                 setAppState(AppState.MENU);
             }
         });
@@ -568,10 +552,9 @@ public class GUI extends JFrame  {
      * @param numPlayers 1 or 2, nothing else
      */
     private void newGame() {
-        addCommand(new Command(Com.PLAY_CLICK));
-        addCommand(new Command(Com.STOP_MENU));
-        addCommand(new Command(Com.PLAY_BACKGROUND));
-        addCommand(new Command(Com.GAME_MESSAGE, new String[]{"newGame"}));
+        addCommand(new Command(Com.SOUND_MSG, new String[]{"stop", "menu"}));
+        addCommand(new Command(Com.SOUND_MSG, new String[]{"loop", "background"}));
+        addCommand(new Command(Com.GAME_MSG, new String[]{"newGame"}));
         setAppState(AppState.GAME);
     }
     
@@ -580,6 +563,7 @@ public class GUI extends JFrame  {
     }
     private void setAppState(AppState s) {
         appState = s;
+        addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "click"}));
         addCommand(new Command(Com.DRAW));
     }
     public void close() {

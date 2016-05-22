@@ -92,6 +92,24 @@ public class SoundEngine {
 			this.backgroundMusic.stop();
 		}
 	}
+
+    public void inbox(String[] message) {
+        switch(message[0]) {
+            case "play":
+                playSound(message[1]);
+                break;                    
+            case "loop":
+                if (message[1].equals("background")) startBackgroundMusic();
+                else if (message[1].equals("menu")) startMenuMusic();
+                break;
+            case "stop":
+                if (message[1].equals("background")) endBackgroundMusic();
+                else if (message[1].equals("menu")) endMenuMusic();
+                break;
+            default:
+                break;
+        }
+    }
 	
 	
 }
