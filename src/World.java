@@ -69,7 +69,7 @@ public class World {
         // Maze generator connects nodes together and sets start/finish.
         mazeGenerator();
         generateCoins();
-        doorAndKeyGenerator();
+        // doorAndKeyGenerator();
     }
     
     public void addPlayer(String name) {
@@ -157,7 +157,7 @@ public class World {
         Iterator<String> iter = beings.keySet().iterator();
         while (iter.hasNext()) {
             Being b = beings.get(iter.next());
-            if (b.getName().equals(start)) {
+            if (b.getNode().equals(finish)) {
                 // winner winner chicken dinner
                 addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "finish"}));
                 
