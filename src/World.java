@@ -162,11 +162,15 @@ public class World {
                 addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "finish"}));
             }
             if (b.getNode().equals(key)) {
-                addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "finish"}));
+                b.setKey(true);
                 key = null;
-                connectNodes(doorStart, doorFinish);
-                doorStart = null;
-                doorFinish = null;
+            }
+            if (b.getNode().equals(doorStart)) {
+                if (b.getKey()) {
+                    connectNodes(doorStart, doorFinish);
+                    doorStart = null;
+                    doorFinish = null;
+                }
             }
         }
     }

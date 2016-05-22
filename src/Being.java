@@ -4,12 +4,14 @@ public class Being extends Entity {
     private String name;
     private boolean AIControl;
     private int coins;
+    private boolean key;
     
     public Being(Node node, String name) {
         super(node);        
         this.AIControl = false;
         this.name = name;
         this.coins = 0;
+        this.key = false;
     }
 
     public String getName() {
@@ -45,4 +47,12 @@ public class Being extends Entity {
     public void addCoins(int coins) {
         this.coins += coins;
     } 
+    
+    public boolean getKey() {
+        return this.key;
+    }
+    
+    public void setKey(boolean key) {
+        this.key = key;
+    }
 }
