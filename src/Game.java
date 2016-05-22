@@ -35,30 +35,31 @@ public class Game {
         int height = pref.getValue("defaultMapHeight");
         int width = pref.getValue("defaultMapWidth");
         aiThreadPool = Executors.newScheduledThreadPool(4); 
+        boolean doorAndKey = pref.getBool("doorAndKey");
         
         for (int x = 1; x <= 4; x++) {
             String opt = pref.getText("player"+x);
             if (opt.equals("Human")) {
-                World world = new World(commands, "world"+x, height, width);
+                World world = new World(commands, "world"+x, height, width, doorAndKey);
                 worlds.put("world"+x, world);
                 System.out.println("Added Human");
                 world.addPlayer("Moneymaker");                    
             } else if (opt.equals("Easy AI")) {
-                World world = new World(commands, "world"+x, height, width);
+                World world = new World(commands, "world"+x, height, width, doorAndKey);
                 worlds.put("world"+x, world);
                 world.addPlayer("Moneymaker");
                 AI ai = new AISolve(world,"Moneymaker", "easy");
                 aiRunnable air = new aiRunnable(ai, commands);
                 aiThreadPool.scheduleAtFixedRate(air, 0, 200, TimeUnit.MILLISECONDS);
             } else if (opt.equals("Med AI")) {
-                World world = new World(commands, "world"+x, height, width);
+                World world = new World(commands, "world"+x, height, width, doorAndKey);
                 worlds.put("world"+x, world);
                 world.addPlayer("Moneymaker");
                 AI ai = new AISolve(world,"Moneymaker", "med");
                 aiRunnable air = new aiRunnable(ai, commands);
                 aiThreadPool.scheduleAtFixedRate(air, 0, 200, TimeUnit.MILLISECONDS);
             } else if (opt.equals("Hard AI")) {
-                World world = new World(commands, "world"+x, height, width);
+                World world = new World(commands, "world"+x, height, width, doorAndKey);
                 worlds.put("world"+x, world);
                 world.addPlayer("Moneymaker");
                 AI ai = new AISolve(world,"Moneymaker", "hard");

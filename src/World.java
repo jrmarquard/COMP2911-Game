@@ -43,7 +43,7 @@ public class World {
     // Items are stationary objects that can be interacted with by 
     private ArrayList<Item> items;
     
-    public World (Queue<Command> commands, String name, int width, int height) {
+    public World (Queue<Command> commands, String name, int width, int height, boolean doorAndKey) {
         this.commands = commands;
         this.name = name;
         this.updateFlag = false;
@@ -69,7 +69,7 @@ public class World {
         // Maze generator connects nodes together and sets start/finish.
         mazeGenerator();
         generateCoins();
-        doorAndKeyGenerator();
+        if (doorAndKey) doorAndKeyGenerator();
     }
     
     public void addPlayer(String name) {

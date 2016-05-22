@@ -239,7 +239,7 @@ public class GUI extends JFrame  {
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(6,0,6,0);
         
-        // Add two columsn on the sides
+        // Add two columns on the sides
         JPanel blankColumnLeft = new JPanel();
         JPanel blankColumnRight = new JPanel();
         c.gridx = 0;
@@ -254,15 +254,30 @@ public class GUI extends JFrame  {
         // Start building the settings list
         c.weightx = 1;
 
-        // Map size selection
+        // Map size selection        
+        JCheckBox doorAndKey = new JCheckBox("", pref.getBool("doorAndKey"));
+        doorAndKey.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                pref.toggleBool("doorAndKey");
+            }
+        });
+        
+        c.gridx = 1;
+        c.gridy = 0;
+        c.anchor = GridBagConstraints.WEST;
+        settingsPanel.add(new JLabel("Generate door and key?"), c);
+        c.gridx = 2;
+        c.anchor = GridBagConstraints.EAST;
+        settingsPanel.add(doorAndKey, c);
+        
         JFormattedTextField widthSize = new JFormattedTextField();
         widthSize.setValue(Integer.toString(pref.getValue("defaultMapWidth")));
         widthSize.setColumns(2);
         widthSize.getDocument().addDocumentListener(new PrefUpdate("value", "defaultMapWidth"));
         
-        
         c.gridx = 1;
-        c.gridy = 0;
+        c.gridy = 1;
         c.anchor = GridBagConstraints.WEST;
         settingsPanel.add(new JLabel("Width"), c);
         c.gridx = 2;
@@ -274,19 +289,16 @@ public class GUI extends JFrame  {
         heightSize.setColumns(2);
         heightSize.getDocument().addDocumentListener(new PrefUpdate("value", "defaultMapHeight"));
         c.gridx = 1;
-        c.gridy = 1;
+        c.gridy = 2;
         c.anchor = GridBagConstraints.WEST;
         settingsPanel.add(new JLabel("Height"), c);
         c.gridx = 2;
         c.anchor = GridBagConstraints.EAST;
         settingsPanel.add(heightSize, c);
-        
-        
-        
-        
+                
         // Gamemode selection 
         c.gridx = 1;
-        c.gridy = 2;
+        c.gridy = 3;
         c.anchor = GridBagConstraints.WEST;
         JLabel gameModeText = new JLabel();
         gameModeText.setText("Gamemode: ");
@@ -312,7 +324,7 @@ public class GUI extends JFrame  {
         
         if (gameMode.equals("Solve")) {
             c.gridx = 1;
-            c.gridy = 3;
+            c.gridy = 4;
             c.anchor = GridBagConstraints.WEST;
             settingsPanel.add(new JLabel("Player 1: "), c);
             c.gridx = 2;
@@ -321,7 +333,7 @@ public class GUI extends JFrame  {
         } else if (gameMode.equals("Race")) {
             for (int x = 1; x <= 4; x++) {
                 c.gridx = 1;
-                c.gridy = x+4;
+                c.gridy = x+3;
                 c.anchor = GridBagConstraints.WEST;
                 settingsPanel.add(new JLabel("Player "+x+": "), c);
                 c.gridx = 2;
@@ -330,7 +342,7 @@ public class GUI extends JFrame  {
             }
         }
         
-        c.gridy = 9;
+        c.gridy = 8;
         c.gridx = 1;
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.CENTER;
