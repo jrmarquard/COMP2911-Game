@@ -122,23 +122,23 @@ public class Game {
     }
 
     public void inbox(String[] message) {
-        switch(message[0]) {
-            case "move":
-                World w = worlds.get(message[1]);
-                w.moveBeing(message[2], message[3]);
-                break;                    
-            case "newGame":
-                newGame();
-                break;
-            case "endGame":
-                endGame();
-                break;
-            default:
-                break;
-        }
-        if (message[0] == "move") {
-        } else if (message[0] == "newGame") {
-            
+        try {
+            switch(message[0]) {
+                case "move":
+                    World w = worlds.get(message[1]);
+                    w.moveBeing(message[2], message[3]);
+                    break;                    
+                case "newGame":
+                    newGame();
+                    break;
+                case "endGame":
+                    endGame();
+                    break;
+                default:
+                    break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
     

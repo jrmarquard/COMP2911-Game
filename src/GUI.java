@@ -329,14 +329,10 @@ public class GUI extends JFrame  {
             }
         }
         
-        
-        windowPanel.add(settingsPanel);
-        // Settings Panel Layout End
-        
-        // Panel across the bottom of the screen.
-        JPanel navPanelBottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        navPanelBottom.setBackground(windowPanel.getBackground().darker());
-        windowPanel.add(navPanelBottom);
+        c.gridy = 9;
+        c.gridx = 1;
+        c.gridwidth = 2;
+        c.anchor = GridBagConstraints.CENTER;
         JButton startGameButton = new JButton("Start Game");
         startGameButton.addActionListener(new ActionListener() {
             @Override
@@ -345,8 +341,11 @@ public class GUI extends JFrame  {
                 newGame();
             }
         });
-        navPanelBottom.add(startGameButton);
+        settingsPanel.add(startGameButton, c);
+
         
+        windowPanel.add(settingsPanel);
+        // Settings Panel Layout End        
     }
     
     /**

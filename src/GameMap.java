@@ -117,13 +117,13 @@ public class GameMap extends JPanel {
                 } else {
                     // Vertical walls
                     if (col%2 == 0) {
-                        if (!world.isAdjacent((col/2)-1, (row-1)/2, col/2, (row-1)/2)){
+                        if (!world.isConnected((col/2)-1, (row-1)/2, col/2, (row-1)/2)){
                             g2d.fillRect((tileSize+wallWidth)*((col/2)), wallWidth + (tileSize+wallWidth)*((row-1)/2), wallWidth, tileSize);   
                         }
                     }
                     // Horizontal walls
                     else if (row%2 == 0) {
-                        if (!world.isAdjacent((col-1)/2, (row/2)-1, (col-1)/2, (row/2))){
+                        if (!world.isConnected((col-1)/2, (row/2)-1, (col-1)/2, (row/2))){
                             g2d.fillRect(wallWidth + (tileSize+wallWidth)*((col-1)/2), (tileSize+wallWidth)*(row/2), tileSize, wallWidth);   
                         }
                     }

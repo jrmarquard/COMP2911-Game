@@ -24,7 +24,6 @@ public class World {
     private ArrayList<ArrayList<Node>> nodes;
     private Node start;
     private Node finish;
-    
     private int width;
     private int height;
     
@@ -37,38 +36,23 @@ public class World {
     private ArrayList<Item> items;
     
     public World (String name, int width, int height) {
-        this.setName(name);
-        
+        this.name = name;
         this.nodes = new ArrayList<ArrayList<Node>>();
-        
-        int counterW = 0;
-        int counterH = 0;
-        
-        while (counterW < width) {
-            this.nodes.add(new ArrayList<Node>());
-            while (counterH < height) {
-                this.nodes.get(counterW).add(new Node(counterW, counterH));
-                counterH++;
-            }
-            counterH = 0;
-            counterW++;
-        }
-        
-        this.start = null;
-        this.finish = null;
+        this.beings = new HashMap<String, Being>();
+        this.items = new ArrayList<Item>();
         
         this.width = width;
         this.height = height;
         
+        for (int w = 0; w < width; w++) {
+            this.nodes.add(new ArrayList<Node>());
+            for (int h = 0; h < height; h++) {
+                this.nodes.get(w).add(new Node(w, h));
+            }
+        }
         
-        this.beings = new HashMap<String, Being>();
-        this.items = new ArrayList<Item>();
-        
+        // Maze generator connects nodes together and sets start/finish.
         mazeGenerator();
-        
-        // Add player
-        
-        // Generate coins
         generateCoins();
     }
     
@@ -78,7 +62,6 @@ public class World {
     }
     
     public void generateCoins() {
-        
         float h = (float)getHeight();
         float w = (float)getWidth();
         float r = (float)15;
@@ -90,23 +73,17 @@ public class World {
         int coinValue = 50;
         
         for (int x = 0; x < numberOfCoins; x++) {
-            while (!uniqueCoordinates(xC, yC)) {
-                xC = rand.nextInt(getWidth());
-                yC = rand.nextInt(getHeight());
-                coinValue = 5+rand.nextInt(80);
+            xC = rand.nextInt(getWidth());
+            yC = rand.nextInt(getHeight());
+            Node n = getNode(xC, yC);
+            if (start.equals(n)) continue;
+            if (finish.equals(n)) continue;
+            for (Item i : items) {
+                if (i.getNode().equals(n)) continue;
             }
-            Coins coins = new Coins(getNode(xC,yC),coinValue);
+            Coins coins = new Coins(n,coinValue);
             items.add(coins);
         }
-    }
-    
-    private boolean uniqueCoordinates(int x, int y) {
-        if (isStart(x,y)) return false;
-        if (isFinish(x,y)) return false;
-        for (Item i : items) {
-            if (i.getNode().equals(new Node(x,y))) return false;
-        }
-        return true;
     }
 
     public int getPlayerCoins(String id) {
@@ -123,15 +100,16 @@ public class World {
     
     public void moveBeing(String id, String dir) {
         Being b = beings.get(id);
+        Node n = b.getNode();
         if (b != null) {
-            if (dir == "up" && isUp(b.getNode())) {
-                b.setNode(b.getNode().getUp());
-            } else if (dir == "down" && isDown(b.getNode())) {
-                b.setNode(b.getNode().getDown());
-            } else if (dir == "left" && isLeft(b.getNode())) {
-                b.setNode(b.getNode().getLeft());
-            } else if (dir == "right" && isRight(b.getNode())) {
-                b.setNode(b.getNode().getRight());
+            if (dir == "up" && n.getUp() != null) {
+                b.setNode(n.getUp());
+            } else if (dir == "down" && n.getDown() != null) {
+                b.setNode(n.getDown());
+            } else if (dir == "left" && n.getLeft() != null) {
+                b.setNode(n.getLeft());
+            } else if (dir == "right" && n.getRight() != null) {
+                b.setNode(n.getRight());
             }
         }
         update();
@@ -144,10 +122,8 @@ public class World {
      * - entity collisions
      *     - player picks up coins
      *     - player dies
-     *     
-     * If something has happened, ask the GUI to redraw the world.
      */
-    public void update() {        
+    public void update() {
         entityCollision();
     }
     
@@ -178,79 +154,51 @@ public class World {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Node getBeingCoordinate(String id) {
-        return beings.get(id).getNode();
-    }
-    
-    // From where I imported the maze class, need to fix all this up.
     public Node getStartNode() {
         return this.start;
     }
-    
     public Node getFinishNode() {
         return this.finish;
     }
     public int getWidth() {
         return this.width;
     }
-    
     public int getHeight() {
         return this.height;
     }
+
+    public Node getBeingCoordinate(String id) {
+        return beings.get(id).getNode();
+    }
+    public Node getPlayerNode() {
+        return beings.get("Moneymaker").getNode();
+    }
     
+    /**
+     * Get the node at the x and y coordinates given.
+     * @param x The x coordinate.
+     * @param y The y coordinate.
+     * @return Node at x and y.
+     */
     public Node getNode(int x, int y) {
         return this.nodes.get(x).get(y);
     }
-    public boolean isAdjacent(int x1, int y1, int x2, int y2) {
-        return getNode(x1,y1).isAdjacent(getNode(x2,y2));
-    }
     
-    public boolean isDown(Node n) {
-        if (n.getDown() == null) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-    
-    public boolean isUp(Node n) {
-        if (n.getUp() == null) {
-            return false;
-        } else {
-            return true;
-        }
+    /**
+     * Checks if the x and y coordinates given are corrected to each other.
+     * @param x1
+     * @param y1
+     * @param x2
+     * @param y2
+     * @return
+     */
+    public boolean isConnected(int x1, int y1, int x2, int y2) {
+        return getNode(x1,y1).isConnected(getNode(x2,y2));
     }
 
-    public boolean isRight(Node n) {
-        if (n.getRight() == null) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    public boolean isLeft(Node n) {
-        if (n.getLeft() == null) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-    
-    public boolean isStart(int x, int y) {
-        return getStartNode().equals(new Node(x,y));
-    }
-
-    public boolean isFinish(int x, int y) {
-        return getFinishNode().equals(new Node(x,y));
-    }
+      
     
     public void makePath(int xA, int yA, int xB, int yB) {
         if (xA == xB || yA == yB) {
@@ -408,9 +356,5 @@ public class World {
             nodeA.setLeft(nodeB);
             nodeB.setRight(nodeA);
         }
-    }
-
-    public Node getPlayerNode() {
-        return beings.get("Moneymaker").getNode();
-    }    
+    } 
 }

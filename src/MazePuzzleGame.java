@@ -11,7 +11,7 @@ import java.util.Queue;
  * @author John, Joshua, Patrick, Tim, Tyler
  *
  */
-public class MazePuzzleGame {
+public class MazePuzzleGame extends Thread {
     
     Preferences pref;
     GUI gui;
@@ -31,6 +31,9 @@ public class MazePuzzleGame {
         this.game = new Game(commands, pref);
         this.gui = new GUI(this.pref, this.game, this.commands);
         
+    }
+    
+    public void run() {
         // Draws the GUI
         this.addCommand(new Command(Com.DRAW));
     }
@@ -46,7 +49,8 @@ public class MazePuzzleGame {
      */
 	public static void main(String[] args) {
 	    
-	    MazePuzzleGame game = new MazePuzzleGame();  
+	    MazePuzzleGame game = new MazePuzzleGame();
+	    game.start();
 	    
 	    for (Command c = null; ; c = game.pollCommands()) {
 	        // Adds a delay to stop the program hanging

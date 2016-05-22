@@ -36,14 +36,12 @@ public class AISolve implements AI {
      * @return
      */
     private Command easyMove() {
-        System.out.println("Makes random move");
-        int randValue = (new Random()).nextInt(5);
-        
         String[] message = new String[4];
         message[0] = "move";
         message[1] = worldName;
         message[2] = id;
         
+        int randValue = (new Random()).nextInt(5);
         switch(randValue) {
             case 0:     message[3] = "up";      break;
             case 1:     message[3] = "down";    break;
