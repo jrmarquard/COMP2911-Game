@@ -1,5 +1,5 @@
 
-public class Coins extends Entity {
+public class Coins extends Item {
     
     private int value;
     

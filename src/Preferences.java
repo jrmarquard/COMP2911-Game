@@ -57,6 +57,8 @@ public class Preferences {
             case "colour":  this.GUIcolours.put(setting[1],new Color(Integer.parseInt(line[1], 16)));   break;
             case "value":   this.values.put(setting[1],Integer.parseInt(line[1])); break;
             case "bool":    this.bools.put(setting[1],Boolean.valueOf(line[1])); break;
+            default:        
+                break;
         }
     }
     
@@ -66,7 +68,11 @@ public class Preferences {
             sc = new Scanner(new FileReader("pref.properties"));
 
             for( ; true == sc.hasNextLine() ; ) {
-                setPreference(sc.nextLine());
+                try {
+                    setPreference(sc.nextLine());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
         catch (FileNotFoundException e) {

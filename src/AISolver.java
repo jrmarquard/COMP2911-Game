@@ -1,7 +1,7 @@
 
-public class AISolver implements AIControl {
+public class AISolver implements AI {
 
-    MazeWorld world;
+    Game world;
     
     /**
      * AISolver constructor must include the world so it can get
@@ -9,7 +9,7 @@ public class AISolver implements AIControl {
      * 
      * @param world the world it is in
      */
-    public AISolver (MazeWorld world){
+    public AISolver (Game world){
         this.world = world;
     }
     

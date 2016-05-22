@@ -15,9 +15,8 @@ public class MazePuzzleGame {
     
     Preferences pref;
     DisplayInterface disp;
-    MazeWorld world;
+    Game game;
     Queue<Command> commands;
-    AIAgency aiAgency;
     
     /**
      * Initialises MazePuzzleGame.
@@ -29,10 +28,10 @@ public class MazePuzzleGame {
     public MazePuzzleGame() {
         this.pref = new Preferences();
         this.commands = new LinkedList<Command>();
-        this.world = new MazeWorld(this, pref);
-        this.disp = new GUI(this.pref, this.world, this.commands);
-        this.aiAgency = new AIAgency(commands);
+        this.game = new Game(commands, pref);
+        this.disp = new GUI(this.pref, this.game, this.commands);
         
+        // Draws the GUI
         this.addCommand(new Command(Com.DRAW));
     }
 
@@ -59,17 +58,9 @@ public class MazePuzzleGame {
 	        
 	        // Get the command ID from the command and run appropriate game method
 	        switch (c.getCommandID()) {
-		        case NEW_MAP:      game.newMap(c);                     break;
-	            case DRAW:         game.refreshDisplay();              break;
-	            case EXIT:         game.close();	                   break;
-	            case MOVE_DOWN:
-	            case MOVE_LEFT:
-	            case MOVE_RIGHT:
-	            case MOVE_UP:      game.moveCharacter(c);              break;
-	            case TOGGLE_AI:    game.turnAIOn();                    break;
-	            case RUN_AI:       game.runAI(c);                       break;
-	            case CREATE_AI:    game.createAI(c);                    break;
-	            case IDLE:                                             break;
+	            case DRAW:          game.refreshDisplay();              break;
+	            case EXIT:          game.close();	                   break;
+	            case GAME_MESSAGE:  game.gameMessage(c);              break;
 	            default:                                               break;
 	        }
 	    }
@@ -81,24 +72,6 @@ public class MazePuzzleGame {
 	public void notify(Command c) {
 	    addCommand(c);
 	}
-	
-	/**
-	 * Asks the aiAgency to create an AI of a given name.
-	 */
-    private void createAI(Command c) {
-        CommandAI cAI = (CommandAI) c;
-        aiAgency.createAI(cAI.getName(), cAI.getWorld(), cAI.getSettings());
-    }
-
-    /**
-     * Asks the aiAgency to run the AI of a given name.
-     * It is expected that this AI will return a command 
-     * to update itself in the game.
-     */
-    private void runAI(Command c) {
-        CommandAI cAI = (CommandAI) c;
-        aiAgency.makeMove(cAI.getName());
-    }
 
     /**
      * Executed when the display needs to be refreshed.
@@ -113,54 +86,14 @@ public class MazePuzzleGame {
         });
     }
 
-	/**
-	 * Executed when a new map is requested
-	 * 
-	 * @param o the command object which ordered this method
-	 */
-    private void newMap(Command o) {
-        CommandMap c = (CommandMap)o;
-        int width = c.getWidth();
-        int height = c.getHeight();
-        world.generateWorld(width, height);
-        
-        if (c.getPlayers() > 1) {
-            world.setMuptiplayer(c.getPlayers());
-        }
-        addCommand(new Command(Com.DRAW));
-    }
-    
-    /**
-     * Executed when asked to close.
-     */
-    private void close () {
-        disp.close();
-        System.exit(0);
-    }
-
     /**
      * Moves player up a coordinate
      */
-    private void moveCharacter(Command o) {
-        CommandMap c = (CommandMap)o;
-        int id = c.getPlayerID();
-        switch(c.getCommandID()) {
-            case MOVE_DOWN:     world.moveCharacterDown(id);    break;
-            case MOVE_UP:       world.moveCharacterUp(id);      break;
-            case MOVE_LEFT:     world.moveCharacterLeft(id);    break;
-            case MOVE_RIGHT:    world.moveCharacterRight(id);   break;
-            default: 
-                break;
-        }
+    private void gameMessage(Command c) {
+        String[] message = c.getMessage();
+        game.inbox(message);
         addCommand(new Command(Com.DRAW));
 	}
-    
-    /**
-     * Turns AI on
-     */
-    private void turnAIOn() {
-        world.turnAIOn();
-    }
     
     /**
      * Adds command c to the command queue
@@ -178,5 +111,13 @@ public class MazePuzzleGame {
 	private Command pollCommands() {
 	    return commands.poll();
 	}
+    
+    /**
+     * Executed when asked to close.
+     */
+    private void close () {
+        disp.close();
+        System.exit(0);
+    }
 	
 }
