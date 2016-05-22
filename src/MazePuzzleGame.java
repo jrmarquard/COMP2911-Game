@@ -14,7 +14,7 @@ import java.util.Queue;
 public class MazePuzzleGame {
     
     Preferences pref;
-    DisplayInterface disp;
+    GUI gui;
     Game game;
     Queue<Command> commands;
     
@@ -29,7 +29,7 @@ public class MazePuzzleGame {
         this.pref = new Preferences();
         this.commands = new LinkedList<Command>();
         this.game = new Game(commands, pref);
-        this.disp = new GUI(this.pref, this.game, this.commands);
+        this.gui = new GUI(this.pref, this.game, this.commands);
         
         // Draws the GUI
         this.addCommand(new Command(Com.DRAW));
@@ -81,7 +81,7 @@ public class MazePuzzleGame {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                disp.update();
+                gui.update();
             }
         });
     }
@@ -116,7 +116,7 @@ public class MazePuzzleGame {
      * Executed when asked to close.
      */
     private void close () {
-        disp.close();
+        gui.close();
         System.exit(0);
     }
 	

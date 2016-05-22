@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Queue;
 
 @SuppressWarnings("serial")
-public class GUI extends JFrame implements DisplayInterface {
+public class GUI extends JFrame  {
     
     enum AppState {
         /* Menu displays the main menu */
