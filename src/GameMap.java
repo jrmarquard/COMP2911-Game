@@ -116,14 +116,22 @@ public class GameMap extends JPanel {
                     // Skips north/east/south/west boundaries
                 } else {
                     // Vertical walls
-                    if (col%2 == 0) {
-                        if (!world.isConnected((col/2)-1, (row-1)/2, col/2, (row-1)/2)){
+                    if (col%2 == 0) {  
+                        if(world.isDoor((col/2)-1, (row-1)/2, col/2, (row-1)/2)) {
+                    		g2d.setColor(pref.getColour("doorColour"));
+                    		g2d.fillRect((tileSize+wallWidth)*((col/2)), wallWidth + (tileSize+wallWidth)*((row-1)/2), wallWidth, tileSize);
+                    		g2d.setColor(pref.getColour("wallColour"));
+                    	} else if (!world.isConnected((col/2)-1, (row-1)/2, col/2, (row-1)/2)){
                             g2d.fillRect((tileSize+wallWidth)*((col/2)), wallWidth + (tileSize+wallWidth)*((row-1)/2), wallWidth, tileSize);   
                         }
                     }
                     // Horizontal walls
                     else if (row%2 == 0) {
-                        if (!world.isConnected((col-1)/2, (row/2)-1, (col-1)/2, (row/2))){
+                    	if(world.isDoor((col-1)/2, (row/2)-1, (col-1)/2, (row/2))) {
+                    		g2d.setColor(pref.getColour("doorColour"));
+                    		g2d.fillRect(wallWidth + (tileSize+wallWidth)*((col-1)/2), (tileSize+wallWidth)*(row/2), tileSize, wallWidth);
+                    		g2d.setColor(pref.getColour("wallColour"));
+                    	} else if (!world.isConnected((col-1)/2, (row/2)-1, (col-1)/2, (row/2))){
                             g2d.fillRect(wallWidth + (tileSize+wallWidth)*((col-1)/2), (tileSize+wallWidth)*(row/2), tileSize, wallWidth);   
                         }
                     }
@@ -158,6 +166,13 @@ public class GameMap extends JPanel {
         for (Node s : nodes) {
             g2d.fillRect(wallWidth+(s.getX()*(wallWidth+tileSize)), wallWidth+(s.getY()*(wallWidth+tileSize)), tileSize, tileSize);
         }
+        
+        n = world.getKeyNode();
+        if(n != null) {
+        	g2d.setColor(pref.getColour("keyColour"));
+            g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
+        }
+        
     }
     
     /*

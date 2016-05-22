@@ -1,8 +1,9 @@
 
 public class Node {
 	
-	int x;
-	int y;
+	private int x;
+	private int y;
+	private int cost;
 	private Node up;
 	private Node right;
 	private Node down;
@@ -11,6 +12,7 @@ public class Node {
 	public Node(int x, int y) {
 		this.x = x;
 		this.y = y;
+		this.cost = 0;
 		this.up = null;
 		this.right = null;
 		this.down = null;
@@ -23,6 +25,18 @@ public class Node {
 	
 	public int getY() {
 		return this.y;
+	}
+	
+	public int getCost() {
+		return this.cost;
+	}
+	
+	public void addCost(int cost) {
+		this.cost += cost;
+	}
+	
+	public void resetCost() {
+		this.cost = 0;
 	}
 	
 	public Node getUp() {

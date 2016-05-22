@@ -29,6 +29,12 @@ public class World {
     private int width;
     private int height;
     
+    // Copying in from merge
+    private Node doorStart;
+    private Node doorFinish;
+    private Node key;
+    
+    
     // Multiple beings in a world
     // Beings are things that can move/make decisions
     private Map<String, Being> beings;
@@ -56,9 +62,14 @@ public class World {
             }
         }
         
+        this.doorStart = null;
+        this.doorFinish = null;
+        this.key = null;
+        
         // Maze generator connects nodes together and sets start/finish.
         mazeGenerator();
         generateCoins();
+        doorAndKeyGenerator();
     }
     
     public void addPlayer(String name) {
@@ -199,6 +210,9 @@ public class World {
     public int getHeight() {
         return this.height;
     }
+    public Node getKeyNode() {
+        return key;
+    }
 
     public Node getBeingCoordinate(String id) {
         return beings.get(id).getNode();
@@ -228,8 +242,17 @@ public class World {
     public boolean isConnected(int x1, int y1, int x2, int y2) {
         return getNode(x1,y1).isConnected(getNode(x2,y2));
     }
-
-      
+    
+    public boolean isDoor(int xA, int yA, int xB, int yB) {
+        if((this.getNode(xA, yA).equals(this.doorStart) &&
+                this.getNode(xB, yB).equals(this.doorFinish)) ||
+                (this.getNode(xA, yA).equals(this.doorFinish) &&
+                this.getNode(xB, yB).equals(this.doorStart))) {
+            return true;
+        } else {
+            return false;
+        }
+    }      
     
     public void makePath(int xA, int yA, int xB, int yB) {
         if (xA == xB || yA == yB) {
@@ -388,4 +411,174 @@ public class World {
             nodeB.setRight(nodeA);
         }
     } 
+
+    
+    /**
+     * Fills in the shortest path with the given start and destination
+     * @param shortestPath the List that will be storing the shortest path
+     * @param path the path created by bfs
+     * @param start the starting point
+     * @param dest the destination
+     */
+    private void processPath(ArrayList<Node> shortestPath, ArrayList<Node> path, 
+            Node start, Node dest){
+        int i = path.indexOf(dest);
+        Node source = path.get(i + 1);
+        
+        shortestPath.add(0, dest);
+        if (source.equals(start)) {
+            shortestPath.add(0, start);
+            return;
+        } else {
+            processPath(shortestPath, path, start, source);
+        }
+    }
+
+    /**
+     * Generates a door and a key in the maze
+     */
+    public void doorAndKeyGenerator() {
+        ArrayList<Node> path = new ArrayList<Node>();
+        ArrayList<Node> shortestPath = new ArrayList<Node>();
+        boolean pathFound = false;
+        
+        Queue<Node> explore = new LinkedList<Node>();
+        LinkedList<Node> visited = new LinkedList<Node>();
+        
+        // finds the shortest path from start to finish
+        explore.add(start);
+        while (!explore.isEmpty()){
+            Node n = explore.remove();
+            visited.add(n);
+            
+            ArrayList<Node> reachable = new ArrayList<Node>();
+            if (n.getLeft() != null) reachable.add(n.getLeft());
+            if (n.getDown() != null) reachable.add(n.getDown());
+            if (n.getRight() != null) reachable.add(n.getRight());
+            if (n.getUp() != null) reachable.add(n.getUp());
+            
+            int i = 0;
+            while(i != reachable.size()){
+                Node neighbour = reachable.get(i);
+                path.add(neighbour);
+                path.add(n);
+                
+                if (neighbour.equals(this.finish)){
+                    processPath(shortestPath, path, start, this.finish);
+                    pathFound = true;
+                    break;
+                } else if (!visited.contains(neighbour)){
+                    explore.add(neighbour);
+                }
+                i++;
+            }
+            
+            if(pathFound) {
+                break;
+            }
+        }
+        
+        // Sets the middle point of the shortest path as a door
+        // to block the path
+        int halfPoint = shortestPath.size() / 2;
+        this.doorStart = shortestPath.get(halfPoint);
+        this.doorFinish = shortestPath.get(halfPoint + 1);
+        this.disconnectNodes(this.doorStart, this.doorFinish);
+        
+        // Sets the cost of each of the nodes of the starting side
+        this.resetNodeCost();
+        this.setNodeCost(this.start);
+        this.setNodeCost(this.doorStart);
+        
+        // Finds the node with the greatest cost from start
+        // and from the door and set this as the location of the key
+        for(ArrayList<Node> aList: this.nodes) {
+            for(Node node: aList) {
+                if(this.key == null) {
+                    this.key = node;
+                } else if(node.getCost() > this.key.getCost()) {
+                    this.key = node;
+                }
+            }
+        }
+    }
+    
+    /**
+     * Disconnects the given two nodes, ie make a wall between them
+     * @param nodeA the first node to be disconnected
+     * @param nodeB the second node to be disconnected
+     */
+    private void disconnectNodes(Node nodeA, Node nodeB) {
+        int xA = nodeA.getX();
+        int yA = nodeA.getY();
+        int xB = nodeB.getX();
+        int yB = nodeB.getY();
+        
+        // If nodeA is above nodeB
+        if(xA == xB && yA == yB - 1) {
+            nodeA.setDown(null);
+            nodeB.setUp(null);
+        } 
+        
+        // If nodeA is below nodeB
+        else if(xA == xB && yA == yB + 1) {
+            nodeA.setUp(null);
+            nodeB.setDown(null);
+        } 
+        
+        // If nodeA is left to nodeB
+        else if(xA == xB - 1 && yA == yB) {
+            nodeA.setRight(null);
+            nodeB.setLeft(null);
+        } 
+        
+        // If nodeA is right to nodeB
+        else if(xA == xB + 1 && yA == yB) {
+            nodeA.setLeft(null);
+            nodeB.setRight(null);
+        }
+    }
+    
+
+    
+    /**
+     * Sets the cost of the nodes from the given node by doing a bfs
+     * @param node the starting node
+     */
+    private void setNodeCost(Node node) {
+        Queue<Node> explore = new LinkedList<Node>();
+        LinkedList<Node> visited = new LinkedList<Node>();
+        int i = 1;
+        
+        explore.add(node);
+        while (!explore.isEmpty()){
+            Node n = explore.remove();
+            visited.add(n);
+            
+            ArrayList<Node> reachable = new ArrayList<Node>();
+            if (n.getLeft() != null) reachable.add(n.getLeft());
+            if (n.getDown() != null) reachable.add(n.getDown());
+            if (n.getRight() != null) reachable.add(n.getRight());
+            if (n.getUp() != null) reachable.add(n.getUp());
+            
+            for(Node neighbour: reachable){
+                if (!visited.contains(neighbour)){
+                    neighbour.addCost(i);
+                    explore.add(neighbour);
+                }
+            }
+            
+            i++;
+        }
+    }
+    /**
+     * Resets the cost of all the nodes
+     */
+    private void resetNodeCost() {
+        for(ArrayList<Node> aList: this.nodes) {
+            for(Node node: aList) {
+                node.resetCost();
+            }
+        }
+    }
 }
