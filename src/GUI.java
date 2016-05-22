@@ -318,9 +318,9 @@ public class GUI extends JFrame implements DisplayInterface {
             c.anchor = GridBagConstraints.EAST;
             settingsPanel.add(new PlayerOptions(playerOptions, "player1"), c);
         } else if (gameMode.equals("Race")) {
-            for (int x = 4; x <= 4+4; x++) {
+            for (int x = 1; x <= 4; x++) {
                 c.gridx = 1;
-                c.gridy = x;
+                c.gridy = x+4;
                 c.anchor = GridBagConstraints.WEST;
                 settingsPanel.add(new JLabel("Player "+x+": "), c);
                 c.gridx = 2;
@@ -595,13 +595,11 @@ public class GUI extends JFrame implements DisplayInterface {
             update(e);
         }
         private void update(DocumentEvent e) {
-            System.out.println("triggered 1");
             try {
                 String value = "";
                 int textLength = e.getDocument().getLength();
                 switch(spaceName) {
                     case "value":
-                        System.out.println("triggered 3");
                         if (textLength == 1 || textLength == 2)  {
                             value = e.getDocument().getText(0,textLength);
                             pref.setPreference(spaceName+"."+prefName+"="+value);

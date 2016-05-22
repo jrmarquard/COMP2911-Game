@@ -11,7 +11,7 @@ public class AI_OLD implements AI{
         this.shortestPath = new ArrayList<Node>();
     }
 	
-	private ArrayList<Node> traverseMaze(Maze maze, Node start) {	    
+	private ArrayList<Node> traverseMaze(World world, Node start) {	    
 		ArrayList<Node> path = new ArrayList<Node>();
 		
 		Queue<Node> q = new LinkedList<Node>();
@@ -33,8 +33,8 @@ public class AI_OLD implements AI{
 				Node neighbour = reachable.get(i);
 				path.add(neighbour);
 				path.add(n);
-				if (neighbour.equals(maze.getFinish())){
-				    return processPath(path, start, maze.getFinish());
+				if (neighbour.equals(world.getFinishNode())){
+				    return processPath(path, start, world.getFinishNode());
 				} else if (!visited.contains(neighbour)){
 					q.add(neighbour);
 				}

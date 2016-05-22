@@ -17,10 +17,6 @@ public class Node {
 		this.left = null;
 	}
 	
-	public Coordinate getCoordinate() {
-	    return new Coordinate(this.x, this.y);
-	}
-	
 	public int getX() {
 		return this.x;
 	}
@@ -62,7 +58,7 @@ public class Node {
 	}
 
 	/**
-	 * Checks if the node n is underneath this node
+	 * Checks if the node n is  this node
 	 * 
 	 * @param n query node
 	 * @return returns true if n is beneath node

@@ -5,8 +5,8 @@ public class Being extends Entity {
     private boolean AIControl;
     private int coins;
     
-    public Being(Coordinate coord, String name) {
-        super(coord);        
+    public Being(Node node, String name) {
+        super(node);        
         this.AIControl = false;
         this.name = name;
         this.coins = 0;

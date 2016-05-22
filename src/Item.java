@@ -1,8 +1,8 @@
 
 public class Item extends Entity {
 
-    public Item(Coordinate coord) {
-        super(coord);
+    public Item(Node node) {
+        super(node);
     }
 
 }

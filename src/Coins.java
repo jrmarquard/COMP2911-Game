@@ -11,8 +11,8 @@ public class Coins extends Item {
         this.value = value;
     }
 
-    public Coins(Coordinate coord, int value) {
-        super(coord);
+    public Coins(Node node, int value) {
+        super(node);
         this.value = value;
     }
 

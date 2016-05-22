@@ -1,30 +1,14 @@
-
 public class Entity {
-
-    private Coordinate coord;
+    private Node node;
     
-    public Entity (Coordinate coord) {
-        this.coord = coord;
-    }
-
-    public Coordinate getCoordinate() {
-        // passes out a new coordinate so that it can't be changed by another class
-        return new Coordinate(coord);
-    }
-    public void setCoordinate(Coordinate coord) {
-        this.coord = coord;
+    public Entity (Node node) {
+        this.node = node;
     }
     
-    public int getY() {
-        return coord.getY();
+    public Node getNode() {
+        return node;
     }
-    public int getX() {
-        return coord.getX();
-    }
-    public void setX(int x) {
-        coord.setX(x);
-    }
-    public void setY(int y) {
-        coord.setY(y);
+    public void setNode(Node n) {
+        this.node = n;
     }
 }

@@ -53,9 +53,8 @@ public class GameMap extends JPanel {
         g2d.fillRect(0, 0, windowWidth, windowHeight);
         
         // Gets the number of rows and columns in maze
-        Maze m = world.getMaze();
-        int mazeColumns = m.getWidth();
-        int mazeRows = m.getHeight();
+        int mazeColumns = world.getWidth();
+        int mazeRows = world.getHeight();
         
         // positive integer
         int tileRatio = 5;
@@ -118,13 +117,13 @@ public class GameMap extends JPanel {
                 } else {
                     // Vertical walls
                     if (col%2 == 0) {
-                        if (!m.isAdjacent((col/2)-1, (row-1)/2, col/2, (row-1)/2)){
+                        if (!world.isAdjacent((col/2)-1, (row-1)/2, col/2, (row-1)/2)){
                             g2d.fillRect((tileSize+wallWidth)*((col/2)), wallWidth + (tileSize+wallWidth)*((row-1)/2), wallWidth, tileSize);   
                         }
                     }
                     // Horizontal walls
                     else if (row%2 == 0) {
-                        if (!m.isAdjacent((col-1)/2, (row/2)-1, (col-1)/2, (row/2))){
+                        if (!world.isAdjacent((col-1)/2, (row/2)-1, (col-1)/2, (row/2))){
                             g2d.fillRect(wallWidth + (tileSize+wallWidth)*((col-1)/2), (tileSize+wallWidth)*(row/2), tileSize, wallWidth);   
                         }
                     }
@@ -133,30 +132,30 @@ public class GameMap extends JPanel {
         }
         
         // Draw on start
-        Coordinate c = world.getStart();
+        Node n = world.getStartNode();
         g2d.setColor(pref.getColour("startColour"));
-        g2d.fillRect(wallWidth+(c.getX()*(wallWidth+tileSize)), wallWidth+(c.getY()*(wallWidth+tileSize)), tileSize, tileSize);
+        g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
         
         // Draw on start
-        c = world.getFinish();
+        n = world.getFinishNode();
         g2d.setColor(pref.getColour("finishColour"));
-        g2d.fillRect(wallWidth+(c.getX()*(wallWidth+tileSize)), wallWidth+(c.getY()*(wallWidth+tileSize)), tileSize, tileSize);
+        g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
 
         // Draw on character
-        Coordinate pC = world.getPlayerCoordinate();
+        n = world.getPlayerNode();
         g2d.setColor(pref.getColour("playerColour"));
         Ellipse2D.Double circle = new Ellipse2D.Double(
-                wallWidth+(pC.getX()*(wallWidth+tileSize))+tileSize/4, 
-                wallWidth+(pC.getY()*(wallWidth+tileSize))+tileSize/4, 
+                wallWidth+(n.getX()*(wallWidth+tileSize))+tileSize/4, 
+                wallWidth+(n.getY()*(wallWidth+tileSize))+tileSize/4, 
                 tileSize/2, 
                 tileSize/2
         );
         g2d.fill(circle);
         
         // Draw on coins
-        ArrayList<Coordinate> coords = world.getEntityCoordinates();
+        ArrayList<Node> nodes = world.getEntityNodes();
         g2d.setColor(pref.getColour("coinColour"));
-        for (Coordinate s : coords) {
+        for (Node s : nodes) {
             g2d.fillRect(wallWidth+(s.getX()*(wallWidth+tileSize)), wallWidth+(s.getY()*(wallWidth+tileSize)), tileSize, tileSize);
         }
     }

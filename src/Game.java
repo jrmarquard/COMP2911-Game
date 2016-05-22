@@ -50,21 +50,21 @@ public class Game {
                 world.addPlayer("Moneymaker");
                 AI ai = new AISolve(world,"Moneymaker", "easy");
                 aiRunnable air = new aiRunnable(ai, commands);
-                aiThreadPool.scheduleAtFixedRate(air, 0, 50, TimeUnit.MILLISECONDS);
+                aiThreadPool.scheduleAtFixedRate(air, 0, 200, TimeUnit.MILLISECONDS);
             } else if (opt.equals("Med AI")) {
                 World world = new World("world"+x, height, width);
                 worlds.put("world"+x, world);
                 world.addPlayer("Moneymaker");
                 AI ai = new AISolve(world,"Moneymaker", "med");
                 aiRunnable air = new aiRunnable(ai, commands);
-                aiThreadPool.scheduleAtFixedRate(air, 0, 50, TimeUnit.MILLISECONDS);
+                aiThreadPool.scheduleAtFixedRate(air, 0, 200, TimeUnit.MILLISECONDS);
             } else if (opt.equals("Hard AI")) {
                 World world = new World("world"+x, height, width);
                 worlds.put("world"+x, world);
                 world.addPlayer("Moneymaker");
                 AI ai = new AISolve(world,"Moneymaker", "hard");
                 aiRunnable air = new aiRunnable(ai, commands);
-                aiThreadPool.scheduleAtFixedRate(air, 0, 50, TimeUnit.MILLISECONDS);
+                aiThreadPool.scheduleAtFixedRate(air, 0, 200, TimeUnit.MILLISECONDS);
             }
         }
     }
