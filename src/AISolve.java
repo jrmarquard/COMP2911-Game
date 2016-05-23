@@ -1,3 +1,4 @@
+import java.util.LinkedList;
 import java.util.Random;
 
 /**
@@ -11,12 +12,16 @@ public class AISolve implements AI {
     String worldName;
     String id;
     String diff;
+    private LinkedList<Node> explore;
+    private LinkedList<Node> visited;
     
     public AISolve(World world, String id, String diff) {
         this.world = world;
         this.worldName = world.getName();;
         this.id = id;
         this.diff = diff;
+        this.explore = new LinkedList<Node>();
+        this.visited = new LinkedList<Node>();
     }
     
     @Override
@@ -41,7 +46,7 @@ public class AISolve implements AI {
         message[1] = worldName;
         message[2] = id;
         
-        int randValue = (new Random()).nextInt(5);
+        int randValue = (new Random()).nextInt(4);
         switch(randValue) {
             case 0:     message[3] = "up";      break;
             case 1:     message[3] = "down";    break;
@@ -58,7 +63,112 @@ public class AISolve implements AI {
      * @return
      */
     private Command medMove() {
-        return easyMove();
+    	String[] message = new String[4];
+        message[0] = "move";
+        message[1] = worldName;
+        message[2] = id;
+        
+        Node current = this.world.getBeingCoordinate(this.id);
+        this.visited.add(current);
+        int currX = current.getX();
+        int currY = current.getY();
+        
+        if(!this.explore.isEmpty()) {
+        	System.out.println("explore");
+        	Node next = this.explore.remove();
+        	this.visited.add(next);
+        	int nextX = next.getX();
+        	int nextY = next.getY();
+        	
+        	if(nextX == currX - 1 && nextY == currY) {
+        		message[3] = "left";
+        	} else if(nextX == currX + 1 && nextY == currY) {
+        		message[3] = "right";
+        	} else if(nextX == currX && nextY == currY - 1) {
+        		message[3] = "up";
+        	} else if(nextX == currX && nextY == currY + 1) {
+        		message[3] = "down";
+        	} 
+        } else {
+        	boolean deadEnd = isAtDeadEnd(current);
+
+        	if(deadEnd) {
+        		boolean addedToExplore = false;
+        		this.visited.clear();
+        		System.out.println("dead");
+
+        		while(this.world.getNode(currX, currY).getUp() != null) {
+        			System.out.println("up");
+        			this.explore.add(this.world.getNode(currX, currY).getUp());
+        			currY--;
+        			addedToExplore = true;
+        		}
+        		
+        		if(!addedToExplore) {
+        			while(this.world.getNode(currX, currY).getDown() != null) {
+            			System.out.println("down");
+            			this.explore.add(this.world.getNode(currX, currY).getDown());
+            			currY++;
+            			addedToExplore = true;
+            		}
+        		}
+        		
+        		if(!addedToExplore) {
+        			while(this.world.getNode(currX, currY).getLeft() != null) {
+            			System.out.println("left");
+            			this.explore.add(this.world.getNode(currX, currY).getLeft());
+            			currX--;
+            			addedToExplore = true;
+            		}
+        		}
+        		
+        		if(!addedToExplore) {
+        			while(this.world.getNode(currX, currY).getRight() != null) {
+            			System.out.println("right");
+            			this.explore.add(this.world.getNode(currX, currY).getRight());
+            			currX++;
+            			addedToExplore = true;
+            		}
+        		}
+        	} else {
+        		System.out.println("not dead");
+        		int randValue = (new Random()).nextInt(4);
+        		
+        		if(randValue == 0) {
+        			if(!this.visited.contains(this.world.getNode(currX, currY).getUp())) {
+            			while(this.world.getNode(currX, currY).getUp() != null) {
+                			this.explore.add(this.world.getNode(currX, currY).getUp());
+                			currY--;
+                		}
+            		}
+        		} else if(randValue == 1) {
+        			if(!this.visited.contains(this.world.getNode(currX, currY).getDown())) {
+            			while(this.world.getNode(currX, currY).getDown() != null) {
+                			this.explore.add(this.world.getNode(currX, currY).getDown());
+                			currY++;
+                		}
+        			}
+        		} else if(randValue == 2) {
+        			if(!this.visited.contains(this.world.getNode(currX, currY).getLeft())) {
+            			while(this.world.getNode(currX, currY).getLeft() != null) {
+                			this.explore.add(this.world.getNode(currX, currY).getLeft());
+                			currX--;
+                		}
+        			}
+        		} else if(randValue == 3) {
+        			if(!this.visited.contains(this.world.getNode(currX, currY).getRight())) {
+            			while(this.world.getNode(currX, currY).getRight() != null) {
+                			this.explore.add(this.world.getNode(currX, currY).getRight());
+                			currX++;
+                		}
+            		}
+        		}
+        	}
+        	
+        	message[3] = "";
+        }
+        
+        return new Command(Com.GAME_MSG, message);
     }
 
     /**
@@ -67,5 +177,34 @@ public class AISolve implements AI {
      */
     private Command hardMove() {
         return easyMove();
+    }
+    
+    private boolean isAtDeadEnd(Node node) {
+    	boolean deadEnd = false;
+    	int x = node.getX();
+    	int y = node.getY();
+    	int count = 0;
+    	
+    	if(this.world.getNode(x, y).getUp() == null) {
+    		count++;
+    	}
+    	
+    	if(this.world.getNode(x, y).getDown() == null) {
+    		count++;
+    	}
+    	
+    	if(this.world.getNode(x, y).getLeft() == null) {
+    		count++;
+    	}
+    	
+    	if(this.world.getNode(x, y).getRight() == null) {
+    		count++;
+    	}
+    	
+    	if(count == 3) {
+    		deadEnd = true;
+    	}
+    	
+    	return deadEnd;
     }
 }
