@@ -430,6 +430,43 @@ public class GUI extends JFrame  {
                 setAppState(AppState.MENU);
             }
         });
+        
+        //Tims adding shiz
+        JButton increaseVolumeButton = new JButton("Increase Volume");
+        increaseVolumeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	addCommand(new Command(Com.SOUND_MSG, new String[]{"volume", "up"}));
+            	addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "click"}));
+            }
+        });
+        
+        JButton decreaseVolumeButton = new JButton("Decrease Volume");
+        decreaseVolumeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	addCommand(new Command(Com.SOUND_MSG, new String[]{"volume", "down"}));
+            	addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "click"}));
+            }
+        });
+        
+        JButton muteButton = new JButton("Mute");
+        muteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "click"}));
+            	addCommand(new Command(Com.SOUND_MSG, new String[]{"volume", "mute"}));
+            	addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "click"}));
+            }
+        });
+        
+        
+        navPanel.add(increaseVolumeButton);
+        navPanel.add(decreaseVolumeButton);
+        navPanel.add(muteButton);
+        
+        //Finishing tims shiz
+        
         navPanel.add(resetButton);
         navPanel.add(backButton);
         

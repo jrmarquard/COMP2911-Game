@@ -21,7 +21,7 @@ public class SoundEngine {
 	public SoundEngine() {
 		this.soundEnabled = true;
 		this.sounds = new HashMap<String, File>();
-		this.masterVolume = 0.9f;
+		this.masterVolume = 0.7f;
 		this.soundMuted = false;
 	
 		ArrayList<String> soundFileNames = new ArrayList<String>();
@@ -116,7 +116,19 @@ public class SoundEngine {
 		this.masterVolume = (0.5f + (0.4f*volume));
 	}
 	
-	public void muteToggle() {
+	public void increaseVolume() {
+		if (this.masterVolume < 0.9f) {
+			this.masterVolume = (this.masterVolume + 0.1f);
+		}
+	}
+	
+	public void decreaseVolume() {
+		if (this.masterVolume > 0.5f) {
+			this.masterVolume = (this.masterVolume - 0.1f);
+		}
+	}
+	
+	public void toggleMute() {
 		if (this.soundEnabled) {
 			if (!this.soundMuted) {
 				this.soundMuted = true;
@@ -148,10 +160,9 @@ public class SoundEngine {
                 else if (message[1].equals("menu")) endMenuMusic();
                 break;
             case "volume":
-            	//need to add some code here
-            	break;
-            case "mute":
-            	//need some code here too
+            	if (message[1].equals("up")) increaseVolume();
+            	else if (message[1].equals("down")) decreaseVolume();
+            	else if (message[1].equals("mute")) toggleMute();
             	break;
             default:
                 break;
