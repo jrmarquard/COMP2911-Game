@@ -19,7 +19,7 @@ import java.util.Stack;
 public class World {
     
     private String name;
-    private Queue<Command> commands;
+    private MazePuzzleGame manager;
     private boolean updateFlag;
     
     // Maze data
@@ -43,8 +43,8 @@ public class World {
     // Items are stationary objects that can be interacted with by 
     private ArrayList<Item> items;
     
-    public World (Queue<Command> commands, String name, int width, int height, boolean doorAndKey) {
-        this.commands = commands;
+    public World (MazePuzzleGame manager, String name, int width, int height, boolean doorAndKey) {
+        this.manager = manager;
         this.name = name;
         this.updateFlag = false;
         
@@ -132,6 +132,7 @@ public class World {
                 updateFlag = true;
             }
             if (updateFlag) {
+                manager.submitCommand(new Command(Com.DRAW));
                 addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "step"}));
                 updateFlag = false;
             }
@@ -193,7 +194,7 @@ public class World {
     }
     
     private void addCommand (Command c) {
-        commands.add(c);
+        manager.submitCommand(c);
     }
     
     /**

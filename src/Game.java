@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Game {
     // The game manager, we use this to notify it off messages with the nofity() method
-    private Queue<Command> commands;
+    private MazePuzzleGame manager;
     
     // Used to load preferences set by the user
     private Preferences pref;
@@ -22,13 +22,8 @@ public class Game {
     // Executor to run the AIs in
     private ScheduledExecutorService aiPool;
     
-    private ExecutorService worldPool;
-    
-    private boolean winStatus;
-    private int winPlayer;
-    
-    public Game (Queue<Command> commands, Preferences pref) {
-        this.commands = commands;
+    public Game (MazePuzzleGame manager, Preferences pref) {
+        this.manager = manager;
         this.pref = pref;
         this.worlds = new ConcurrentSkipListMap<String, World>();       
     }
@@ -47,30 +42,30 @@ public class Game {
         for (int x = 1; x <= 4; x++) {
             String opt = pref.getText("player"+x);
             if (opt.equals("Human")) {
-                World world = new World(commands, "world"+x, height, width, doorAndKey);
+                World world = new World(manager, "world"+x, height, width, doorAndKey);
                 worlds.put("world"+x, world);
                 System.out.println("Added Human");
                 world.addPlayer("Moneymaker");                    
             } else if (opt.equals("Easy AI")) {
-                World world = new World(commands, "world"+x, height, width, doorAndKey);
+                World world = new World(manager, "world"+x, height, width, doorAndKey);
                 worlds.put("world"+x, world);
                 world.addPlayer("Moneymaker");
                 AI ai = new AISolve(world,"Moneymaker", "easy");
-                aiRunnable air = new aiRunnable(ai, commands);
+                aiRunnable air = new aiRunnable(ai);
                 aiPool.scheduleAtFixedRate(air, 0, aiRefreshRate, timeUnit);
             } else if (opt.equals("Med AI")) {
-                World world = new World(commands, "world"+x, height, width, doorAndKey);
+                World world = new World(manager, "world"+x, height, width, doorAndKey);
                 worlds.put("world"+x, world);
                 world.addPlayer("Moneymaker");
                 AI ai = new AISolve(world,"Moneymaker", "med");
-                aiRunnable air = new aiRunnable(ai, commands);
+                aiRunnable air = new aiRunnable(ai);
                 aiPool.scheduleAtFixedRate(air, 0, aiRefreshRate, timeUnit);
             } else if (opt.equals("Hard AI")) {
-                World world = new World(commands, "world"+x, height, width, doorAndKey);
+                World world = new World(manager, "world"+x, height, width, doorAndKey);
                 worlds.put("world"+x, world);
                 world.addPlayer("Moneymaker");
                 AI ai = new AISolve(world,"Moneymaker", "hard");
-                aiRunnable air = new aiRunnable(ai, commands);
+                aiRunnable air = new aiRunnable(ai);
                 aiPool.scheduleAtFixedRate(air, 0, aiRefreshRate, timeUnit);
             }
         }
@@ -129,16 +124,14 @@ public class Game {
     private class aiRunnable implements Runnable {
         
         AI ai;
-        Queue<Command> commands;
         
-        public aiRunnable(AI ai, Queue<Command> commands) {
+        public aiRunnable(AI ai) {
             this.ai = ai;
-            this.commands = commands;
         }
         
         public void run() {
             try {
-                commands.add(ai.makeMove());
+                manager.submitCommand(ai.makeMove());
             } catch (Exception e){
                 System.out.println("AI run error.");
                 e.printStackTrace();

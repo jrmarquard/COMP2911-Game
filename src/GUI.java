@@ -44,14 +44,13 @@ public class GUI extends JFrame  {
     Game game;
     Queue<Command> commands;
     AppState appState;
-    
     JPanel windowPanel;
+    MazePuzzleGame manager;
     
-    public GUI (Preferences pref, Game game, Queue<Command> commands) {
+    public GUI (MazePuzzleGame manager, Preferences pref, Game game) {
+        this.manager = manager;
         this.pref = pref;
         this.game = game;
-        this.commands = commands;
-        
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -60,6 +59,17 @@ public class GUI extends JFrame  {
         });
     }
     
+    public void refresh() {
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("Drawing");
+                draw();
+            }
+        });
+    }
+    
+    
     private void initUI() {
         /* Any layout information that should never be changed
          * should be contained in here. Anything that can be redrawn
@@ -67,7 +77,7 @@ public class GUI extends JFrame  {
          */
         
         // Defaults to display the main menu first
-        setAppState(AppState.MENU); 
+        appState = AppState.MENU; 
         
         // windowPanel is the root panel within this object
         windowPanel = new JPanel();
@@ -127,7 +137,7 @@ public class GUI extends JFrame  {
         });
     }
     
-    public void update() {
+    private void draw() {
         // Reset game panels, remove them (hopefully clears memory)
         windowPanel.removeAll();
         windowPanel.repaint();
@@ -571,7 +581,10 @@ public class GUI extends JFrame  {
     }
     
     private void addCommand(Command c) {
-        commands.add(c);
+        if (c == null) {
+            System.out.println("wtf");
+        }
+        manager.submitCommand(c);
     }
     private void setAppState(AppState s) {
         appState = s;

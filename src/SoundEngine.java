@@ -61,7 +61,7 @@ public class SoundEngine {
 
     public void inbox(String[] message) {
         try {
-            soundRunnable run = new soundRunnable(message);
+            SoundRunnable run = new SoundRunnable(message);
             soundPool.execute(run);
         } catch (Exception e) {
             e.printStackTrace();
@@ -77,6 +77,8 @@ public class SoundEngine {
 	            Clip clip = (Clip) AudioSystem.getLine(info);
 	            clip.open(stream);
 			    clip.start();
+			    clip.close();
+			    stream.close();
 			}
 			catch (Exception e){
 				
@@ -110,9 +112,9 @@ public class SoundEngine {
 		}
 	}
     
-    private class soundRunnable implements Runnable {
+    private class SoundRunnable implements Runnable {
         String[] msg;
-        public soundRunnable (String[] msg) {
+        public SoundRunnable (String[] msg) {
             this.msg = msg;
         }
         @Override
@@ -133,7 +135,6 @@ public class SoundEngine {
                     break;
             }
         }
-        
     }
 	
 	
