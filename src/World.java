@@ -132,7 +132,7 @@ public class World {
                 updateFlag = true;
             }
             if (updateFlag) {
-                manager.submitCommand(new Command(Com.DRAW));
+                // manager.submitCommand(new Command(Com.DRAW));
                 addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "step"}));
                 updateFlag = false;
             }

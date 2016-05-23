@@ -2,10 +2,13 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
+import javax.swing.Timer;
 
 
 @SuppressWarnings("serial")
@@ -14,11 +17,15 @@ public class GameMap extends JPanel {
     private Preferences pref;
     private World world;
     private Graphics2D g2d;
+    private PaintRefresh timer;
     
     public GameMap (World world, Preferences pref) {
         super();
         this.world = world;
         this.pref = pref;
+        
+        timer = new PaintRefresh(this);
+        timer.start();
     }
     
     @Override
@@ -185,6 +192,25 @@ public class GameMap extends JPanel {
         int windowHeight = d.height;
         int windowWidth = d.width;
         return new Dimension(windowWidth,windowHeight);
+    }
+    
+    /**
+     * Attached
+     * @author John
+     *
+     */
+    private class PaintRefresh extends Timer {
+        public PaintRefresh(GameMap gameMap) {
+            super(pref.getValue("refreshPeriod"), new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent event)
+                {
+                    System.out.println("Refreshing "+world.getName());
+                    repaint();
+                }
+            });
+            setInitialDelay(0);
+        }
     }
 } 
 

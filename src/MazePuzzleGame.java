@@ -1,13 +1,7 @@
-import java.awt.EventQueue;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 /**
  * MazePuzzleGame maintains and connects the different parts of the
  * game, allowing for easy communication between the user interface and the 
- * game data.
+ * game data.x
  * 
  * @author John, Joshua, Patrick, Tim, Tyler
  *
@@ -17,9 +11,7 @@ public class MazePuzzleGame extends Thread {
     Preferences pref;
     GUI gui;
     Game game;
-    SoundEngine soundEngine;
-    
-    final public ExecutorService gameExecutor;
+    SoundEngine sounds;
     
     /**
      * Initialises MazePuzzleGame.
@@ -31,10 +23,8 @@ public class MazePuzzleGame extends Thread {
     public MazePuzzleGame() {
         this.pref = new Preferences();
         this.game = new Game(this, pref);
-        this.soundEngine = new SoundEngine();
+        this.sounds = new SoundEngine();
         this.gui = new GUI(this, pref, game);
-        
-        gameExecutor = Executors.newSingleThreadExecutor();
     }
     
     public void run() {
@@ -60,7 +50,7 @@ public class MazePuzzleGame extends Thread {
             case DRAW:         gui.refresh();                       break;
             case EXIT:         System.exit(0);;                     break;
             case GAME_MSG:     game.inbox(c.getMessage());          break;
-            case SOUND_MSG:    soundEngine.inbox(c.getMessage());   break;
+            case SOUND_MSG:    sounds.inbox(c.getMessage());   break;
 	    }
 	}
 }

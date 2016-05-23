@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("serial")
 public class GUI extends JFrame  {
@@ -57,6 +60,16 @@ public class GUI extends JFrame  {
                 initUI();
             }
         });
+        
+//        ScheduledExecutorService refresh = Executors.newSingleThreadScheduledExecutor();
+//        refresh.scheduleAtFixedRate(new Runnable() {
+//            @Override
+//            public void run() {
+//                System.out.println("Drawing");
+//                draw();
+//            }
+//        }, 0, 50, TimeUnit.MILLISECONDS);
+        
     }
     
     public void refresh() {
@@ -140,6 +153,7 @@ public class GUI extends JFrame  {
     private void draw() {
         // Reset game panels, remove them (hopefully clears memory)
         windowPanel.removeAll();
+        windowPanel.revalidate();
         windowPanel.repaint();
 
         // Draws whatever mode the GUI is currently in

@@ -37,7 +37,7 @@ public class Game {
         boolean doorAndKey = pref.getBool("doorAndKey");
         
         TimeUnit timeUnit = TimeUnit.MILLISECONDS;
-        int aiRefreshRate = 10;
+        int aiRefreshRate = 1;
         
         for (int x = 1; x <= 4; x++) {
             String opt = pref.getText("player"+x);
