@@ -8,6 +8,7 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.DataLine;
+import javax.sound.sampled.FloatControl;
 
 public class SoundEngine {
 	private boolean soundEnabled;
@@ -15,10 +16,13 @@ public class SoundEngine {
 	private Clip menuMusic;
 	private Clip backgroundMusic;
 	private float masterVolume;
+	private boolean soundMuted;
 	
 	public SoundEngine() {
 		this.soundEnabled = true;
 		this.sounds = new HashMap<String, File>();
+		this.masterVolume = 0.9f;
+		this.soundMuted = false;
 	
 		ArrayList<String> soundFileNames = new ArrayList<String>();
 		soundFileNames.add("coin.wav");
@@ -56,22 +60,30 @@ public class SoundEngine {
 	
 	public void playSound(String soundName) {
 		if (this.soundEnabled) {
-			try {
-				AudioInputStream stream = AudioSystem.getAudioInputStream(this.sounds.get(soundName));
-	            AudioFormat format = stream.getFormat();
-	            DataLine.Info info = new DataLine.Info(Clip.class, format);
-	            Clip clip = (Clip) AudioSystem.getLine(info);
-	            clip.open(stream);
-			    clip.start();
-			}
-			catch (Exception e){
-				
+			if (!(soundMuted)) {
+				try {
+					AudioInputStream stream = AudioSystem.getAudioInputStream(this.sounds.get(soundName));
+		            AudioFormat format = stream.getFormat();
+		            DataLine.Info info = new DataLine.Info(Clip.class, format);
+		            Clip clip = (Clip) AudioSystem.getLine(info);
+		            clip.open(stream);
+		            FloatControl volume = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+		            volume.setValue(((volume.getMaximum() - volume.getMinimum())*this.masterVolume) + volume.getMinimum());
+				    clip.start();
+				}
+				catch (Exception e){
+					
+				}
 			}
 		}
 	}
 	
 	public void startMenuMusic() {
 		if (this.soundEnabled) {
+			if (!this.soundMuted) {
+				FloatControl menuVolume = (FloatControl) this.menuMusic.getControl(FloatControl.Type.MASTER_GAIN);
+		        menuVolume.setValue(((menuVolume.getMaximum() - menuVolume.getMinimum())*this.masterVolume) + menuVolume.getMinimum());
+			}
 			this.menuMusic.setFramePosition(0);
 			this.menuMusic.loop(Clip.LOOP_CONTINUOUSLY);
 		}
@@ -85,6 +97,10 @@ public class SoundEngine {
 	
 	public void startBackgroundMusic() {
 		if (this.soundEnabled) {
+			if (!this.soundMuted) {
+				FloatControl backgroundVolume = (FloatControl) this.backgroundMusic.getControl(FloatControl.Type.MASTER_GAIN);
+		        backgroundVolume.setValue(((backgroundVolume.getMaximum() - backgroundVolume.getMinimum())*this.masterVolume) + backgroundVolume.getMinimum());
+			}
 			this.backgroundMusic.setFramePosition(0);
 			this.backgroundMusic.loop(Clip.LOOP_CONTINUOUSLY);
 		}
@@ -93,6 +109,28 @@ public class SoundEngine {
 	public void endBackgroundMusic() {
 		if (this.soundEnabled) {
 			this.backgroundMusic.stop();
+		}
+	}
+	
+	public void setVolume(float volume) {
+		this.masterVolume = (0.5f + (0.4f*volume));
+	}
+	
+	public void muteToggle() {
+		if (this.soundEnabled) {
+			if (!this.soundMuted) {
+				this.soundMuted = true;
+				FloatControl menuVolume = (FloatControl) this.menuMusic.getControl(FloatControl.Type.MASTER_GAIN);
+		        menuVolume.setValue(menuVolume.getMinimum());
+		        FloatControl backgroundVolume = (FloatControl) this.backgroundMusic.getControl(FloatControl.Type.MASTER_GAIN);
+		        backgroundVolume.setValue(backgroundVolume.getMinimum());
+			} else {
+				this.soundMuted = false;
+				FloatControl menuVolume = (FloatControl) this.menuMusic.getControl(FloatControl.Type.MASTER_GAIN);
+		        menuVolume.setValue(((menuVolume.getMaximum() - menuVolume.getMinimum())*this.masterVolume) + menuVolume.getMinimum());
+		        FloatControl backgroundVolume = (FloatControl) this.backgroundMusic.getControl(FloatControl.Type.MASTER_GAIN);
+		        backgroundVolume.setValue(((backgroundVolume.getMaximum() - backgroundVolume.getMinimum())*this.masterVolume) + backgroundVolume.getMinimum());
+			}
 		}
 	}
 
@@ -109,6 +147,12 @@ public class SoundEngine {
                 if (message[1].equals("background")) endBackgroundMusic();
                 else if (message[1].equals("menu")) endMenuMusic();
                 break;
+            case "volume":
+            	//need to add some code here
+            	break;
+            case "mute":
+            	//need some code here too
+            	break;
             default:
                 break;
         }
