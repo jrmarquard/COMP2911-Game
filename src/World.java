@@ -169,6 +169,7 @@ public class World {
             if (b.getNode().equals(doorStart)) {
                 if (b.getKey()) {
                     connectNodes(doorStart, doorFinish);
+                    addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "door"}));
                     doorStart = null;
                     doorFinish = null;
                 }

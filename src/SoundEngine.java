@@ -14,6 +14,7 @@ public class SoundEngine {
 	private Map<String, File> sounds;
 	private Clip menuMusic;
 	private Clip backgroundMusic;
+	private float masterVolume;
 	
 	public SoundEngine() {
 		this.soundEnabled = true;
@@ -26,6 +27,7 @@ public class SoundEngine {
         soundFileNames.add("step.wav");
         soundFileNames.add("click.wav");
         soundFileNames.add("key.wav");
+        soundFileNames.add("door.wav");
         
 		try {
 		    for (String fileName : soundFileNames) {

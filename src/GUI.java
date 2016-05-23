@@ -170,6 +170,7 @@ public class GUI extends JFrame  {
         startGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+            	addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "click"}));
                 setAppState(AppState.GAME_INIT);
             }
         });
@@ -189,6 +190,7 @@ public class GUI extends JFrame  {
         aboutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+            	addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "click"}));
                 setAppState(AppState.ABOUT);
             }
         });
@@ -198,6 +200,7 @@ public class GUI extends JFrame  {
             @Override
             public void actionPerformed(ActionEvent e) {
                 addCommand(new Command(Com.SOUND_MSG, new String[]{"stop", "menu"}));
+                addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "click"}));
                 setAppState(AppState.EXIT);
             }
         });
@@ -220,6 +223,7 @@ public class GUI extends JFrame  {
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+            	addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "click"}));
                 setAppState(AppState.MENU);
             }
         });
@@ -259,6 +263,7 @@ public class GUI extends JFrame  {
         doorAndKey.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+            	addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "click"}));
                 pref.toggleBool("doorAndKey");
             }
         });
@@ -313,6 +318,7 @@ public class GUI extends JFrame  {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (ItemEvent.SELECTED == e.getStateChange()) {
+                	addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "click"}));
                     pref.setPreference("text.gameMode="+(String)e.getItem());
                     addCommand(new Command(Com.DRAW));
                 }
@@ -350,6 +356,7 @@ public class GUI extends JFrame  {
         startGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+            	addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "click"}));
                 setAppState(AppState.GAME);
                 newGame();
             }
@@ -376,6 +383,7 @@ public class GUI extends JFrame  {
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+            	addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "click"}));
                 setAppState(AppState.MENU);
             }
         });
@@ -410,6 +418,7 @@ public class GUI extends JFrame  {
             @Override
             public void actionPerformed(ActionEvent e) {
                 pref.loadPreferences();
+                addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "click"}));
                 setAppState(AppState.SETTINGS);
             }
         });
@@ -417,6 +426,7 @@ public class GUI extends JFrame  {
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+            	addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "click"}));
                 setAppState(AppState.MENU);
             }
         });
@@ -550,6 +560,7 @@ public class GUI extends JFrame  {
             @Override
             public void actionPerformed(ActionEvent e) {
                 addCommand(new Command(Com.GAME_MSG, new String[]{"endGame"}));
+                addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "click"}));
                 addCommand(new Command(Com.SOUND_MSG, new String[]{"stop", "background"}));
                 addCommand(new Command(Com.SOUND_MSG, new String[]{"loop", "menu"}));
                 setAppState(AppState.MENU);
@@ -575,7 +586,6 @@ public class GUI extends JFrame  {
     }
     private void setAppState(AppState s) {
         appState = s;
-        addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "click"}));
         addCommand(new Command(Com.DRAW));
     }
     public void close() {
@@ -640,6 +650,7 @@ public class GUI extends JFrame  {
                 public void itemStateChanged(ItemEvent e) {
                     if (ItemEvent.SELECTED == e.getStateChange()) {
                         pref.setPreference("text."+setting+"="+(String)e.getItem());
+                        addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "click"}));
                     }
                 }
             });
