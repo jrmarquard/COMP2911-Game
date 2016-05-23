@@ -2,6 +2,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -15,9 +17,15 @@ public class SoundEngine {
 	private Clip menuMusic;
 	private Clip backgroundMusic;
 	
+	// Thread pool to run sounds in
+	ExecutorService soundPool;
+	
 	public SoundEngine() {
 		this.soundEnabled = true;
 		this.sounds = new HashMap<String, File>();
+		
+		// Initiliase thread pool
+		soundPool = Executors.newCachedThreadPool();
 	
 		ArrayList<String> soundFileNames = new ArrayList<String>();
 		soundFileNames.add("coin.wav");
@@ -50,8 +58,17 @@ public class SoundEngine {
 			System.out.println("Sound disabled");
 		}
 	}
+
+    public void inbox(String[] message) {
+        try {
+            soundRunnable run = new soundRunnable(message);
+            soundPool.execute(run);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 	
-	public void playSound(String soundName) {
+	private void playSound(String soundName) {
 		if (this.soundEnabled) {
 			try {
 				AudioInputStream stream = AudioSystem.getAudioInputStream(this.sounds.get(soundName));
@@ -67,48 +84,56 @@ public class SoundEngine {
 		}
 	}
 	
-	public void startMenuMusic() {
+	private void startMenuMusic() {
 		if (this.soundEnabled) {
 			this.menuMusic.setFramePosition(0);
 			this.menuMusic.loop(Clip.LOOP_CONTINUOUSLY);
 		}
 	}
 	
-	public void endMenuMusic() {
+	private void endMenuMusic() {
 		if (this.soundEnabled) {
 			this.menuMusic.stop();
 		}
 	}
 	
-	public void startBackgroundMusic() {
+	private void startBackgroundMusic() {
 		if (this.soundEnabled) {
 			this.backgroundMusic.setFramePosition(0);
 			this.backgroundMusic.loop(Clip.LOOP_CONTINUOUSLY);
 		}
 	}
 	
-	public void endBackgroundMusic() {
+	private void endBackgroundMusic() {
 		if (this.soundEnabled) {
 			this.backgroundMusic.stop();
 		}
 	}
-
-    public void inbox(String[] message) {
-        switch(message[0]) {
-            case "play":
-                playSound(message[1]);
-                break;                    
-            case "loop":
-                if (message[1].equals("background")) startBackgroundMusic();
-                else if (message[1].equals("menu")) startMenuMusic();
-                break;
-            case "stop":
-                if (message[1].equals("background")) endBackgroundMusic();
-                else if (message[1].equals("menu")) endMenuMusic();
-                break;
-            default:
-                break;
+    
+    private class soundRunnable implements Runnable {
+        String[] msg;
+        public soundRunnable (String[] msg) {
+            this.msg = msg;
         }
+        @Override
+        public void run() {
+            switch(msg[0]) {
+                case "play":
+                    // playSound(msg[1]);
+                    break;                    
+                case "loop":
+                    if (msg[1].equals("background")) startBackgroundMusic();
+                    else if (msg[1].equals("menu")) startMenuMusic();
+                    break;
+                case "stop":
+                    if (msg[1].equals("background")) endBackgroundMusic();
+                    else if (msg[1].equals("menu")) endMenuMusic();
+                    break;
+                default:
+                    break;
+            }
+        }
+        
     }
 	
 	

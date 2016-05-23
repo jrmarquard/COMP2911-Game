@@ -30,7 +30,11 @@ public class MazePuzzleGame extends Thread {
         this.commands = new LinkedList<Command>();
         this.game = new Game(commands, pref);
         this.gui = new GUI(this.pref, this.game, this.commands);
-        this.soundEngine = new SoundEngine();        
+        this.soundEngine = new SoundEngine();
+        
+        
+        
+        
     }
     
     public void run() {

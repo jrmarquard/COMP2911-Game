@@ -2,6 +2,8 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -18,7 +20,9 @@ public class Game {
     private Map<String, World> worlds;
     
     // Executor to run the AIs in
-    private ScheduledExecutorService aiThreadPool;
+    private ScheduledExecutorService aiPool;
+    
+    private ExecutorService worldPool;
     
     private boolean winStatus;
     private int winPlayer;
@@ -26,7 +30,7 @@ public class Game {
     public Game (Queue<Command> commands, Preferences pref) {
         this.commands = commands;
         this.pref = pref;
-        this.worlds = new TreeMap<String, World>();       
+        this.worlds = new ConcurrentSkipListMap<String, World>();       
     }
     
     public void newGame() {
@@ -34,8 +38,11 @@ public class Game {
 
         int height = pref.getValue("defaultMapHeight");
         int width = pref.getValue("defaultMapWidth");
-        aiThreadPool = Executors.newScheduledThreadPool(4); 
+        aiPool = Executors.newScheduledThreadPool(4); 
         boolean doorAndKey = pref.getBool("doorAndKey");
+        
+        TimeUnit timeUnit = TimeUnit.MILLISECONDS;
+        int aiRefreshRate = 10;
         
         for (int x = 1; x <= 4; x++) {
             String opt = pref.getText("player"+x);
@@ -50,21 +57,21 @@ public class Game {
                 world.addPlayer("Moneymaker");
                 AI ai = new AISolve(world,"Moneymaker", "easy");
                 aiRunnable air = new aiRunnable(ai, commands);
-                aiThreadPool.scheduleAtFixedRate(air, 0, 200, TimeUnit.MILLISECONDS);
+                aiPool.scheduleAtFixedRate(air, 0, aiRefreshRate, timeUnit);
             } else if (opt.equals("Med AI")) {
                 World world = new World(commands, "world"+x, height, width, doorAndKey);
                 worlds.put("world"+x, world);
                 world.addPlayer("Moneymaker");
                 AI ai = new AISolve(world,"Moneymaker", "med");
                 aiRunnable air = new aiRunnable(ai, commands);
-                aiThreadPool.scheduleAtFixedRate(air, 0, 200, TimeUnit.MILLISECONDS);
+                aiPool.scheduleAtFixedRate(air, 0, aiRefreshRate, timeUnit);
             } else if (opt.equals("Hard AI")) {
                 World world = new World(commands, "world"+x, height, width, doorAndKey);
                 worlds.put("world"+x, world);
                 world.addPlayer("Moneymaker");
                 AI ai = new AISolve(world,"Moneymaker", "hard");
                 aiRunnable air = new aiRunnable(ai, commands);
-                aiThreadPool.scheduleAtFixedRate(air, 0, 200, TimeUnit.MILLISECONDS);
+                aiPool.scheduleAtFixedRate(air, 0, aiRefreshRate, timeUnit);
             }
         }
     }
@@ -84,33 +91,6 @@ public class Game {
     
     public World getWorld(String worldName) {
         return worlds.get(worldName);
-    }
-    
-    /**
-     * Returns true if the game has been won.
-     * 
-     * @return the winStatus boolean
-     */
-    public boolean getWinStatus () {
-        return winStatus;
-    }
-    
-    /**
-     * Returns the player who won
-     * @return the player who won
-     */
-    public int getWinPlayer() {
-    	return this.winPlayer;
-    }
-    
-    private void sendCommand (Command c) {
-        commands.add(c);
-    }
-
-    public void moveBeing(String worldName, String id, String dir) {
-        World w = this.worlds.get(worldName);
-        w.moveBeing(id, dir);
-        sendCommand(new Command(Com.DRAW));
     }
 
     public ArrayList<World> getWorlds() {
@@ -139,10 +119,10 @@ public class Game {
     }
     
     private void endGame() {
-        // TODO Auto-generated method stub
-
+        // Remove old worlds
         worlds.clear();
-        aiThreadPool.shutdownNow();
+        // Stop new submissions and end all currently running tasks immediately
+        aiPool.shutdownNow();
         
     }
 
