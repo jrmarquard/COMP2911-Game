@@ -163,6 +163,7 @@ public class World {
             }
             if (b.getNode().equals(key)) {
                 b.setKey(true);
+                addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "key"}));
                 key = null;
             }
             if (b.getNode().equals(doorStart)) {
