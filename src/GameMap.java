@@ -195,9 +195,7 @@ public class GameMap extends JPanel {
     }
     
     /**
-     * Attached
-     * @author John
-     *
+     * Attached to this GameMap to refresh the display at a set rate.     *
      */
     private class PaintRefresh extends Timer {
         public PaintRefresh(GameMap gameMap) {
@@ -205,11 +203,9 @@ public class GameMap extends JPanel {
                 @Override
                 public void actionPerformed(ActionEvent event)
                 {
-                    System.out.println("Refreshing "+world.getName());
                     repaint();
                 }
             });
-            setInitialDelay(0);
         }
     }
 } 

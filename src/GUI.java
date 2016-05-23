@@ -11,9 +11,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("serial")
 public class GUI extends JFrame  {
@@ -76,7 +73,6 @@ public class GUI extends JFrame  {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                System.out.println("Drawing");
                 draw();
             }
         });
@@ -338,7 +334,7 @@ public class GUI extends JFrame  {
             public void itemStateChanged(ItemEvent e) {
                 if (ItemEvent.SELECTED == e.getStateChange()) {
                     pref.setPreference("text.gameMode="+(String)e.getItem());
-                    addCommand(new Command(Com.DRAW));
+                    refresh();
                 }
             }
         });
@@ -603,7 +599,7 @@ public class GUI extends JFrame  {
     private void setAppState(AppState s) {
         appState = s;
         addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "click"}));
-        addCommand(new Command(Com.DRAW));
+        refresh();
     }
     public void close() {
         this.dispose();
