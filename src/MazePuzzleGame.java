@@ -40,11 +40,11 @@ public class MazePuzzleGame {
 	    MazePuzzleGame game = new MazePuzzleGame();
 	}
 	
-	public void submitCommand(Command c) {
+	public void submitCommand(Message c) {
 	    switch (c.getCommandID()) {
-            case EXIT:         System.exit(0);;                     break;
-            case GAME_MSG:     game.inbox(c.getMessage());          break;
-            case SOUND_MSG:    sounds.inbox(c.getMessage());   break;
+            case Message.EXIT:         System.exit(0);;                 break;
+            case Message.GAME_MSG:     game.inbox(c.getMessage());      break;
+            case Message.SOUND_MSG:    sounds.inbox(c.getMessage());    break;
 	    }
 	}
 }

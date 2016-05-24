@@ -1,22 +1,29 @@
-public class Command {
-    private Com id;
+public class Message {
+    /**
+     * 
+     */
+    public static final int EXIT = 0;
+    public static final int GAME_MSG = 1;
+    public static final int SOUND_MSG = 2;
+    
+    private int id;
     private String[] message;
     
-    public Command (Com id) {
+    public Message (int id) {
         this.id = id;
         this.message = null;
     }
 
-    public Command(Com id, String[] message) {
+    public Message(int id, String[] message) {
         this.id = id;
         this.setMessage(message);
     }
 
-    public Com getCommandID() {
+    public int getCommandID() {
         return id;
     }
 
-    public void setCommandID(Com Com) {
+    public void setCommandID(int Com) {
         this.id = Com;
     }
 

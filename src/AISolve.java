@@ -20,7 +20,7 @@ public class AISolve implements AI {
     }
     
     @Override
-    public Command makeMove() {
+    public Message makeMove() {
         switch (diff) {
             case "easy": return easyMove();
             case "med": return medMove();
@@ -35,7 +35,7 @@ public class AISolve implements AI {
      * Makes a completely random move, sometimes stays still
      * @return
      */
-    private Command easyMove() {
+    private Message easyMove() {
         String[] message = new String[4];
         message[0] = "move";
         message[1] = worldName;
@@ -50,14 +50,14 @@ public class AISolve implements AI {
             default:    message[3] = "";        break;
         }
         
-        return new Command(Com.GAME_MSG, message);
+        return new Message(Message.GAME_MSG, message);
     }
 
     /**
      * Medium Difficulty
      * @return
      */
-    private Command medMove() {
+    private Message medMove() {
         return easyMove();
     }
 
@@ -65,7 +65,7 @@ public class AISolve implements AI {
      * Hard difficulty
      * @return
      */
-    private Command hardMove() {
+    private Message hardMove() {
         return easyMove();
     }
 }

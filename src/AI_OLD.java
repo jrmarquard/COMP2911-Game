@@ -57,7 +57,7 @@ public class AI_OLD implements AI{
 		}
 	}
 	
-	public Command makeMove() {
+	public Message makeMove() {
 //        Coordinate start = world.getPlayerCoordinate(0);
 //        
 //        // process path

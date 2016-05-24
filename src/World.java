@@ -133,7 +133,7 @@ public class World {
             }
             if (updateFlag) {
                 // manager.submitCommand(new Command(Com.DRAW));
-                addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "step"}));
+                sendCommand(new Message(Message.SOUND_MSG, new String[]{"play", "step"}));
                 updateFlag = false;
             }
         }
@@ -160,7 +160,7 @@ public class World {
             Being b = beings.get(iter.next());
             if (b.getNode().equals(finish)) {
                 // winner winner chicken dinner
-                addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "finish"}));
+                sendCommand(new Message(Message.SOUND_MSG, new String[]{"play", "finish"}));
             }
             if (b.getNode().equals(key)) {
                 b.setKey(true);
@@ -186,14 +186,14 @@ public class World {
                     if (e instanceof Coins) {
                         b.addCoins(((Coins)e).getValue());
                         iter.remove();
-                        addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "coin"}));
+                        sendCommand(new Message(Message.SOUND_MSG, new String[]{"play", "coin"}));
                     }
                 }
             }
         }
     }
     
-    private void addCommand (Command c) {
+    private void sendCommand(Message c) {
         manager.submitCommand(c);
     }
     
