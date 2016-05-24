@@ -6,7 +6,7 @@
  * @author John, Joshua, Patrick, Tim, Tyler
  *
  */
-public class MazePuzzleGame extends Thread {
+public class MazePuzzleGame {
     
     Preferences pref;
     GUI gui;
@@ -27,10 +27,6 @@ public class MazePuzzleGame extends Thread {
         this.gui = new GUI(this, pref, game);
     }
     
-    public void run() {
-        submitCommand(new Command(Com.DRAW));
-    }
-    
     /**
      * main function for the game. Execution starts here.
      * 
@@ -42,12 +38,10 @@ public class MazePuzzleGame extends Thread {
      */
 	public static void main(String[] args) {
 	    MazePuzzleGame game = new MazePuzzleGame();
-	    game.start();
 	}
 	
 	public void submitCommand(Command c) {
 	    switch (c.getCommandID()) {
-            case DRAW:         gui.refresh();                       break;
             case EXIT:         System.exit(0);;                     break;
             case GAME_MSG:     game.inbox(c.getMessage());          break;
             case SOUND_MSG:    sounds.inbox(c.getMessage());   break;

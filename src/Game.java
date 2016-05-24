@@ -98,8 +98,7 @@ public class Game {
     public void inbox(String[] message) {
         switch(message[0]) {
             case "move":
-                World w = worlds.get(message[1]);
-                w.moveBeing(message[2], message[3]);
+                worlds.get(message[1]).moveBeing(message[2], message[3]);
                 break;                    
             case "newGame":
                 newGame();
@@ -117,7 +116,6 @@ public class Game {
         worlds.clear();
         // Stop new submissions and end all currently running tasks immediately
         aiPool.shutdownNow();
-        
     }
 
     private class aiRunnable implements Runnable {

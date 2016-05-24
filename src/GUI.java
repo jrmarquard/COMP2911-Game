@@ -57,18 +57,9 @@ public class GUI extends JFrame  {
             @Override
             public void run() {
                 initUI();
+                refresh();
             }
         });
-        
-//        ScheduledExecutorService refresh = Executors.newSingleThreadScheduledExecutor();
-//        refresh.scheduleAtFixedRate(new Runnable() {
-//            @Override
-//            public void run() {
-//                System.out.println("Drawing");
-//                draw();
-//            }
-//        }, 0, 50, TimeUnit.MILLISECONDS);
-        
     }
     
     public void refresh() {
