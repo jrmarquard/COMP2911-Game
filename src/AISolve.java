@@ -178,7 +178,7 @@ public class AISolve implements AI {
         int currX = current.getX();
         int currY = current.getY();
         LinkedList<Node> reachable = this.getReachable(current);
-        current.addCost(1);
+        current.addVisitCost(1);
         this.visited.add(current);
         
         Node next = null;
@@ -191,7 +191,7 @@ public class AISolve implements AI {
         			next = node;
         			first = false;
         		} else {
-        			if(node.getCost() < next.getCost()) {
+        			if(node.getVisitCost() < next.getVisitCost()) {
         				next = node;
         			}
         		}
@@ -200,7 +200,7 @@ public class AISolve implements AI {
         	}
         }
         
-        next.addCost(1);
+        next.addVisitCost(1);
         this.visited.add(next);
         int nextX = next.getX();
     	int nextY = next.getY();

@@ -32,6 +32,7 @@ public class Game {
         int width = pref.getValue("defaultMapWidth");
         aiPool = Executors.newScheduledThreadPool(4); 
         boolean doorAndKey = pref.getBool("doorAndKey");
+        boolean enemy = pref.getBool("enemy");
         
         TimeUnit timeUnit = TimeUnit.MILLISECONDS;
         int aiRefreshRate = 150;
@@ -41,7 +42,15 @@ public class Game {
                 if (opt.equals("Human")) {
                     World world = new World(manager, "world"+x, height, width, doorAndKey);
                     worlds.put("world"+x, world);
-                    world.addPlayer("Moneymaker");                    
+                    world.addPlayer("Moneymaker");
+                    
+                    if(enemy) {
+                    	world.addEnemy("Enemy");
+                        AI aiE = new AIEnemy(world,"Enemy");
+                        aiRunnable airE = new aiRunnable(aiE);
+                        aiPool.scheduleAtFixedRate(airE, aiRefreshRate*(2/10), aiRefreshRate, timeUnit);
+
+                    }
                 } else if (opt.equals("Easy AI")) {
                     World world = new World(manager, "world"+x, height, width, doorAndKey);
                     worlds.put("world"+x, world);
@@ -49,6 +58,14 @@ public class Game {
                     AI ai = new AISolve(world,"Moneymaker", "easy");
                     aiRunnable air = new aiRunnable(ai);
                     aiPool.scheduleAtFixedRate(air, aiRefreshRate*(2/10), aiRefreshRate, timeUnit);
+                    
+                    if(enemy) {
+                    	world.addEnemy("Enemy");
+                        AI aiE = new AIEnemy(world,"Enemy");
+                        aiRunnable airE = new aiRunnable(aiE);
+                        aiPool.scheduleAtFixedRate(airE, aiRefreshRate*(2/10), aiRefreshRate, timeUnit);
+
+                    }
                 } else if (opt.equals("Med AI")) {
                     World world = new World(manager, "world"+x, height, width, doorAndKey);
                     worlds.put("world"+x, world);
@@ -56,6 +73,14 @@ public class Game {
                     AI ai = new AISolve(world,"Moneymaker", "med");
                     aiRunnable air = new aiRunnable(ai);
                     aiPool.scheduleAtFixedRate(air, aiRefreshRate*(5/10), aiRefreshRate, timeUnit);
+                    
+                    if(enemy) {
+                    	world.addEnemy("Enemy");
+                        AI aiE = new AIEnemy(world,"Enemy");
+                        aiRunnable airE = new aiRunnable(aiE);
+                        aiPool.scheduleAtFixedRate(airE, aiRefreshRate*(2/10), aiRefreshRate, timeUnit);
+
+                    }
                 } else if (opt.equals("Hard AI")) {
                     World world = new World(manager, "world"+x, height, width, doorAndKey);
                     worlds.put("world"+x, world);
@@ -63,6 +88,14 @@ public class Game {
                     AI ai = new AISolve(world,"Moneymaker", "hard");
                     aiRunnable air = new aiRunnable(ai);
                     aiPool.scheduleAtFixedRate(air, aiRefreshRate*(8/10), aiRefreshRate, timeUnit);
+                    
+                    if(enemy) {
+                    	world.addEnemy("Enemy");
+                        AI aiE = new AIEnemy(world,"Enemy");
+                        aiRunnable airE = new aiRunnable(aiE);
+                        aiPool.scheduleAtFixedRate(airE, aiRefreshRate*(2/10), aiRefreshRate, timeUnit);
+
+                    }
                 }
             }
         } else if (gameMode.equals("Solve")) {
@@ -70,6 +103,15 @@ public class Game {
             World world = new World(manager, "world"+1, height, width, doorAndKey);
             worlds.put("world"+1, world);
             world.addPlayer("Moneymaker");
+            
+            if(enemy) {
+            	world.addEnemy("Enemy");
+                AI aiE = new AIEnemy(world,"Enemy");
+                aiRunnable airE = new aiRunnable(aiE);
+                aiPool.scheduleAtFixedRate(airE, aiRefreshRate*(2/10), aiRefreshRate, timeUnit);
+
+            }
+            
             if (opt.equals("Easy AI")) {
                 AI ai = new AISolve(world,"Moneymaker", "easy");
                 aiRunnable air = new aiRunnable(ai);

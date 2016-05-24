@@ -4,6 +4,7 @@ public class Node {
 	private int x;
 	private int y;
 	private int cost;
+	private int visitCost;
 	private Node up;
 	private Node right;
 	private Node down;
@@ -13,6 +14,7 @@ public class Node {
 		this.x = x;
 		this.y = y;
 		this.cost = 0;
+		this.visitCost = 0;
 		this.up = null;
 		this.right = null;
 		this.down = null;
@@ -37,6 +39,14 @@ public class Node {
 	
 	public void resetCost() {
 		this.cost = 0;
+	}
+	
+	public int getVisitCost() {
+		return this.visitCost;
+	}
+	
+	public void addVisitCost(int visitCost) {
+		this.visitCost += visitCost;
 	}
 	
 	public Node getUp() {

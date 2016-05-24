@@ -73,7 +73,12 @@ public class World {
     }
     
     public void addPlayer(String name) {
-        Being player = new Being(getStartNode(), name);
+        Being player = new Being(this.start, name);
+        beings.put(name, player);
+    }
+    
+    public void addEnemy(String name) {
+        Being player = new Being(this.finish, name);
         beings.put(name, player);
     }
     
@@ -196,15 +201,6 @@ public class World {
     private void addCommand (Command c) {
         manager.submitCommand(c);
     }
-    
-    /**
-     * Return the coordinates of the player
-     * 
-     * @return x coordinate of the player
-     */
-    public Node getPlayerCoordinate () {
-        return beings.get("Moneymaker").getNode();
-    }
 
     public String getName() {
         return this.name;
@@ -230,6 +226,10 @@ public class World {
     }
     public Node getPlayerNode() {
         return beings.get("Moneymaker").getNode();
+    }
+    
+    public Node getEnemyNode() {
+        return beings.get("Enemy").getNode();
     }
     
     /**
