@@ -22,6 +22,7 @@ public class World {
     private String name;
     private MazePuzzleGame manager;
     private boolean updateFlag;
+    private boolean worldChangeFlag;
     
     // Maze data
     private ArrayList<ArrayList<Node>> nodes;
@@ -51,6 +52,7 @@ public class World {
         this.manager = manager;
         this.name = name;
         this.updateFlag = false;
+        this.worldChangeFlag = false;
         
         this.nodes = new ArrayList<ArrayList<Node>>();
         this.beings = new HashMap<String, Being>();
@@ -142,10 +144,19 @@ public class World {
                 // manager.submitCommand(new Command(Com.DRAW));
                 sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "step"}));
                 updateFlag = false;
+                worldChangeFlag = true;
             }
         }
         update();
     }    
+
+    public boolean isWorldChangeFlag() {
+        return worldChangeFlag;
+    }
+
+    public void setWorldChangeFlag(boolean worldChangeFlag) {
+        this.worldChangeFlag = worldChangeFlag;
+    }
 
     /**
      * Run this after any changes in the maze. It checks for anything

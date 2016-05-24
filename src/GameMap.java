@@ -238,7 +238,15 @@ public class GameMap extends JPanel {
                 @Override
                 public void actionPerformed(ActionEvent event)
                 {
-                    repaint();
+                    /*
+                     *  Checks to see if the world has actually changed
+                     *  before repainting.
+                     */
+                    if (world.isWorldChangeFlag()) {
+                        repaint();
+                        world.setWorldChangeFlag(false);
+                    }
+                    
                 }
             });
         }
