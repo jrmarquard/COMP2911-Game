@@ -133,7 +133,7 @@ public class World {
             }
             if (updateFlag) {
                 // manager.submitCommand(new Command(Com.DRAW));
-                sendCommand(new Message(Message.SOUND_MSG, new String[]{"play", "step"}));
+                sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "step"}));
                 updateFlag = false;
             }
         }
@@ -160,15 +160,17 @@ public class World {
             Being b = beings.get(iter.next());
             if (b.getNode().equals(finish)) {
                 // winner winner chicken dinner
-                sendCommand(new Message(Message.SOUND_MSG, new String[]{"play", "finish"}));
+                sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "finish"}));
             }
             if (b.getNode().equals(key)) {
                 b.setKey(true);
+                sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "key"}));
                 key = null;
             }
             if (b.getNode().equals(doorStart)) {
                 if (b.getKey()) {
                     connectNodes(doorStart, doorFinish);
+                    sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "door"}));
                     doorStart = null;
                     doorFinish = null;
                 }
@@ -186,14 +188,14 @@ public class World {
                     if (e instanceof Coins) {
                         b.addCoins(((Coins)e).getValue());
                         iter.remove();
-                        sendCommand(new Message(Message.SOUND_MSG, new String[]{"play", "coin"}));
+                        sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "coin"}));
                     }
                 }
             }
         }
     }
     
-    private void sendCommand(Message c) {
+    private void sendMessage(Message c) {
         manager.submitCommand(c);
     }
     

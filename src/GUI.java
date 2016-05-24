@@ -275,6 +275,7 @@ public class GUI extends JFrame  {
         doorAndKey.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+            	sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "click"}));
                 pref.toggleBool("doorAndKey");
             }
         });
@@ -329,6 +330,7 @@ public class GUI extends JFrame  {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (ItemEvent.SELECTED == e.getStateChange()) {
+                	sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "click"}));
                     pref.setPreference("text.gameMode="+(String)e.getItem());
                     refresh();
                 }
@@ -441,6 +443,7 @@ public class GUI extends JFrame  {
                 setAppState(AppState.MENU);
             }
         });
+        
         navPanel.add(resetButton);
         navPanel.add(backButton);
         
@@ -655,6 +658,7 @@ public class GUI extends JFrame  {
                 public void itemStateChanged(ItemEvent e) {
                     if (ItemEvent.SELECTED == e.getStateChange()) {
                         pref.setPreference("text."+setting+"="+(String)e.getItem());
+                        sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "click"}));
                     }
                 }
             });

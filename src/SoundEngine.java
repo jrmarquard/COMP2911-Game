@@ -167,8 +167,24 @@ public class SoundEngine {
 			this.backgroundMusic.stop();
 		}
 	}
-    
-    private class SoundRunnable implements Runnable {
+	
+	public void setVolume(float volume) {
+		this.masterVolume = (0.5f + (0.4f*volume));
+	}
+	
+	public void increaseVolume() {
+		if (this.masterVolume < 0.9f) {
+			this.masterVolume = (this.masterVolume + 0.1f);
+		}
+	}
+	
+	public void decreaseVolume() {
+		if (this.masterVolume > 0.5f) {
+			this.masterVolume = (this.masterVolume - 0.1f);
+		}
+	}
+	
+	private class SoundRunnable implements Runnable {
         String[] msg;
         
         public SoundRunnable (String[] msg) {
