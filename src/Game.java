@@ -44,7 +44,6 @@ public class Game {
             if (opt.equals("Human")) {
                 World world = new World(manager, "world"+x, height, width, doorAndKey);
                 worlds.put("world"+x, world);
-                System.out.println("Added Human");
                 world.addPlayer("Moneymaker");                    
             } else if (opt.equals("Easy AI")) {
                 World world = new World(manager, "world"+x, height, width, doorAndKey);

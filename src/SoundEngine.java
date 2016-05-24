@@ -1,4 +1,6 @@
 import java.io.File;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -8,12 +10,18 @@ public class SoundEngine {
 	private boolean soundEnabled;
 	private Clip menuMusic;
 	private Clip backgroundMusic;
+	private float masterVolume;
+	private List<FloatControl> volControls;
+	private Preferences pref;
 	
 	// Thread pool to run sounds in
 	ExecutorService soundPool;
 	
-	public SoundEngine() {
+	public SoundEngine(Preferences pref) {
+	    this.pref = pref;
 		this.soundEnabled = true;
+		this.masterVolume = 0f;
+		this.volControls = new ArrayList<FloatControl>();
 		
 		// Initiliase thread pool
 		soundPool = Executors.newCachedThreadPool();
@@ -39,6 +47,14 @@ public class SoundEngine {
 			this.soundEnabled = false;
 			System.out.println("Sound disabled");
 		}
+		
+
+        FloatControl menuVolumeControl = (FloatControl) menuMusic.getControl(FloatControl.Type.MASTER_GAIN);
+        volControls.add(menuVolumeControl);
+        FloatControl bgBolumeControl = (FloatControl) backgroundMusic.getControl(FloatControl.Type.MASTER_GAIN);
+        volControls.add(bgBolumeControl);
+        
+        setMasterVolume();
 	}
 
     public void inbox(String[] message) {
@@ -47,6 +63,28 @@ public class SoundEngine {
             soundPool.execute(run);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Sets the master volume up between max and min values.
+     * 
+     * 
+     * @param volume A number between 0 and 100. Where 0 is mute and 100 max volume.
+     */
+    private void setMasterVolume() {
+        
+        int volume = pref.getValue("masterVolume");
+        
+        float minVol = -20.0f;
+        float maxVol = 2.0f;
+        float volUnit = (maxVol-minVol)/100f;
+        
+        masterVolume = minVol + volUnit*(float)volume;
+        if (volume == 0) masterVolume = -64f;
+        
+        for (FloatControl f : volControls) {
+            f.setValue(masterVolume);
         }
     }
 	
@@ -70,6 +108,11 @@ public class SoundEngine {
 		        audioOutputLine.open(audioFormat);
 		        audioOutputLine.start();
 
+		        /* Get and set the volume control*/
+		        FloatControl volumeControl = (FloatControl) audioOutputLine.getControl(FloatControl.Type.MASTER_GAIN);
+		        volumeControl.setValue(masterVolume);
+		        
+		        
                 // buffer of 32 kb
 		        byte[] sampleByte = new byte[32*1024];
 		        
@@ -139,6 +182,9 @@ public class SoundEngine {
                 case "stop":
                     if (msg[1].equals("background")) endBackgroundMusic();
                     else if (msg[1].equals("menu")) endMenuMusic();
+                    break;
+                case "changeVolume":
+                    setMasterVolume();
                     break;
                 default:
                     break;
