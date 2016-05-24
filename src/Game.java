@@ -128,7 +128,7 @@ public class Game {
         
         public void run() {
             try {
-                manager.submitCommand(ai.makeMove());
+                manager.sendMessage(ai.makeMove());
             } catch (Exception e){
                 System.out.println("AI run error.");
                 e.printStackTrace();

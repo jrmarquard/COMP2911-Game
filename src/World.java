@@ -196,7 +196,7 @@ public class World {
     }
     
     private void sendMessage(Message c) {
-        manager.submitCommand(c);
+        manager.sendMessage(c);
     }
     
     /**

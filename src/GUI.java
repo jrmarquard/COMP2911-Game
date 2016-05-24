@@ -590,7 +590,7 @@ public class GUI extends JFrame  {
     }
     
     private void sendMessage(Message c) {
-        manager.submitCommand(c);
+        manager.sendMessage(c);
     }
     private void setAppState(AppState s) {
         appState = s;

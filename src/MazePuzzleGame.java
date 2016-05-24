@@ -40,7 +40,7 @@ public class MazePuzzleGame {
 	    MazePuzzleGame game = new MazePuzzleGame();
 	}
 	
-	public void submitCommand(Message c) {
+	public void sendMessage(Message c) {
 	    switch (c.getCommandID()) {
             case Message.EXIT:         System.exit(0);;                 break;
             case Message.GAME_MSG:     game.inbox(c.getMessage());      break;
