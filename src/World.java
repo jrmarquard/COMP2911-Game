@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
@@ -34,6 +35,7 @@ public class World {
     private Node doorFinish;
     private Node key;
     
+    private ArrayList<Node> visibileNodes;
     
     // Multiple beings in a world
     // Beings are things that can move/make decisions
@@ -51,6 +53,7 @@ public class World {
         this.nodes = new ArrayList<ArrayList<Node>>();
         this.beings = new HashMap<String, Being>();
         this.items = new ArrayList<Item>();
+        this.visibileNodes = new ArrayList<Node>();
         
         this.width = width;
         this.height = height;
@@ -69,6 +72,7 @@ public class World {
         // Maze generator connects nodes together and sets start/finish.
         mazeGenerator();
         generateCoins();
+        calculateVisibility(start);
         if (doorAndKey) doorAndKeyGenerator();
     }
     
@@ -153,7 +157,44 @@ public class World {
         // Check if there are any winnders
         beingCollision();
         itemCollision();
+        Node playerNode = beings.get("Moneymaker").getNode();
+        calculateVisibility(playerNode);
     }
+    
+    /**
+     * Calculate the visibility of each node from 
+     * @param node
+     */
+    public void calculateVisibility(Node start) {
+        for (Node n : visibileNodes) {
+            n.setVisibility(0);
+        }
+        visibileNodes.clear();
+                
+        int maxVisDistance = 8;
+        float visRes = 100.0f/(float)maxVisDistance;
+        
+        Queue<Node> nodesToCheck = new LinkedList<Node>();
+        nodesToCheck.add(start);
+        
+        start.setVisibility(0.0f);
+        while (!nodesToCheck.isEmpty()) {
+            Node n = nodesToCheck.remove();
+            // System.out.println("Node at "+n.getX()+", "+n.getY()+" is "+distance+" far away.");
+            
+            if (n.getVisibility() <= 100-visRes) {
+                visibileNodes.add(n);
+                for (Node m : n.getConnectedNodes()) {
+                    if (!nodesToCheck.contains(m) && !visibileNodes.contains(m)) {
+                        m.setVisibility(n.getVisibility()+visRes);
+                        nodesToCheck.add(m);                            
+                    }
+                }
+            }
+            
+        }
+    }
+    
     private void beingCollision() {
         Iterator<String> iter = beings.keySet().iterator();
         while (iter.hasNext()) {
@@ -254,6 +295,24 @@ public class World {
      */
     public boolean isConnected(int x1, int y1, int x2, int y2) {
         return getNode(x1,y1).isConnected(getNode(x2,y2));
+    }
+    public float getWallVisibility(int x1, int y1, int x2, int y2) {
+        float visA = getNode(x1,y1).getVisibility();
+        float visB = getNode(x2,y2).getVisibility();
+        if (visA < visB) {
+            return visB;
+        } else {
+            return visA;
+        }
+    }
+    public float getDoorVisibility(int x1, int y1, int x2, int y2) {
+        float visA = getNode(x1,y1).getVisibility();
+        float visB = getNode(x2,y2).getVisibility();
+        if (visA > visB) {
+            return visB;
+        } else {
+            return visA;
+        }
     }
     
     public boolean isDoor(int xA, int yA, int xB, int yB) {
@@ -593,5 +652,9 @@ public class World {
                 node.resetCost();
             }
         }
+    }
+
+    public float getNodeVisibility(int x, int y) {
+        return getNode(x, y).getVisibility();
     }
 }

@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 
 public class Node {
 	
@@ -9,6 +11,13 @@ public class Node {
 	private Node down;
 	private Node left;
 	
+	/**
+	 * 0 = No light
+	 * ...
+	 * 100 = Completely lit
+	 */
+	private float visibility;
+	
 	public Node(int x, int y) {
 		this.x = x;
 		this.y = y;
@@ -17,9 +26,22 @@ public class Node {
 		this.right = null;
 		this.down = null;
 		this.left = null;
+		this.visibility = 100f;		
 	}
 	
-	public int getX() {
+	public float getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(float visibility) {
+        if (visibility > 100f) {
+            this.visibility = 100f;
+        } else {
+            this.visibility = visibility;
+        }
+    }
+
+    public int getX() {
 		return this.x;
 	}
 	
@@ -69,6 +91,15 @@ public class Node {
 
 	public void setLeft(Node left) {
 		this.left = left;
+	}
+	
+	public ArrayList<Node> getConnectedNodes() {
+	    ArrayList<Node> nodes = new ArrayList<Node>();
+	    if (this.up != null) nodes.add(this.up);
+	    if (this.down != null) nodes.add(this.down);
+	    if (this.left != null) nodes.add(this.left);
+	    if (this.right != null) nodes.add(this.right);
+	    return nodes;
 	}
 	
 	public boolean isConnected(Node n) {

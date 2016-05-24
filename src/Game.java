@@ -19,10 +19,14 @@ public class Game {
     // Executor to run the AIs in
     private ScheduledExecutorService aiPool;
     
+    // false if unpaused, true if paused
+    private boolean pause;
+    
     public Game (MazePuzzleGame manager, Preferences pref) {
         this.manager = manager;
         this.pref = pref;
-        this.worlds = new ConcurrentSkipListMap<String, World>();       
+        this.worlds = new ConcurrentSkipListMap<String, World>();
+        this.pause = false;
     }
     
     public void newGame() {
@@ -115,6 +119,7 @@ public class Game {
     public void inbox(String[] message) {
         switch(message[0]) {
             case "move":
+                if (pause) return;
                 worlds.get(message[1]).moveBeing(message[2], message[3]);
                 break;                    
             case "newGame":
@@ -123,8 +128,19 @@ public class Game {
             case "endGame":
                 endGame();
                 break;
+            case "pause":
+                togglePause();
+                break;
             default:
                 break;
+        }
+    }
+    
+    private void togglePause() {
+        if (pause == false) {
+            pause = true;
+        } else {
+            pause = false;
         }
     }
     
