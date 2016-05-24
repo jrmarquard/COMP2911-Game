@@ -8,10 +8,10 @@
  */
 public class MazePuzzleGame {
     
-    Preferences pref;
-    GUI gui;
-    Game game;
-    SoundEngine sounds;
+    public static Preferences pref;
+    private GUI gui;
+    private Game game;
+    private SoundEngine sounds;
     
     /**
      * Initialises MazePuzzleGame.
@@ -21,10 +21,10 @@ public class MazePuzzleGame {
      * MazeWorld, and commands queue.
      */
     public MazePuzzleGame() {
-        this.pref = new Preferences();
+        pref = new Preferences();
         this.game = new Game(this, pref);
         this.sounds = new SoundEngine(pref);
-        this.gui = new GUI(this, pref, game);
+        new GUI(this, pref, game);
     }
     
     /**
@@ -37,8 +37,7 @@ public class MazePuzzleGame {
      * @param args Arguments for the program. Unused.
      */
 	public static void main(String[] args) {
-	    @SuppressWarnings("unused")
-        MazePuzzleGame game = new MazePuzzleGame();
+        new MazePuzzleGame();
 	}
 	
 	public void sendMessage(Message c) {

@@ -173,13 +173,15 @@ public class GameMap extends JPanel {
                             g2d.setColor(pref.getColour("doorColour"));
                             g2d.fillRect((tileSize+wallWidth)*((col/2)), wallWidth + (tileSize+wallWidth)*((row-1)/2), wallWidth, tileSize);
                             // Draw the shade on top
-                            float vis = world.getDoorVisibility((col/2)-1, (row-1)/2, col/2, (row-1)/2);
+                            float vis = world.getWallVisibility((col/2)-1, (row-1)/2, col/2, (row-1)/2);
                             float opacity = (255f/100f)*vis;
                             g2d.setColor(new Color(shade.getRed(), shade.getGreen(), shade.getBlue(), (int)opacity));
                             g2d.fillRect((tileSize+wallWidth)*((col/2)), wallWidth + (tileSize+wallWidth)*((row-1)/2), wallWidth, tileSize);  
                     	} else if (!world.isConnected((col/2)-1, (row-1)/2, col/2, (row-1)/2)){
+                    	    // Draw a wall
                             g2d.fillRect((tileSize+wallWidth)*((col/2)), wallWidth + (tileSize+wallWidth)*((row-1)/2), wallWidth, tileSize);   
                         } else {
+                            // Draw shade
                             float vis = world.getWallVisibility((col/2)-1, (row-1)/2, col/2, (row-1)/2);
                             float opacity = (255f/100f)*vis;
                             g2d.setColor(new Color(shade.getRed(), shade.getGreen(), shade.getBlue(), (int)opacity));
@@ -189,15 +191,19 @@ public class GameMap extends JPanel {
                     // Horizontal walls
                     else if (row%2 == 0) {
                     	if (world.isDoor((col-1)/2, (row/2)-1, (col-1)/2, (row/2))) {
+                            // Draw the door
                     	    g2d.setColor(pref.getColour("doorColour"));
                             g2d.fillRect(wallWidth + (tileSize+wallWidth)*((col-1)/2), (tileSize+wallWidth)*(row/2), tileSize, wallWidth);
-                            float vis = world.getDoorVisibility((col-1)/2, (row/2)-1, (col-1)/2, (row/2));
+                            // Draw the shade on top
+                            float vis = world.getWallVisibility((col-1)/2, (row/2)-1, (col-1)/2, (row/2));
                             float opacity = (255f/100f)*vis;
                             g2d.setColor(new Color(shade.getRed(), shade.getGreen(), shade.getBlue(), (int)opacity));
                     		g2d.fillRect(wallWidth + (tileSize+wallWidth)*((col-1)/2), (tileSize+wallWidth)*(row/2), tileSize, wallWidth);
                     	} else if (!world.isConnected((col-1)/2, (row/2)-1, (col-1)/2, (row/2))){
+                            // Draw a wall
                             g2d.fillRect(wallWidth + (tileSize+wallWidth)*((col-1)/2), (tileSize+wallWidth)*(row/2), tileSize, wallWidth);   
                         } else {
+                            // Draw shade
                             float vis = world.getWallVisibility((col-1)/2, (row/2)-1, (col-1)/2, (row/2));
                             float opacity = (255f/100f)*vis;
                             g2d.setColor(new Color(shade.getRed(), shade.getGreen(), shade.getBlue(), (int)opacity));

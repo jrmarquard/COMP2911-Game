@@ -35,7 +35,9 @@ public class World {
     private Node doorFinish;
     private Node key;
     
+    // Lighting
     private ArrayList<Node> visibileNodes;
+    private int maxVisDistance;
     
     // Multiple beings in a world
     // Beings are things that can move/make decisions
@@ -54,6 +56,7 @@ public class World {
         this.beings = new HashMap<String, Being>();
         this.items = new ArrayList<Item>();
         this.visibileNodes = new ArrayList<Node>();
+        maxVisDistance = MazePuzzleGame.pref.getValue("visibleRange");
         
         this.width = width;
         this.height = height;
@@ -162,25 +165,27 @@ public class World {
     }
     
     /**
-     * Calculate the visibility of each node from 
-     * @param node
+     * Calculate the visibility of each node from a given node.
+     * 
+     * @param node The node to start from.
      */
-    public void calculateVisibility(Node start) {
+    public void calculateVisibility(Node startNode) {
+        // Resets the that were visibile to be dark
         for (Node n : visibileNodes) {
             n.setVisibility(0);
         }
         visibileNodes.clear();
-                
-        int maxVisDistance = 8;
+        
         float visRes = 100.0f/(float)maxVisDistance;
         
-        Queue<Node> nodesToCheck = new LinkedList<Node>();
-        nodesToCheck.add(start);
+        System.out.println("updating");
         
-        start.setVisibility(0.0f);
+        Queue<Node> nodesToCheck = new LinkedList<Node>();
+        nodesToCheck.add(startNode);
+        
+        startNode.setVisibility(0.0f);
         while (!nodesToCheck.isEmpty()) {
             Node n = nodesToCheck.remove();
-            // System.out.println("Node at "+n.getX()+", "+n.getY()+" is "+distance+" far away.");
             
             if (n.getVisibility() <= 100-visRes) {
                 visibileNodes.add(n);
@@ -201,6 +206,7 @@ public class World {
             Being b = beings.get(iter.next());
             if (b.getNode().equals(finish)) {
                 // winner winner chicken dinner
+                sendMessage(new Message(Message.GAME_MSG, new String[]{"pause"}));
                 sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "finish"}));
             }
             if (b.getNode().equals(key)) {
@@ -299,20 +305,7 @@ public class World {
     public float getWallVisibility(int x1, int y1, int x2, int y2) {
         float visA = getNode(x1,y1).getVisibility();
         float visB = getNode(x2,y2).getVisibility();
-        if (visA < visB) {
-            return visB;
-        } else {
-            return visA;
-        }
-    }
-    public float getDoorVisibility(int x1, int y1, int x2, int y2) {
-        float visA = getNode(x1,y1).getVisibility();
-        float visB = getNode(x2,y2).getVisibility();
-        if (visA > visB) {
-            return visB;
-        } else {
-            return visA;
-        }
+        return (visA+visB)/2f;
     }
     
     public boolean isDoor(int xA, int yA, int xB, int yB) {

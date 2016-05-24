@@ -30,6 +30,7 @@ public class Game {
     }
     
     public void newGame() {
+        pause = false;
         String gameMode = pref.getText("gameMode");
 
         int height = pref.getValue("defaultMapHeight");

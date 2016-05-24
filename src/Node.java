@@ -12,9 +12,9 @@ public class Node {
 	private Node left;
 	
 	/**
-	 * 0 = No light
+	 * 0 = Completely lit
 	 * ...
-	 * 100 = Completely lit
+	 * 100 = Completely dark
 	 */
 	private float visibility;
 	
