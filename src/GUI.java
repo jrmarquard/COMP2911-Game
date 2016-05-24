@@ -44,7 +44,7 @@ public class GUI extends JFrame  {
     
     Preferences pref;
     Game game;
-    Queue<Command> commands;
+    Queue<Message> messages;
     AppState appState;
     JPanel windowPanel;
     MazePuzzleGame manager;
@@ -57,21 +57,12 @@ public class GUI extends JFrame  {
             @Override
             public void run() {
                 initUI();
+                refresh();
             }
         });
-        
-//        ScheduledExecutorService refresh = Executors.newSingleThreadScheduledExecutor();
-//        refresh.scheduleAtFixedRate(new Runnable() {
-//            @Override
-//            public void run() {
-//                System.out.println("Drawing");
-//                draw();
-//            }
-//        }, 0, 50, TimeUnit.MILLISECONDS);
-        
     }
     
-    public void refresh() {
+    private void refresh() {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -88,8 +79,8 @@ public class GUI extends JFrame  {
          */
         
         // Defaults to display the main menu first
-        appState = AppState.MENU; 
-        addCommand(new Command(Com.SOUND_MSG, new String[]{"loop", "menu"}));
+        appState = AppState.MENU;
+        sendMessage(new Message(Message.SOUND_MSG, new String[]{"loop", "menu"}));
         
         // windowPanel is the root panel within this object
         windowPanel = new JPanel();
@@ -131,20 +122,19 @@ public class GUI extends JFrame  {
                 
                 String[] message = controls.get(keyPressed);
                 if (message != null) {
-                    addCommand(new Command(Com.GAME_MSG, message));
+                    sendMessage(new Message(Message.GAME_MSG, message));
                 }
                 
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_ESCAPE:   setAppState(AppState.MENU);                 break;
-                    case KeyEvent.VK_N:        newGame();                                 break;
                 }
             }
         });
         
-        // Not really necessary I think, but it's clear
+        // Exits from the main thread
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent windowEvent){
-                addCommand(new Command(Com.EXIT));
+                sendMessage(new Message(Message.EXIT));
             }
         });
     }
@@ -167,7 +157,7 @@ public class GUI extends JFrame  {
                             break;
             case ABOUT:     drawAbout();        
                             break;
-            case EXIT:      addCommand(new Command(Com.EXIT));
+            case EXIT:      sendMessage(new Message(Message.EXIT));
                             break;
         }
         
@@ -183,7 +173,7 @@ public class GUI extends JFrame  {
     
     
     /**
-     * drawMenu 
+     * drawMenu displays the menu screen.
      */
     private void drawMenu() {
         windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
@@ -219,7 +209,7 @@ public class GUI extends JFrame  {
         exitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                addCommand(new Command(Com.SOUND_MSG, new String[]{"stop", "menu"}));
+                sendMessage(new Message(Message.SOUND_MSG, new String[]{"stop", "menu"}));
                 setAppState(AppState.EXIT);
             }
         });
@@ -230,6 +220,10 @@ public class GUI extends JFrame  {
         windowPanel.add(exitButton);
     }
     
+    /**
+     * drawGameInit shows the screen before starting a game, allowing you to select various
+     * options for the game.
+     */
     private void drawGameInit() {
         windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
         
@@ -281,6 +275,7 @@ public class GUI extends JFrame  {
         doorAndKey.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+            	sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "click"}));
                 pref.toggleBool("doorAndKey");
             }
         });
@@ -335,6 +330,7 @@ public class GUI extends JFrame  {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (ItemEvent.SELECTED == e.getStateChange()) {
+                	sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "click"}));
                     pref.setPreference("text.gameMode="+(String)e.getItem());
                     refresh();
                 }
@@ -372,8 +368,10 @@ public class GUI extends JFrame  {
         startGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                sendMessage(new Message(Message.SOUND_MSG, new String[]{"stop", "menu"}));
+                sendMessage(new Message(Message.SOUND_MSG, new String[]{"loop", "background"}));
+                sendMessage(new Message(Message.GAME_MSG, new String[]{"newGame"}));
                 setAppState(AppState.GAME);
-                newGame();
             }
         });
         settingsPanel.add(startGameButton, c);
@@ -384,7 +382,7 @@ public class GUI extends JFrame  {
     }
     
     /**
-     *  
+     * drawAbout shows the about screen, with information on the game and it's authors. 
      */
     private void drawAbout() {
         windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
@@ -419,6 +417,9 @@ public class GUI extends JFrame  {
         windowPanel.add(aboutTextPanel);
     }
     
+    /**
+     * drawsettings allows you to change non-gameplay settings like sound and graphics.
+     */
     private void drawSettings() {
         windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
         
@@ -442,6 +443,7 @@ public class GUI extends JFrame  {
                 setAppState(AppState.MENU);
             }
         });
+        
         navPanel.add(resetButton);
         navPanel.add(backButton);
         
@@ -468,13 +470,7 @@ public class GUI extends JFrame  {
             JPanel settingRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
             JLabel settingName = new JLabel();
             JTextField settingValue = new JTextField();
-            JPanel settingColour = new JPanel() {
-//                @Override
-//                public Dimension getPreferredSize() {
-//                    Dimension d = this.getParent().getSize();
-//                    return new Dimension(d.height,d.height);
-//                }
-            };
+            JPanel settingColour = new JPanel();
             
             settingRow.setBorder(BorderFactory.createLineBorder(Color.black));
             settingValue.setColumns(6);
@@ -503,7 +499,7 @@ public class GUI extends JFrame  {
                 JSlider source = (JSlider) e.getSource();
                 int newVolume = (int)source.getValue();
                 pref.setPreference("value.masterVolume="+newVolume);
-                addCommand(new Command(Com.SOUND_MSG, new String[]{"changeVolume"}));
+                sendMessage(new Message(Message.SOUND_MSG, new String[]{"changeVolume"}));
                 
             }
         });
@@ -513,7 +509,9 @@ public class GUI extends JFrame  {
         
     }
     
-    
+    /**
+     * drawGame shows the game.
+     */
     private void drawGame() {
         windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
         
@@ -574,44 +572,25 @@ public class GUI extends JFrame  {
         
         // Menu Panel
         gameMenuPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-
-        drawGameMenuPanel(gameMenuPanel);
-
-        windowPanel.setPreferredSize(windowPanel.getSize());
-    }
-    
-    private void drawGameMenuPanel(JPanel gameMenuPanel) {
-        gameMenuPanel.removeAll();
         gameMenuPanel.setBackground(pref.getColour("menuColour"));
         
         JClickButton closeButton = new JClickButton("Exit to menu");
-        closeButton.setMnemonic(KeyEvent.VK_W);
         closeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                addCommand(new Command(Com.GAME_MSG, new String[]{"endGame"}));
-                addCommand(new Command(Com.SOUND_MSG, new String[]{"stop", "background"}));
-                addCommand(new Command(Com.SOUND_MSG, new String[]{"loop", "menu"}));
+                sendMessage(new Message(Message.GAME_MSG, new String[]{"endGame"}));
+                sendMessage(new Message(Message.SOUND_MSG, new String[]{"stop", "background"}));
+                sendMessage(new Message(Message.SOUND_MSG, new String[]{"loop", "menu"}));
                 setAppState(AppState.MENU);
             }
         });
         gameMenuPanel.add(closeButton);
+
+        windowPanel.setPreferredSize(windowPanel.getSize());
     }
     
-    /**
-     * Creates a new game for the specified number of players
-     * 
-     * @param numPlayers 1 or 2, nothing else
-     */
-    private void newGame() {
-        addCommand(new Command(Com.SOUND_MSG, new String[]{"stop", "menu"}));
-        addCommand(new Command(Com.SOUND_MSG, new String[]{"loop", "background"}));
-        addCommand(new Command(Com.GAME_MSG, new String[]{"newGame"}));
-        setAppState(AppState.GAME);
-    }
-    
-    private void addCommand(Command c) {
-        manager.submitCommand(c);
+    private void sendMessage(Message c) {
+        manager.sendMessage(c);
     }
     private void setAppState(AppState s) {
         appState = s;
@@ -679,6 +658,7 @@ public class GUI extends JFrame  {
                 public void itemStateChanged(ItemEvent e) {
                     if (ItemEvent.SELECTED == e.getStateChange()) {
                         pref.setPreference("text."+setting+"="+(String)e.getItem());
+                        sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "click"}));
                     }
                 }
             });
@@ -696,7 +676,7 @@ public class GUI extends JFrame  {
             this.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "click"}));
+                    sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "click"}));
                 }
             });
         }

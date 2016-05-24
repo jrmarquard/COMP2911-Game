@@ -1,9 +1,6 @@
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Queue;
-import java.util.TreeMap;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -118,8 +115,7 @@ public class Game {
     public void inbox(String[] message) {
         switch(message[0]) {
             case "move":
-                World w = worlds.get(message[1]);
-                w.moveBeing(message[2], message[3]);
+                worlds.get(message[1]).moveBeing(message[2], message[3]);
                 break;                    
             case "newGame":
                 newGame();
@@ -137,7 +133,6 @@ public class Game {
         worlds.clear();
         // Stop new submissions and end all currently running tasks immediately
         aiPool.shutdownNow();
-        
     }
 
     private class aiRunnable implements Runnable {
@@ -150,7 +145,7 @@ public class Game {
         
         public void run() {
             try {
-                manager.submitCommand(ai.makeMove());
+                manager.sendMessage(ai.makeMove());
             } catch (Exception e){
                 System.out.println("AI run error.");
                 e.printStackTrace();
