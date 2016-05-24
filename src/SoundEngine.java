@@ -53,10 +53,10 @@ public class SoundEngine {
 	private void playSound(String soundName) {
 		if (this.soundEnabled) {
 			try {
-			    // Loads
+			    /* Loads the audio file into memory. */
 			    File soundFile = new File("sounds/"+soundName+".wav");
 		        
-		        /* Gets an audioInputStream for the given soundFile*/
+		        /* Gets an audioInputStream for the audio file. */
 		        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(soundFile);
 		        		        
 		        /* Gets the format from the audioInputStream, so we know how to interpret the file. */
