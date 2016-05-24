@@ -23,7 +23,7 @@ public class MazePuzzleGame extends Thread {
     public MazePuzzleGame() {
         this.pref = new Preferences();
         this.game = new Game(this, pref);
-        this.sounds = new SoundEngine();
+        this.sounds = new SoundEngine(pref);
         this.gui = new GUI(this, pref, game);
     }
     

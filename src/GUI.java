@@ -3,6 +3,8 @@ import java.awt.event.*;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
@@ -87,6 +89,7 @@ public class GUI extends JFrame  {
         
         // Defaults to display the main menu first
         appState = AppState.MENU; 
+        addCommand(new Command(Com.SOUND_MSG, new String[]{"loop", "menu"}));
         
         // windowPanel is the root panel within this object
         windowPanel = new JPanel();
@@ -186,7 +189,7 @@ public class GUI extends JFrame  {
         windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
 
         // Button will start a new game
-        JButton startGameButton = new JButton("Play");
+        JClickButton startGameButton = new JClickButton("Play");
         startGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -195,17 +198,16 @@ public class GUI extends JFrame  {
         });
 
         // Button will go to settings
-        JButton settingsButton = new JButton("Settings");
+        JClickButton settingsButton = new JClickButton("Settings");
         settingsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "click"}));
                 setAppState(AppState.SETTINGS);
             }
         });
         
         // Button will go to settings
-        JButton aboutButton = new JButton("About");
+        JClickButton aboutButton = new JClickButton("About");
         aboutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -213,7 +215,7 @@ public class GUI extends JFrame  {
             }
         });
         // Button will quit the game
-        JButton exitButton = new JButton("Exit");
+        JClickButton exitButton = new JClickButton("Exit");
         exitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -236,7 +238,7 @@ public class GUI extends JFrame  {
         navPanelTop.setBackground(windowPanel.getBackground().darker());
         windowPanel.add(navPanelTop);
         
-        JButton backButton = new JButton("Back");
+        JClickButton backButton = new JClickButton("Back");
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -366,7 +368,7 @@ public class GUI extends JFrame  {
         c.gridx = 1;
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.CENTER;
-        JButton startGameButton = new JButton("Start Game");
+        JClickButton startGameButton = new JClickButton("Start Game");
         startGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -392,7 +394,7 @@ public class GUI extends JFrame  {
         navPanel.setBackground(windowPanel.getBackground().darker());
         windowPanel.add(navPanel);
         
-        JButton backButton = new JButton("Back");
+        JClickButton backButton = new JClickButton("Back");
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -425,7 +427,7 @@ public class GUI extends JFrame  {
         navPanel.setBackground(windowPanel.getBackground().darker());
         windowPanel.add(navPanel);
         
-        JButton resetButton = new JButton("Reset to defaults");
+        JClickButton resetButton = new JClickButton("Reset to defaults");
         resetButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -433,7 +435,7 @@ public class GUI extends JFrame  {
                 setAppState(AppState.SETTINGS);
             }
         });
-        JButton backButton = new JButton("Back");
+        JClickButton backButton = new JClickButton("Back");
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -491,6 +493,24 @@ public class GUI extends JFrame  {
             settingRow.add(settingColour);
             settingsPanel.add(settingRow);
         }
+        
+        JPanel volSliderPanel = new JPanel();
+        JLabel volSliderLabel = new JLabel("Master Volume: ");
+        JSlider volSlider = new JSlider(0, 100, pref.getValue("masterVolume"));
+        volSlider.addChangeListener(new ChangeListener(){
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                JSlider source = (JSlider) e.getSource();
+                int newVolume = (int)source.getValue();
+                pref.setPreference("value.masterVolume="+newVolume);
+                addCommand(new Command(Com.SOUND_MSG, new String[]{"changeVolume"}));
+                
+            }
+        });
+        volSliderPanel.add(volSliderLabel);
+        volSliderPanel.add(volSlider);
+        windowPanel.add(volSliderPanel);
+        
     }
     
     
@@ -564,7 +584,7 @@ public class GUI extends JFrame  {
         gameMenuPanel.removeAll();
         gameMenuPanel.setBackground(pref.getColour("menuColour"));
         
-        JButton closeButton = new JButton("Exit to menu");
+        JClickButton closeButton = new JClickButton("Exit to menu");
         closeButton.setMnemonic(KeyEvent.VK_W);
         closeButton.addActionListener(new ActionListener() {
             @Override
@@ -591,14 +611,10 @@ public class GUI extends JFrame  {
     }
     
     private void addCommand(Command c) {
-        if (c == null) {
-            System.out.println("wtf");
-        }
         manager.submitCommand(c);
     }
     private void setAppState(AppState s) {
         appState = s;
-        addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "click"}));
         refresh();
     }
     public void close() {
@@ -664,6 +680,23 @@ public class GUI extends JFrame  {
                     if (ItemEvent.SELECTED == e.getStateChange()) {
                         pref.setPreference("text."+setting+"="+(String)e.getItem());
                     }
+                }
+            });
+        }
+    }
+    
+    /**
+     * Exactly the same as a normal button but it sends a click command
+     * to the sound engine.
+     * 
+     */
+    private class JClickButton extends JButton {
+        public JClickButton (String s) {
+            super(s);
+            this.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    addCommand(new Command(Com.SOUND_MSG, new String[]{"play", "click"}));
                 }
             });
         }
