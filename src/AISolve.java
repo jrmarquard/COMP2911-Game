@@ -1,3 +1,4 @@
+import java.util.LinkedList;
 import java.util.Random;
 
 /**
@@ -11,12 +12,16 @@ public class AISolve implements AI {
     String worldName;
     String id;
     String diff;
+    private LinkedList<Node> explore;
+    private LinkedList<Node> visited;
     
     public AISolve(World world, String id, String diff) {
         this.world = world;
         this.worldName = world.getName();;
         this.id = id;
         this.diff = diff;
+        this.explore = new LinkedList<Node>();
+        this.visited = new LinkedList<Node>();
     }
     
     @Override
@@ -41,7 +46,7 @@ public class AISolve implements AI {
         message[1] = worldName;
         message[2] = id;
         
-        int randValue = (new Random()).nextInt(5);
+        int randValue = (new Random()).nextInt(4);
         switch(randValue) {
             case 0:     message[3] = "up";      break;
             case 1:     message[3] = "down";    break;
@@ -58,7 +63,105 @@ public class AISolve implements AI {
      * @return
      */
     private Command medMove() {
-        return easyMove();
+    	String[] message = new String[4];
+        message[0] = "move";
+        message[1] = worldName;
+        message[2] = id;
+        
+        Node current = this.world.getBeingCoordinate(this.id);
+        this.visited.add(current);
+        int currX = current.getX();
+        int currY = current.getY();
+        
+        if(!this.explore.isEmpty()) {
+        	Node next = this.explore.remove();
+        	this.visited.add(next);
+        	int nextX = next.getX();
+        	int nextY = next.getY();
+        	
+        	if(nextX == currX - 1 && nextY == currY) {
+        		message[3] = "left";
+        	} else if(nextX == currX + 1 && nextY == currY) {
+        		message[3] = "right";
+        	} else if(nextX == currX && nextY == currY - 1) {
+        		message[3] = "up";
+        	} else if(nextX == currX && nextY == currY + 1) {
+        		message[3] = "down";
+        	} 
+        } else {
+        	boolean deadEnd = isAtDeadEnd(current);
+
+        	if(deadEnd) {
+        		boolean addedToExplore = false;
+        		this.visited.clear();
+
+        		while(this.world.getNode(currX, currY).getUp() != null) {
+        			this.explore.add(this.world.getNode(currX, currY).getUp());
+        			currY--;
+        			addedToExplore = true;
+        		}
+        		
+        		if(!addedToExplore) {
+        			while(this.world.getNode(currX, currY).getDown() != null) {
+            			this.explore.add(this.world.getNode(currX, currY).getDown());
+            			currY++;
+            			addedToExplore = true;
+            		}
+        		}
+        		
+        		if(!addedToExplore) {
+        			while(this.world.getNode(currX, currY).getLeft() != null) {
+            			this.explore.add(this.world.getNode(currX, currY).getLeft());
+            			currX--;
+            			addedToExplore = true;
+            		}
+        		}
+        		
+        		if(!addedToExplore) {
+        			while(this.world.getNode(currX, currY).getRight() != null) {
+            			this.explore.add(this.world.getNode(currX, currY).getRight());
+            			currX++;
+            			addedToExplore = true;
+            		}
+        		}
+        	} else {
+        		int randValue = (new Random()).nextInt(4);
+        		
+        		if(randValue == 0) {
+        			if(!this.visited.contains(this.world.getNode(currX, currY).getUp())) {
+            			while(this.world.getNode(currX, currY).getUp() != null) {
+                			this.explore.add(this.world.getNode(currX, currY).getUp());
+                			currY--;
+                		}
+            		}
+        		} else if(randValue == 1) {
+        			if(!this.visited.contains(this.world.getNode(currX, currY).getDown())) {
+            			while(this.world.getNode(currX, currY).getDown() != null) {
+                			this.explore.add(this.world.getNode(currX, currY).getDown());
+                			currY++;
+                		}
+        			}
+        		} else if(randValue == 2) {
+        			if(!this.visited.contains(this.world.getNode(currX, currY).getLeft())) {
+            			while(this.world.getNode(currX, currY).getLeft() != null) {
+                			this.explore.add(this.world.getNode(currX, currY).getLeft());
+                			currX--;
+                		}
+        			}
+        		} else if(randValue == 3) {
+        			if(!this.visited.contains(this.world.getNode(currX, currY).getRight())) {
+            			while(this.world.getNode(currX, currY).getRight() != null) {
+                			this.explore.add(this.world.getNode(currX, currY).getRight());
+                			currX++;
+                		}
+            		}
+        		}
+        	}
+        	
+        	message[3] = "";
+        }
+        
+        return new Command(Com.GAME_MSG, message);
     }
 
     /**
@@ -66,6 +169,120 @@ public class AISolve implements AI {
      * @return
      */
     private Command hardMove() {
-        return easyMove();
+    	String[] message = new String[4];
+        message[0] = "move";
+        message[1] = worldName;
+        message[2] = id;
+        
+        Node current = this.world.getBeingCoordinate(this.id);
+        int currX = current.getX();
+        int currY = current.getY();
+        LinkedList<Node> reachable = this.getReachable(current);
+        current.addCost(1);
+        this.visited.add(current);
+        
+        Node next = null;
+        boolean first = true;
+        boolean allVisited = isReachableInVisited(reachable);
+        
+        for(Node node: reachable) {
+        	if(allVisited) {
+        		if(first) {
+        			next = node;
+        			first = false;
+        		} else {
+        			if(node.getCost() < next.getCost()) {
+        				next = node;
+        			}
+        		}
+        	} else if(!visited.contains(node)) {
+        		next = node;
+        	}
+        }
+        
+        next.addCost(1);
+        this.visited.add(next);
+        int nextX = next.getX();
+    	int nextY = next.getY();
+    	
+    	if(nextX == currX - 1 && nextY == currY) {
+    		message[3] = "left";
+    	} else if(nextX == currX + 1 && nextY == currY) {
+    		message[3] = "right";
+    	} else if(nextX == currX && nextY == currY - 1) {
+    		message[3] = "up";
+    	} else if(nextX == currX && nextY == currY + 1) {
+    		message[3] = "down";
+    	} else {
+    		message[3] = "";
+    	}
+        
+        return new Command(Com.GAME_MSG, message);
+    }
+    
+    private boolean isAtDeadEnd(Node node) {
+    	boolean deadEnd = false;
+    	int x = node.getX();
+    	int y = node.getY();
+    	int count = 0;
+    	
+    	if(this.world.getNode(x, y).getUp() == null) {
+    		count++;
+    	}
+    	
+    	if(this.world.getNode(x, y).getDown() == null) {
+    		count++;
+    	}
+    	
+    	if(this.world.getNode(x, y).getLeft() == null) {
+    		count++;
+    	}
+    	
+    	if(this.world.getNode(x, y).getRight() == null) {
+    		count++;
+    	}
+    	
+    	if(count == 3) {
+    		deadEnd = true;
+    	}
+    	
+    	return deadEnd;
+    }
+    
+    private LinkedList<Node> getReachable(Node node) {
+    	LinkedList<Node> reachable = new LinkedList<Node>();
+    	int x = node.getX();
+    	int y = node.getY();
+    	
+    	if(this.world.getNode(x, y).getUp() != null) {
+    		reachable.add(this.world.getNode(x, y).getUp());
+    	}
+    	
+    	if(this.world.getNode(x, y).getDown() != null) {
+    		reachable.add(this.world.getNode(x, y).getDown());
+    	}
+    	
+    	if(this.world.getNode(x, y).getLeft() != null) {
+    		reachable.add(this.world.getNode(x, y).getLeft());
+    	}
+    	
+    	if(this.world.getNode(x, y).getRight() != null) {
+    		reachable.add(this.world.getNode(x, y).getRight());
+    	}
+    	
+    	return reachable;
+    }
+    
+    private boolean isReachableInVisited(LinkedList<Node> reachable) {
+    	boolean isAllIn = true;
+    	
+    	for(Node node: reachable) {
+    		if(!this.visited.contains(node)) {
+    			isAllIn = false;
+    			break;
+    		}
+    	}
+    	
+    	return isAllIn;
     }
 }
