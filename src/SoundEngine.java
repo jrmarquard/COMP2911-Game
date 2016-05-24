@@ -13,6 +13,8 @@ public class SoundEngine {
 	private float masterVolume;
 	private List<FloatControl> volControls;
 	private Preferences pref;
+	private int gameSoundsPlaying;
+	final private int MAX_GAME_SOUNDS = 5;
 	
 	// Thread pool to run sounds in
 	ExecutorService soundPool;
@@ -22,6 +24,7 @@ public class SoundEngine {
 		this.soundEnabled = true;
 		this.masterVolume = 0f;
 		this.volControls = new ArrayList<FloatControl>();
+		this.gameSoundsPlaying = 0;
 		
 		// Initiliase thread pool
 		soundPool = Executors.newCachedThreadPool();
@@ -89,6 +92,7 @@ public class SoundEngine {
     }
 	
 	private void playSound(String soundName) {
+	    if (gameSoundsPlaying >= MAX_GAME_SOUNDS) return; 
 		if (this.soundEnabled) {
 			try {
 			    /* Loads the audio file into memory. */
@@ -107,11 +111,12 @@ public class SoundEngine {
 		        SourceDataLine audioOutputLine = (SourceDataLine) AudioSystem.getLine(info);
 		        audioOutputLine.open(audioFormat);
 		        audioOutputLine.start();
+		        
+		        gameSoundsPlaying++;
 
 		        /* Get and set the volume control*/
 		        FloatControl volumeControl = (FloatControl) audioOutputLine.getControl(FloatControl.Type.MASTER_GAIN);
 		        volumeControl.setValue(masterVolume);
-		        
 		        
                 // buffer of 32 kb
 		        byte[] sampleByte = new byte[32*1024];
@@ -129,6 +134,7 @@ public class SoundEngine {
                 Thread.sleep(100);
                 audioOutputLine.close();
                 audioInputStream.close();
+                gameSoundsPlaying--;
 			}
 			catch (Exception e){
 			    e.printStackTrace();
