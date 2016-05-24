@@ -37,7 +37,7 @@ public class Game {
         boolean doorAndKey = pref.getBool("doorAndKey");
         
         TimeUnit timeUnit = TimeUnit.MILLISECONDS;
-        int aiRefreshRate = 200;
+        int aiRefreshRate = 150;
         
         for (int x = 1; x <= 4; x++) {
             String opt = pref.getText("player"+x);
@@ -52,21 +52,21 @@ public class Game {
                 world.addPlayer("Moneymaker");
                 AI ai = new AISolve(world,"Moneymaker", "easy");
                 aiRunnable air = new aiRunnable(ai);
-                aiPool.scheduleAtFixedRate(air, 0, aiRefreshRate, timeUnit);
+                aiPool.scheduleAtFixedRate(air, aiRefreshRate*(2/10), aiRefreshRate, timeUnit);
             } else if (opt.equals("Med AI")) {
                 World world = new World(manager, "world"+x, height, width, doorAndKey);
                 worlds.put("world"+x, world);
                 world.addPlayer("Moneymaker");
                 AI ai = new AISolve(world,"Moneymaker", "med");
                 aiRunnable air = new aiRunnable(ai);
-                aiPool.scheduleAtFixedRate(air, 0, aiRefreshRate, timeUnit);
+                aiPool.scheduleAtFixedRate(air, aiRefreshRate*(5/10), aiRefreshRate, timeUnit);
             } else if (opt.equals("Hard AI")) {
                 World world = new World(manager, "world"+x, height, width, doorAndKey);
                 worlds.put("world"+x, world);
                 world.addPlayer("Moneymaker");
                 AI ai = new AISolve(world,"Moneymaker", "hard");
                 aiRunnable air = new aiRunnable(ai);
-                aiPool.scheduleAtFixedRate(air, 0, aiRefreshRate, timeUnit);
+                aiPool.scheduleAtFixedRate(air, aiRefreshRate*(8/10), aiRefreshRate, timeUnit);
             }
         }
     }
