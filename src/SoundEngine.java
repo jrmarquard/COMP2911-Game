@@ -1,7 +1,4 @@
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -9,7 +6,6 @@ import javax.sound.sampled.*;
 
 public class SoundEngine {
 	private boolean soundEnabled;
-	private Map<String, File> sounds;
 	private Clip menuMusic;
 	private Clip backgroundMusic;
 	
@@ -18,24 +14,11 @@ public class SoundEngine {
 	
 	public SoundEngine() {
 		this.soundEnabled = true;
-		this.sounds = new HashMap<String, File>();
 		
 		// Initiliase thread pool
 		soundPool = Executors.newCachedThreadPool();
-	
-		ArrayList<String> soundFileNames = new ArrayList<String>();
-		soundFileNames.add("coin.wav");
-        soundFileNames.add("intro.wav");
-        soundFileNames.add("finish.wav");
-        soundFileNames.add("step.wav");
-        soundFileNames.add("click.wav");
         
 		try {
-		    for (String fileName : soundFileNames) {
-	            String fileLocation = "sounds/"+fileName;
-	            fileName = fileName.split("\\.")[0];
-	            sounds.put(fileName, new File(fileLocation));
-            }
 		    // Load menu music
 		    String menuSound = new String("sounds/menu.wav");
 		    AudioInputStream stream = AudioSystem.getAudioInputStream(new File(menuSound));
