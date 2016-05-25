@@ -6,10 +6,9 @@
  * @author John, Joshua, Patrick, Tim, Tyler
  *
  */
-public class MazePuzzleGame {
+public class App {
     
     public static Preferences pref;
-    private GUI gui;
     private Game game;
     private SoundEngine sounds;
     
@@ -20,11 +19,11 @@ public class MazePuzzleGame {
      * via the commands queue, and links together the display with the preferences,
      * MazeWorld, and commands queue.
      */
-    public MazePuzzleGame() {
-        pref = new Preferences();
-        this.game = new Game(this, pref);
-        this.sounds = new SoundEngine(pref);
-        new GUI(this, pref, game);
+    public App() {
+        App.pref = new Preferences();
+        this.game = new Game(this);
+        this.sounds = new SoundEngine();
+        new GUI(this, game);
     }
     
     /**
@@ -37,7 +36,7 @@ public class MazePuzzleGame {
      * @param args Arguments for the program. Unused.
      */
 	public static void main(String[] args) {
-        new MazePuzzleGame();
+        new App();
 	}
 	
 	public void sendMessage(Message c) {

@@ -15,15 +15,13 @@ import javax.swing.Timer;
 @SuppressWarnings("serial")
 public class GameMap extends JPanel {
 
-    private Preferences pref;
     private World world;
     private Graphics2D g2d;
     private PaintRefresh timer;
     
-    public GameMap (World world, Preferences pref) {
+    public GameMap (World world) {
         super();
         this.world = world;
-        this.pref = pref;
         
         timer = new PaintRefresh(this);
         timer.start();
@@ -57,7 +55,7 @@ public class GameMap extends JPanel {
         int windowHeight = d.height;
         int windowWidth = d.width;
 
-        g2d.setColor(pref.getColour("backgroundColour"));
+        g2d.setColor(App.pref.getColour("backgroundColour"));
         g2d.fillRect(0, 0, windowWidth, windowHeight);
         
         // Gets the number of rows and columns in maze
@@ -104,22 +102,22 @@ public class GameMap extends JPanel {
         g2d.translate(offsetX + (mazeWidth - mazeUnitCols*wallWidth)/2, offsetY + (mazeHeight - mazeUnitRows*wallWidth)/2);
         
         // Draw floor
-        g2d.setColor(pref.getColour("floorColour"));
+        g2d.setColor(App.pref.getColour("floorColour"));
         g2d.fillRect(0, 0, mazeUnitCols*wallWidth, mazeUnitRows*wallWidth);
         
         // Draw on start
         Node n = world.getStartNode();
-        g2d.setColor(pref.getColour("startColour"));
+        g2d.setColor(App.pref.getColour("startColour"));
         g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
         
         // Draw on start
         n = world.getFinishNode();
-        g2d.setColor(pref.getColour("finishColour"));
+        g2d.setColor(App.pref.getColour("finishColour"));
         g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
 
         // Draw on character
         n = world.getPlayerNode();
-        g2d.setColor(pref.getColour("playerColour"));
+        g2d.setColor(App.pref.getColour("playerColour"));
         Ellipse2D.Double circle = new Ellipse2D.Double(
                 wallWidth+(n.getX()*(wallWidth+tileSize))+tileSize/4, 
                 wallWidth+(n.getY()*(wallWidth+tileSize))+tileSize/4, 
@@ -129,9 +127,9 @@ public class GameMap extends JPanel {
         g2d.fill(circle);
         
         // Draw on Enemy
-        if(pref.getBool("enemy")) {
+        if(App.pref.getBool("enemy")) {
         	n = world.getEnemyNode();
-            g2d.setColor(pref.getColour("enemyColour"));
+            g2d.setColor(App.pref.getColour("enemyColour"));
             Ellipse2D.Double circleE = new Ellipse2D.Double(
                     wallWidth+(n.getX()*(wallWidth+tileSize))+tileSize/4, 
                     wallWidth+(n.getY()*(wallWidth+tileSize))+tileSize/4, 
@@ -143,7 +141,7 @@ public class GameMap extends JPanel {
         
         // Draw on coins
         ArrayList<Node> nodes = world.getEntityNodes();
-        g2d.setColor(pref.getColour("coinColour"));
+        g2d.setColor(App.pref.getColour("coinColour"));
         for (Node s : nodes) {
             g2d.fillRect(wallWidth+(s.getX()*(wallWidth+tileSize)), wallWidth+(s.getY()*(wallWidth+tileSize)), tileSize, tileSize);
         }
@@ -151,12 +149,12 @@ public class GameMap extends JPanel {
         // Draw key
         n = world.getKeyNode();
         if(n != null) {
-            g2d.setColor(pref.getColour("keyColour"));
+            g2d.setColor(App.pref.getColour("keyColour"));
             g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
         }
 
         // Draw the east/north/west/south walls of entire maze
-        g2d.setColor(pref.getColour("wallColour"));
+        g2d.setColor(App.pref.getColour("wallColour"));
         g2d.fillRect(0, 0, wallWidth, mazeUnitRows*wallWidth);
         g2d.fillRect(0, 0, mazeUnitCols*wallWidth, wallWidth);
         g2d.fillRect((mazeUnitCols-1)*wallWidth, 0, wallWidth, mazeUnitRows*wallWidth);
@@ -165,8 +163,8 @@ public class GameMap extends JPanel {
         // Draw inside of maze
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
-                g2d.setColor(pref.getColour("wallColour"));
-                Color shade = pref.getColour("wallColour");
+                g2d.setColor(App.pref.getColour("wallColour"));
+                Color shade = App.pref.getColour("wallColour");
                 if (col%2 == 0 && row%2 == 0) {
                     // Wall corners
                     g2d.fillRect((col/2)*(wallWidth+tileSize),(row/2)*(wallWidth+tileSize),wallWidth,wallWidth);                    
@@ -183,7 +181,7 @@ public class GameMap extends JPanel {
                     if (col%2 == 0) {
                         if (world.isDoor((col/2)-1, (row-1)/2, col/2, (row-1)/2)) {
                             // Draw the door
-                            g2d.setColor(pref.getColour("doorColour"));
+                            g2d.setColor(App.pref.getColour("doorColour"));
                             g2d.fillRect((tileSize+wallWidth)*((col/2)), wallWidth + (tileSize+wallWidth)*((row-1)/2), wallWidth, tileSize);
                             // Draw the shade on top
                             float vis = world.getWallVisibility((col/2)-1, (row-1)/2, col/2, (row-1)/2);
@@ -205,7 +203,7 @@ public class GameMap extends JPanel {
                     else if (row%2 == 0) {
                     	if (world.isDoor((col-1)/2, (row/2)-1, (col-1)/2, (row/2))) {
                             // Draw the door
-                    	    g2d.setColor(pref.getColour("doorColour"));
+                    	    g2d.setColor(App.pref.getColour("doorColour"));
                             g2d.fillRect(wallWidth + (tileSize+wallWidth)*((col-1)/2), (tileSize+wallWidth)*(row/2), tileSize, wallWidth);
                             // Draw the shade on top
                             float vis = world.getWallVisibility((col-1)/2, (row/2)-1, (col-1)/2, (row/2));
@@ -246,8 +244,8 @@ public class GameMap extends JPanel {
      */
     private class PaintRefresh extends Timer {
         public PaintRefresh(GameMap gameMap) {
-            //pref.getValue("refreshPeriod")
-            super(pref.getValue("refreshPeriod"), new ActionListener() {
+            //App.pref.getValue("refreshPeriod")
+            super(App.pref.getValue("refreshPeriod"), new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent event)
                 {

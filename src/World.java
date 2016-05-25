@@ -18,9 +18,9 @@ import java.util.Stack;
  *
  */
 public class World {
-    
+    // World properies
     private String name;
-    private MazePuzzleGame manager;
+    private App manager;
     private boolean updateFlag;
     private boolean worldChangeFlag;
     
@@ -48,7 +48,7 @@ public class World {
     // Items are stationary objects that can be interacted with by 
     private ArrayList<Item> items;
     
-    public World (MazePuzzleGame manager, String name, int width, int height, boolean doorAndKey) {
+    public World (App manager, String name, int width, int height, boolean doorAndKey) {
         this.manager = manager;
         this.name = name;
         this.updateFlag = false;
@@ -58,7 +58,7 @@ public class World {
         this.beings = new HashMap<String, Being>();
         this.items = new ArrayList<Item>();
         this.visibileNodes = new ArrayList<Node>();
-        maxVisDistance = MazePuzzleGame.pref.getValue("visibleRange");
+        maxVisDistance = App.pref.getValue("visibleRange");
         
         this.width = width;
         this.height = height;
@@ -79,7 +79,6 @@ public class World {
         generateCoins();
         
         // If visibility is turned off make all the tiles bright.
-        System.out.println(maxVisDistance);
         if (maxVisDistance == -1) {
             for (ArrayList<Node> an : nodes) {
                 for (Node n : an) {
@@ -90,16 +89,6 @@ public class World {
             calculateVisibility(start);            
         }
         if (doorAndKey) doorAndKeyGenerator();
-    }
-    
-    public void addPlayer(String name) {
-        Being player = new Being(this.start, name);
-        beings.put(name, player);
-    }
-    
-    public void addEnemy(String name) {
-        Being player = new Being(this.finish, name);
-        beings.put(name, player);
     }
     
     public void generateCoins() {
@@ -125,6 +114,22 @@ public class World {
             Coins coins = new Coins(n,coinValue);
             items.add(coins);
         }
+    }
+
+    /**
+     * Run this after any changes in the maze. It checks for anything
+     * that needs to be updated. This includes:
+     * - win conditions
+     * - entity collisions
+     *     - player picks up coins
+     *     - player dies
+     */
+    public void update() {
+        // runs the collision checks for the world
+        collision();
+
+        // Recalculate's the lighting
+        calculateVisibility(beings.get("Moneymaker").getNode());
     }
 
     public int getPlayerCoins(String id) {
@@ -172,21 +177,6 @@ public class World {
     public void setWorldChangeFlag(boolean worldChangeFlag) {
         this.worldChangeFlag = worldChangeFlag;
     }
-
-    /**
-     * Run this after any changes in the maze. It checks for anything
-     * that needs to be updated. This includes:
-     * - win conditions
-     * - entity collisions
-     *     - player picks up coins
-     *     - player dies
-     */
-    public void update() {
-        Node playerNode = beings.get("Moneymaker").getNode();
-        calculateVisibility(playerNode);
-        beingCollision();
-        itemCollision();
-    }
     
     /**
      * Calculate the visibility of each node from a given node.
@@ -226,30 +216,26 @@ public class World {
         }
     }
     
-    private void beingCollision() {
+    private void collision() {
+        // Being collision
         Iterator<String> iter = beings.keySet().iterator();
         while (iter.hasNext()) {
+            // Finish check
             Being b = beings.get(iter.next());
             if (b.getName().equals("Moneymaker") && b.getNode().equals(finish)) {
                 // winner winner chicken dinner
                 sendMessage(new Message(Message.GAME_MSG, new String[]{"pause"}));
                 sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "finish"}));
-                
-                boolean displayMapAfterWin = false;
-                if (displayMapAfterWin) {
-                    for (ArrayList<Node> an : nodes) {
-                        for (Node n : an) {
-                            n.setVisibility(0f);
-                            worldChangeFlag=true;
-                        }
-                    }
-                }
             }
+            
+            // Key Check
             if (b.getNode().equals(key)) {
                 b.setKey(true);
                 sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "key"}));
                 key = null;
             }
+            
+            // Opening door check
             if (b.getNode().equals(doorStart)) {
                 if (b.getKey()) {
                     connectNodes(doorStart, doorFinish);
@@ -259,11 +245,11 @@ public class World {
                 }
             }
         }
-    }
-    private void itemCollision () {
-        Iterator<Item> iter = items.iterator();
-        while (iter.hasNext()) {
-            Entity e = iter.next();
+        
+        // Item collision
+        Iterator<Item> itemItr = items.iterator();
+        while (itemItr.hasNext()) {
+            Entity e = itemItr.next();
             
             for(Map.Entry<String,Being> entry : beings.entrySet()) {
                 Being b = entry.getValue();
@@ -278,25 +264,54 @@ public class World {
         }
     }
     
-    private void sendMessage(Message c) {
-        manager.sendMessage(c);
+    /**
+     * A wrapper to send a message to the App
+     * @param c
+     */
+    private void sendMessage(Message m) {
+        manager.sendMessage(m);
     }
 
+    /**
+     * Get's the name of the world
+     * @return world name
+     */
     public String getName() {
         return this.name;
     }
+    
+    /**
+     * Gets the start node.
+     * @return start node
+     */
     public Node getStartNode() {
         return this.start;
     }
+    
+    /**
+     * Gets the finish node
+     * @return finish node
+     */
     public Node getFinishNode() {
         return this.finish;
     }
+    
+    /**
+     * Gets the width of the maze
+     * @return maze width
+     */
     public int getWidth() {
         return this.width;
     }
+    
+    /**
+     * Gets the height of the maze
+     * @return maze height
+     */
     public int getHeight() {
         return this.height;
     }
+    
     public Node getKeyNode() {
         return key;
     }
@@ -658,5 +673,15 @@ public class World {
 
     public float getNodeVisibility(int x, int y) {
         return getNode(x, y).getVisibility();
+    }
+    
+    public void addPlayer(String name) {
+        Being player = new Being(this.start, name);
+        beings.put(name, player);
+    }
+    
+    public void addEnemy(String name) {
+        Being player = new Being(this.finish, name);
+        beings.put(name, player);
     }
 }

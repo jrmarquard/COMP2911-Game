@@ -42,16 +42,14 @@ public class GUI extends JFrame  {
         EXIT
     }
     
-    Preferences pref;
     Game game;
     Queue<Message> messages;
     AppState appState;
     JPanel windowPanel;
-    MazePuzzleGame manager;
+    App manager;
     
-    public GUI (MazePuzzleGame manager, Preferences pref, Game game) {
+    public GUI (App manager, Game game) {
         this.manager = manager;
-        this.pref = pref;
         this.game = game;
         EventQueue.invokeLater(new Runnable() {
             @Override
@@ -88,7 +86,7 @@ public class GUI extends JFrame  {
         this.add(windowPanel);
         
         // Set more information
-        setTitle(pref.getText("appName"));
+        setTitle(App.pref.getText("appName"));
         pack();
         setLocationRelativeTo(null);
         setVisible(true);
@@ -265,7 +263,7 @@ public class GUI extends JFrame  {
         c.gridx = 3;
         gameSettingsPanel.add(blankColumnRight, c);
 
-        String gameMode = pref.getText("gameMode");
+        String gameMode = App.pref.getText("gameMode");
 
         /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          * Start building the settings list
@@ -275,12 +273,12 @@ public class GUI extends JFrame  {
         int row = 0;
 
         // Door and key generation option       
-        JCheckBox doorAndKey = new JCheckBox("", pref.getBool("doorAndKey"));
+        JCheckBox doorAndKey = new JCheckBox("", App.pref.getBool("doorAndKey"));
         doorAndKey.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
             	sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "click"}));
-                pref.toggleBool("doorAndKey");
+                App.pref.toggleBool("doorAndKey");
             }
         });
         
@@ -293,12 +291,12 @@ public class GUI extends JFrame  {
         gameSettingsPanel.add(doorAndKey, c);
         
         // Enemy generation option
-        JCheckBox enemy = new JCheckBox("", pref.getBool("enemy"));
+        JCheckBox enemy = new JCheckBox("", App.pref.getBool("enemy"));
         enemy.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "click"}));
-                pref.toggleBool("enemy");
+                App.pref.toggleBool("enemy");
             }
         });
 
@@ -313,7 +311,7 @@ public class GUI extends JFrame  {
         // Visibility selection
         String[] visModes = new String[]{"Off", "Low", "Med", "High"};
         JComboBox<String> visSelection = new JComboBox<String>(visModes);
-        int vis = pref.getValue("visibleRange");
+        int vis = App.pref.getValue("visibleRange");
         switch (vis) {
             case 3: visSelection.setSelectedItem("Low");     break;
             case 6: visSelection.setSelectedItem("Med");     break;
@@ -327,10 +325,10 @@ public class GUI extends JFrame  {
                 if (ItemEvent.SELECTED == e.getStateChange()) {
                     sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "click"}));
                     switch ((String)e.getItem()) {
-                        case "Off": pref.setPreference("value.visibleRange=-1");    break;
-                        case "Low": pref.setPreference("value.visibleRange=3");     break;
-                        case "Med": pref.setPreference("value.visibleRange=6");     break;
-                        case "High": pref.setPreference("value.visibleRange=10");   break;
+                        case "Off": App.pref.setPreference("value.visibleRange=-1");    break;
+                        case "Low": App.pref.setPreference("value.visibleRange=3");     break;
+                        case "Med": App.pref.setPreference("value.visibleRange=6");     break;
+                        case "High": App.pref.setPreference("value.visibleRange=10");   break;
                     }
                     refresh();
                 }
@@ -347,7 +345,7 @@ public class GUI extends JFrame  {
         gameSettingsPanel.add(visSelection, c);
         
         JFormattedTextField widthSize = new JFormattedTextField();
-        widthSize.setValue(Integer.toString(pref.getValue("defaultMapWidth")));
+        widthSize.setValue(Integer.toString(App.pref.getValue("defaultMapWidth")));
         widthSize.setColumns(2);
         widthSize.getDocument().addDocumentListener(new PrefUpdate("value", "defaultMapWidth"));
         
@@ -360,7 +358,7 @@ public class GUI extends JFrame  {
         gameSettingsPanel.add(widthSize, c);
 
         JFormattedTextField heightSize = new JFormattedTextField();
-        heightSize.setValue(Integer.toString(pref.getValue("defaultMapHeight")));
+        heightSize.setValue(Integer.toString(App.pref.getValue("defaultMapHeight")));
         heightSize.setColumns(2);
         heightSize.getDocument().addDocumentListener(new PrefUpdate("value", "defaultMapHeight"));
         c.gridx = 1;
@@ -389,7 +387,7 @@ public class GUI extends JFrame  {
             public void itemStateChanged(ItemEvent e) {
                 if (ItemEvent.SELECTED == e.getStateChange()) {
                 	sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "click"}));
-                    pref.setPreference("text.gameMode="+(String)e.getItem());
+                    App.pref.setPreference("text.gameMode="+(String)e.getItem());
                     refresh();
                 }
             }
@@ -495,7 +493,7 @@ public class GUI extends JFrame  {
         resetButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                pref.loadPreferences();
+                App.pref.loadPreferences();
                 setAppState(AppState.SETTINGS);
             }
         });
@@ -522,8 +520,8 @@ public class GUI extends JFrame  {
         };
         windowPanel.add(settingsPanel);
         
-        for (String s : pref.getKeys("colour")) {
-            Color c = pref.getColour(s);
+        for (String s : App.pref.getKeys("colour")) {
+            Color c = App.pref.getColour(s);
             String red = String.format("%02X",c.getRed());
             String green = String.format("%02X",c.getGreen());
             String blue = String.format("%02X",c.getBlue());
@@ -555,13 +553,13 @@ public class GUI extends JFrame  {
         
         JPanel volSliderPanel = new JPanel();
         JLabel volSliderLabel = new JLabel("Master Volume: ");
-        JSlider volSlider = new JSlider(0, 100, pref.getValue("masterVolume"));
+        JSlider volSlider = new JSlider(0, 100, App.pref.getValue("masterVolume"));
         volSlider.addChangeListener(new ChangeListener(){
             @Override
             public void stateChanged(ChangeEvent e) {
                 JSlider source = (JSlider) e.getSource();
                 int newVolume = (int)source.getValue();
-                pref.setPreference("value.masterVolume="+newVolume);
+                App.pref.setPreference("value.masterVolume="+newVolume);
                 sendMessage(new Message(Message.SOUND_MSG, new String[]{"changeVolume"}));
                 
             }
@@ -588,7 +586,7 @@ public class GUI extends JFrame  {
 
         // Title Panel
         titlePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
-        titlePanel.setBackground(pref.getColour("titleDefaultColour"));
+        titlePanel.setBackground(App.pref.getColour("titleDefaultColour"));
 
         ArrayList<Integer> coins = game.getPlayerCoins();
         for (Integer i : coins) {
@@ -610,11 +608,11 @@ public class GUI extends JFrame  {
         
         if (numWorlds >= 1) {
             JPanel innerPanelA = new JPanel(new GridBagLayout());
-            innerPanelA.add(new GameMap(worlds.get(0), pref));
+            innerPanelA.add(new GameMap(worlds.get(0)));
             gamePanelTop.add(innerPanelA);
             if (numWorlds >= 2) {            
                 JPanel innerPanelB = new JPanel(new GridBagLayout());
-                innerPanelB.add(new GameMap(worlds.get(1), pref));
+                innerPanelB.add(new GameMap(worlds.get(1)));
                 gamePanelTop.add(innerPanelB);
                 if (numWorlds >= 3) {    
                     JPanel gamePanelBot = new JPanel();
@@ -622,11 +620,11 @@ public class GUI extends JFrame  {
                     gamePanel.add(gamePanelBot);
                     
                     JPanel innerPanelC = new JPanel(new GridBagLayout());
-                    innerPanelC.add(new GameMap(worlds.get(2), pref));
+                    innerPanelC.add(new GameMap(worlds.get(2)));
                     gamePanelBot.add(innerPanelC);
                     if (numWorlds == 4) {            
                         JPanel innerPanelD = new JPanel(new GridBagLayout());
-                        innerPanelD.add(new GameMap(worlds.get(3), pref));
+                        innerPanelD.add(new GameMap(worlds.get(3)));
                         gamePanelBot.add(innerPanelD);
                     }
                 }
@@ -635,7 +633,7 @@ public class GUI extends JFrame  {
         
         // Menu Panel
         gameMenuPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-        gameMenuPanel.setBackground(pref.getColour("menuColour"));
+        gameMenuPanel.setBackground(App.pref.getColour("menuColour"));
         
         JClickButton closeButton = new JClickButton("Exit to menu");
         closeButton.addActionListener(new ActionListener() {
@@ -692,13 +690,13 @@ public class GUI extends JFrame  {
                     case "value":
                         if (textLength == 1 || textLength == 2)  {
                             value = e.getDocument().getText(0,textLength);
-                            pref.setPreference(spaceName+"."+prefName+"="+value);
+                            App.pref.setPreference(spaceName+"."+prefName+"="+value);
                         }
                         break;
                     case "colour":
                         if (textLength == 6) {
                             value = e.getDocument().getText(0,textLength);
-                            pref.setPreference(spaceName+"."+prefName+"="+value);
+                            App.pref.setPreference(spaceName+"."+prefName+"="+value);
                         }
                         break;
                     default:
@@ -715,12 +713,12 @@ public class GUI extends JFrame  {
         public PlayerOptions(String[] o, String s) {
             super(o);
             this.setting = s;
-            setSelectedItem(pref.getText(s));
+            setSelectedItem(App.pref.getText(s));
             addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(ItemEvent e) {
                     if (ItemEvent.SELECTED == e.getStateChange()) {
-                        pref.setPreference("text."+setting+"="+(String)e.getItem());
+                        App.pref.setPreference("text."+setting+"="+(String)e.getItem());
                         sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "click"}));
                     }
                 }

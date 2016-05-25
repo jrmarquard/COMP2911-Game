@@ -7,20 +7,23 @@ import java.util.concurrent.Executors;
 import javax.sound.sampled.*;
 
 public class SoundEngine {
-	private boolean soundEnabled;
+    // Sounds
 	private Clip menuMusic;
 	private Clip backgroundMusic;
+	
+	// Sound options
 	private float masterVolume;
 	private List<FloatControl> volControls;
-	private Preferences pref;
+    private boolean soundEnabled;
 	private int gameSoundsPlaying;
-	final private int MAX_GAME_SOUNDS = 5;
+	
+	// Permanent options
+	private final int MAX_GAME_SOUNDS = 5;
 	
 	// Thread pool to run sounds in
 	ExecutorService soundPool;
 	
-	public SoundEngine(Preferences pref) {
-	    this.pref = pref;
+	public SoundEngine() {
 		this.soundEnabled = true;
 		this.masterVolume = 0f;
 		this.volControls = new ArrayList<FloatControl>();
@@ -77,7 +80,7 @@ public class SoundEngine {
      */
     private void setMasterVolume() {
         
-        int volume = pref.getValue("masterVolume");
+        int volume = App.pref.getValue("masterVolume");
         
         float minVol = -20.0f;
         float maxVol = 2.0f;
