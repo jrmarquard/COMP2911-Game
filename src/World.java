@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Stack;
+import java.util.concurrent.Semaphore;
 
 /**
  * World contains:
@@ -48,6 +49,9 @@ public class World {
     // Items are stationary objects that can be interacted with by 
     private ArrayList<Item> items;
     
+    //Synchronization
+    private Semaphore visibilitySemaphore;
+    
     public World (MazePuzzleGame manager, String name, int width, int height, boolean doorAndKey) {
         this.manager = manager;
         this.name = name;
@@ -77,6 +81,9 @@ public class World {
         // Maze generator connects nodes together and sets start/finish.
         mazeGenerator();
         generateCoins();
+        
+        //Synchronization
+        this.visibilitySemaphore = new Semaphore(1, true);
         
         // If visibility is turned off make all the tiles bright.
         System.out.println(maxVisDistance);
@@ -198,6 +205,11 @@ public class World {
         // if visibility is turned off don't calculate
         if (maxVisDistance == -1) return;
         
+        try {
+			this.visibilitySemaphore.acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
         // Resets the that were visibile to be dark
         for (Node n : visibileNodes) {
             n.setVisibility(0);
@@ -224,6 +236,7 @@ public class World {
             }
             
         }
+        this.visibilitySemaphore.release();
     }
     
     private void beingCollision() {

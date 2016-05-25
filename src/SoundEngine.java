@@ -51,6 +51,13 @@ public class SoundEngine {
             info = new DataLine.Info(Clip.class, format);
             this.backgroundMusic = (Clip) AudioSystem.getLine(info);
             backgroundMusic.open(stream);
+            
+            FloatControl menuVolumeControl = (FloatControl) menuMusic.getControl(FloatControl.Type.MASTER_GAIN);
+            volControls.add(menuVolumeControl);
+            FloatControl bgBolumeControl = (FloatControl) backgroundMusic.getControl(FloatControl.Type.MASTER_GAIN);
+            volControls.add(bgBolumeControl);
+        
+            setMasterVolume();
 		} 
 		catch (Exception e){
 			this.soundEnabled = false;
@@ -58,12 +65,7 @@ public class SoundEngine {
 		}
 		
 
-        FloatControl menuVolumeControl = (FloatControl) menuMusic.getControl(FloatControl.Type.MASTER_GAIN);
-        volControls.add(menuVolumeControl);
-        FloatControl bgBolumeControl = (FloatControl) backgroundMusic.getControl(FloatControl.Type.MASTER_GAIN);
-        volControls.add(bgBolumeControl);
         
-        setMasterVolume();
 	}
 
     public void inbox(String[] message) {
@@ -82,32 +84,34 @@ public class SoundEngine {
      * @param volume A number between 0 and 100. Where 0 is mute and 100 max volume.
      */
     private void setMasterVolume() {
-        
-        int volume = pref.getValue("masterVolume");
-        
-        float minVol = -20.0f;
-        float maxVol = 2.0f;
-        float volUnit = (maxVol-minVol)/100f;
-        
-        masterVolume = minVol + volUnit*(float)volume;
-        if (volume == 0) masterVolume = -64f;
-        
-        for (FloatControl f : volControls) {
-            f.setValue(masterVolume);
+        if (this.soundEnabled) {
+	        int volume = pref.getValue("masterVolume");
+	        
+	        float minVol = -20.0f;
+	        float maxVol = 2.0f;
+	        float volUnit = (maxVol-minVol)/100f;
+	        
+	        masterVolume = minVol + volUnit*(float)volume;
+	        if (volume == 0) masterVolume = -64f;
+	        
+	        for (FloatControl f : volControls) {
+	            f.setValue(masterVolume);
+	        }
         }
     }
 	
 	private void playSound(String soundName) {
-		try {
-			this.soundsPlayingSemaphore.acquire();
-		} catch (InterruptedException e1) {
-			return;
-		}
-	    if (gameSoundsPlaying >= MAX_GAME_SOUNDS) {
-	    	this.soundsPlayingSemaphore.release();
-	    	return; 
-	    }
 		if (this.soundEnabled) {
+			try {
+				this.soundsPlayingSemaphore.acquire();
+			} catch (InterruptedException e1) {
+				return;
+			}
+		    if (gameSoundsPlaying >= MAX_GAME_SOUNDS) {
+		    	this.soundsPlayingSemaphore.release();
+		    	return; 
+		    }
+		
 			try {
 				gameSoundsPlaying++;
 				this.soundsPlayingSemaphore.release();
@@ -147,19 +151,17 @@ public class SoundEngine {
 		        // Sleep the thread allowing the sound to finish playing, and then close resources.
 		        // Should make this based on the length of the sound clip to ensure everything
 		        // has enough time to finish playing.
+		        this.soundsPlayingSemaphore.acquire();
+                gameSoundsPlaying--;
+                this.soundsPlayingSemaphore.release();
                 Thread.sleep(1000);
                 audioOutputLine.close();
                 audioInputStream.close();
-                this.soundsPlayingSemaphore.acquire();
-                gameSoundsPlaying--;
-                this.soundsPlayingSemaphore.release();
 			}
 			catch (Exception e){
 			    e.printStackTrace();
 			}
-		} else {
-			this.soundsPlayingSemaphore.release();
-		}
+		} 
 	}
 	
 	private void startMenuMusic() {
