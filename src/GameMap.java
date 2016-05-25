@@ -128,6 +128,19 @@ public class GameMap extends JPanel {
         );
         g2d.fill(circle);
         
+        // Draw on Enemy
+        if(pref.getBool("enemy")) {
+        	n = world.getEnemyNode();
+            g2d.setColor(pref.getColour("enemyColour"));
+            Ellipse2D.Double circleE = new Ellipse2D.Double(
+                    wallWidth+(n.getX()*(wallWidth+tileSize))+tileSize/4, 
+                    wallWidth+(n.getY()*(wallWidth+tileSize))+tileSize/4, 
+                    tileSize/2, 
+                    tileSize/2
+            );
+            g2d.fill(circleE);
+        }
+        
         // Draw on coins
         ArrayList<Node> nodes = world.getEntityNodes();
         g2d.setColor(pref.getColour("coinColour"));

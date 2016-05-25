@@ -280,6 +280,14 @@ public class GUI extends JFrame  {
             }
         });
         
+        JCheckBox enemy = new JCheckBox("", pref.getBool("enemy"));
+        enemy.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                pref.toggleBool("enemy");
+            }
+        });
+        
         c.gridx = 1;
         c.gridy = 0;
         c.anchor = GridBagConstraints.WEST;
@@ -287,6 +295,14 @@ public class GUI extends JFrame  {
         c.gridx = 2;
         c.anchor = GridBagConstraints.EAST;
         settingsPanel.add(doorAndKey, c);
+
+        c.gridx = 1;
+        c.gridy = 1;
+        c.anchor = GridBagConstraints.WEST;
+        settingsPanel.add(new JLabel("Enemy in maze?"), c);
+        c.gridx = 2;
+        c.anchor = GridBagConstraints.EAST;
+        settingsPanel.add(enemy, c);
         
         JFormattedTextField widthSize = new JFormattedTextField();
         widthSize.setValue(Integer.toString(pref.getValue("defaultMapWidth")));
@@ -294,7 +310,7 @@ public class GUI extends JFrame  {
         widthSize.getDocument().addDocumentListener(new PrefUpdate("value", "defaultMapWidth"));
         
         c.gridx = 1;
-        c.gridy = 1;
+        c.gridy = 2;
         c.anchor = GridBagConstraints.WEST;
         settingsPanel.add(new JLabel("Width"), c);
         c.gridx = 2;
@@ -306,7 +322,7 @@ public class GUI extends JFrame  {
         heightSize.setColumns(2);
         heightSize.getDocument().addDocumentListener(new PrefUpdate("value", "defaultMapHeight"));
         c.gridx = 1;
-        c.gridy = 2;
+        c.gridy = 3;
         c.anchor = GridBagConstraints.WEST;
         settingsPanel.add(new JLabel("Height"), c);
         c.gridx = 2;
@@ -315,7 +331,7 @@ public class GUI extends JFrame  {
                 
         // Gamemode selection 
         c.gridx = 1;
-        c.gridy = 3;
+        c.gridy = 4;
         c.anchor = GridBagConstraints.WEST;
         JLabel gameModeText = new JLabel();
         gameModeText.setText("Gamemode: ");
@@ -342,7 +358,7 @@ public class GUI extends JFrame  {
         
         if (gameMode.equals("Solve")) {
             c.gridx = 1;
-            c.gridy = 4;
+            c.gridy = 5;
             c.anchor = GridBagConstraints.WEST;
             settingsPanel.add(new JLabel("Player 1: "), c);
             c.gridx = 2;
@@ -351,7 +367,7 @@ public class GUI extends JFrame  {
         } else if (gameMode.equals("Race")) {
             for (int x = 1; x <= 4; x++) {
                 c.gridx = 1;
-                c.gridy = x+3;
+                c.gridy = x+4;
                 c.anchor = GridBagConstraints.WEST;
                 settingsPanel.add(new JLabel("Player "+x+": "), c);
                 c.gridx = 2;
@@ -360,7 +376,7 @@ public class GUI extends JFrame  {
             }
         }
         
-        c.gridy = 8;
+        c.gridy = 9;
         c.gridx = 1;
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.CENTER;

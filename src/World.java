@@ -82,7 +82,12 @@ public class World {
     }
     
     public void addPlayer(String name) {
-        Being player = new Being(getStartNode(), name);
+        Being player = new Being(this.start, name);
+        beings.put(name, player);
+    }
+    
+    public void addEnemy(String name) {
+        Being player = new Being(this.finish, name);
         beings.put(name, player);
     }
     
@@ -141,7 +146,6 @@ public class World {
                 updateFlag = true;
             }
             if (updateFlag) {
-                // manager.submitCommand(new Command(Com.DRAW));
                 sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "step"}));
                 updateFlag = false;
                 worldChangeFlag = true;
@@ -167,12 +171,10 @@ public class World {
      *     - player dies
      */
     public void update() {
-        
-        // Check if there are any winnders
-        beingCollision();
-        itemCollision();
         Node playerNode = beings.get("Moneymaker").getNode();
         calculateVisibility(playerNode);
+        beingCollision();
+        itemCollision();
     }
     
     /**
@@ -188,8 +190,6 @@ public class World {
         visibileNodes.clear();
         
         float visRes = 100.0f/(float)maxVisDistance;
-        
-        System.out.println("updating");
         
         Queue<Node> nodesToCheck = new LinkedList<Node>();
         nodesToCheck.add(startNode);
@@ -215,10 +215,20 @@ public class World {
         Iterator<String> iter = beings.keySet().iterator();
         while (iter.hasNext()) {
             Being b = beings.get(iter.next());
-            if (b.getNode().equals(finish)) {
+            if (b.getName().equals("Moneymaker") && b.getNode().equals(finish)) {
                 // winner winner chicken dinner
                 sendMessage(new Message(Message.GAME_MSG, new String[]{"pause"}));
                 sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "finish"}));
+                
+                boolean displayMapAfterWin = false;
+                if (displayMapAfterWin) {
+                    for (ArrayList<Node> an : nodes) {
+                        for (Node n : an) {
+                            n.setVisibility(0f);
+                            worldChangeFlag=true;
+                        }
+                    }
+                }
             }
             if (b.getNode().equals(key)) {
                 b.setKey(true);
@@ -256,15 +266,6 @@ public class World {
     private void sendMessage(Message c) {
         manager.sendMessage(c);
     }
-    
-    /**
-     * Return the coordinates of the player
-     * 
-     * @return x coordinate of the player
-     */
-    public Node getPlayerCoordinate () {
-        return beings.get("Moneymaker").getNode();
-    }
 
     public String getName() {
         return this.name;
@@ -290,6 +291,10 @@ public class World {
     }
     public Node getPlayerNode() {
         return beings.get("Moneymaker").getNode();
+    }
+    
+    public Node getEnemyNode() {
+        return beings.get("Enemy").getNode();
     }
     
     /**
@@ -329,28 +334,6 @@ public class World {
             return false;
         }
     }      
-    
-    public void makePath(int xA, int yA, int xB, int yB) {
-        if (xA == xB || yA == yB) {
-            if ((xA + 1) == xB) {
-                this.getNode(xA, yA).setRight(this.getNode(xB, yB));
-                this.getNode(xB, yB).setLeft(this.getNode(xA, yA));
-            } else if ((xB + 1) == xA) {
-                this.getNode(xA, yA).setLeft(this.getNode(xB, yB));
-                this.getNode(xB, yB).setRight(this.getNode(xA, yA));
-            } else if ((yA + 1) == yB) {
-                this.getNode(xA, yA).setDown(this.getNode(xB, yB));
-                this.getNode(xB, yB).setUp(this.getNode(xA, yA));
-            } else if ((yB + 1) == yA) {
-                this.getNode(xA, yA).setUp(this.getNode(xB, yB));
-                this.getNode(xB, yB).setDown(this.getNode(xA, yA));
-            } else {
-                //Illegal
-            }
-        } else {
-            //Illegal
-        }
-    }
     
     /**
      * Generates a maze
