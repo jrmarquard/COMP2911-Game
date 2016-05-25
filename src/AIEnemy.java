@@ -48,6 +48,7 @@ public class AIEnemy implements AI {
         } else {
         	boolean playerReached = false;
         	boolean goRandom = false;
+        	boolean playerAtDeadEnd = isAtDeadEnd(player);
         	
         	if(currX == playerX) {
         		// Player is below
@@ -62,7 +63,7 @@ public class AIEnemy implements AI {
             			currY++;
             		}
         			
-        			if(playerReached) {
+        			if(playerReached && !playerAtDeadEnd) {
         				// Returns towards the opposite direction
             			while(this.world.getNode(currX, currY).getUp() != null) {
                 			this.explore.add(this.world.getNode(currX, currY).getUp());
@@ -86,7 +87,7 @@ public class AIEnemy implements AI {
             			currY--;
             		}
         			
-        			if(playerReached) {
+        			if(playerReached && !playerAtDeadEnd) {
         				// Returns towards the opposite direction
             			while(this.world.getNode(currX, currY).getDown() != null) {
                 			this.explore.add(this.world.getNode(currX, currY).getDown());
@@ -110,7 +111,7 @@ public class AIEnemy implements AI {
             			currX++;
             		}
         			
-        			if(playerReached) {
+        			if(playerReached && !playerAtDeadEnd) {
         				// Returns towards the opposite direction
             			while(this.world.getNode(currX, currY).getLeft() != null) {
                 			this.explore.add(this.world.getNode(currX, currY).getLeft());
@@ -134,7 +135,7 @@ public class AIEnemy implements AI {
             			currX--;
             		}
         			
-        			if(playerReached) {
+        			if(playerReached && !playerAtDeadEnd) {
         				// Returns towards the opposite direction
             			while(this.world.getNode(currX, currY).getRight() != null) {
                 			this.explore.add(this.world.getNode(currX, currY).getRight());
@@ -150,6 +151,14 @@ public class AIEnemy implements AI {
         	}
         	
         	if(goRandom) {
+        		if(playerAtDeadEnd) {
+        			player.addVisitCost(3);
+        			
+        			for(Node node: player.getConnectedNodes()) {
+        				node.addVisitCost(3);
+        			}
+        		}
+        		
         		ArrayList<Node> reachable = current.getConnectedNodes();
                 current.addVisitCost(1);
                 this.visited.add(current);
@@ -159,7 +168,7 @@ public class AIEnemy implements AI {
                 boolean allVisited = isReachableInVisited(reachable);
                 
                 for(Node node: reachable) {
-                	if(allVisited) {
+                	if(allVisited || playerAtDeadEnd) {
                 		if(first) {
                 			next = node;
                 			first = false;
@@ -195,6 +204,35 @@ public class AIEnemy implements AI {
         }
 
         return new Message(Message.GAME_MSG, message);
+	}
+	
+	private boolean isAtDeadEnd(Node node) {
+		boolean deadEnd = false;
+    	int x = node.getX();
+    	int y = node.getY();
+    	int count = 0;
+    	
+    	if(this.world.getNode(x, y).getUp() == null) {
+    		count++;
+    	}
+    	
+    	if(this.world.getNode(x, y).getDown() == null) {
+    		count++;
+    	}
+    	
+    	if(this.world.getNode(x, y).getLeft() == null) {
+    		count++;
+    	}
+    	
+    	if(this.world.getNode(x, y).getRight() == null) {
+    		count++;
+    	}
+    	
+    	if(count == 3) {
+    		deadEnd = true;
+    	}
+    	
+    	return deadEnd;
 	}
     
     private boolean isReachableInVisited(ArrayList<Node> reachable) {
