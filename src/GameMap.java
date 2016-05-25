@@ -116,7 +116,7 @@ public class GameMap extends JPanel {
         g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
 
         // Draw on character
-        n = world.getPlayerNode();
+        n = world.getBeingNode("Moneymaker");
         g2d.setColor(App.pref.getColour("playerColour"));
         Ellipse2D.Double circle = new Ellipse2D.Double(
                 wallWidth+(n.getX()*(wallWidth+tileSize))+tileSize/4, 
@@ -128,7 +128,7 @@ public class GameMap extends JPanel {
         
         // Draw on Enemy
         if(App.pref.getBool("enemy")) {
-        	n = world.getEnemyNode();
+        	n = world.getBeingNode("Enemy");
             g2d.setColor(App.pref.getColour("enemyColour"));
             Ellipse2D.Double circleE = new Ellipse2D.Double(
                     wallWidth+(n.getX()*(wallWidth+tileSize))+tileSize/4, 

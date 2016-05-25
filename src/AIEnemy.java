@@ -23,8 +23,8 @@ public class AIEnemy implements AI {
         message[1] = worldName;
         message[2] = id;
         
-        Node current = this.world.getBeingCoordinate(this.id);
-        Node player = this.world.getPlayerNode();
+        Node current = this.world.getBeingNode(this.id);
+        Node player = this.world.getBeingNode("Moneymaker");
         int currX = current.getX();
         int currY = current.getY();
         int playerX = player.getX();

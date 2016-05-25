@@ -68,7 +68,7 @@ public class AIPlayer implements AI {
         message[1] = worldName;
         message[2] = id;
         
-        Node current = this.world.getBeingCoordinate(this.id);
+        Node current = this.world.getBeingNode(this.id);
         this.visited.add(current);
         int currX = current.getX();
         int currY = current.getY();
@@ -174,7 +174,7 @@ public class AIPlayer implements AI {
         message[1] = worldName;
         message[2] = id;
         
-        Node current = this.world.getBeingCoordinate(this.id);
+        Node current = this.world.getBeingNode(this.id);
         int currX = current.getX();
         int currY = current.getY();
         LinkedList<Node> reachable = this.getReachable(current);

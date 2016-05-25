@@ -263,14 +263,37 @@ public class GUI extends JFrame  {
         c.gridx = 3;
         gameSettingsPanel.add(blankColumnRight, c);
 
-        String gameMode = App.pref.getText("gameMode");
-
         /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          * Start building the settings list
          * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          */
         c.weightx = 1;
         int row = 0;
+        
+        // Game mode selection 
+        c.gridx = 1;
+        c.gridy = row++;
+        c.anchor = GridBagConstraints.WEST;
+        JLabel gameModeText = new JLabel();
+        gameModeText.setText("Gamemode: ");
+        gameSettingsPanel.add(gameModeText, c);
+
+        c.gridx = 2;
+        c.anchor = GridBagConstraints.EAST;
+        String[] gameModes = new String[]{"Infinite Mazes", "Race"};
+        JComboBox<String> gameModeSelection = new JComboBox<String>(gameModes);
+        gameModeSelection.setSelectedItem(App.pref.getText("gameMode"));
+        gameModeSelection.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (ItemEvent.SELECTED == e.getStateChange()) {
+                    sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "click"}));
+                    App.pref.setPreference("text.gameMode="+(String)e.getItem());
+                    refresh();
+                }
+            }
+        });
+        gameSettingsPanel.add(gameModeSelection, c);
 
         // Door and key generation option       
         JCheckBox doorAndKey = new JCheckBox("", App.pref.getBool("doorAndKey"));
@@ -368,31 +391,6 @@ public class GUI extends JFrame  {
         c.gridx = 2;
         c.anchor = GridBagConstraints.EAST;
         gameSettingsPanel.add(heightSize, c);
-                
-        // Gamemode selection 
-        c.gridx = 1;
-        c.gridy = row++;
-        c.anchor = GridBagConstraints.WEST;
-        JLabel gameModeText = new JLabel();
-        gameModeText.setText("Gamemode: ");
-        gameSettingsPanel.add(gameModeText, c);
-
-        c.gridx = 2;
-        c.anchor = GridBagConstraints.EAST;
-        String[] gameModes = new String[]{"Solve", "Race"};
-        JComboBox<String> gameModeSelection = new JComboBox<String>(gameModes);
-        gameModeSelection.setSelectedItem(gameMode);
-        gameModeSelection.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (ItemEvent.SELECTED == e.getStateChange()) {
-                	sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "click"}));
-                    App.pref.setPreference("text.gameMode="+(String)e.getItem());
-                    refresh();
-                }
-            }
-        });
-        gameSettingsPanel.add(gameModeSelection, c);
 
         String[] playerOptions = new String[]{"Human", "Easy AI", "Med AI", "Hard AI", "Off"};
 
