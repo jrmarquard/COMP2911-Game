@@ -198,11 +198,10 @@ public class AISolve implements AI {
         		}
         	} else if(!visited.contains(node)) {
         		next = node;
+        		this.visited.add(next);
         	}
         }
         
-        next.addVisitCost(1);
-        this.visited.add(next);
         int nextX = next.getX();
     	int nextY = next.getY();
     	

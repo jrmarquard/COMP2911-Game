@@ -267,7 +267,7 @@ public class World {
             
             for(Map.Entry<String,Being> entry : beings.entrySet()) {
                 Being b = entry.getValue();
-                if (b.getNode().equals(e.getNode())) {
+                if (!b.getName().equals("Enemy") && b.getNode().equals(e.getNode())) {
                     if (e instanceof Coins) {
                         b.addCoins(((Coins)e).getValue());
                         iter.remove();
