@@ -176,6 +176,7 @@ public class World {
                     System.out.println("Killed");
                     sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "death"}));
                     b.setDead(true);
+                    worldChangeFlag = true;
                 }
             }
         }
@@ -287,6 +288,7 @@ public class World {
                 // winner winner chicken dinner
                 sendMessageToApp(new Message(Message.GAME_MSG, new String[]{"pause"}));
                 sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "finish"}));
+                worldChangeFlag = true;
             }
             
             // Key check
@@ -294,6 +296,7 @@ public class World {
                 b.setKey(true);
                 sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "key"}));
                 key = null;
+                worldChangeFlag = true;
             }
             
             // Opening door check
@@ -303,6 +306,7 @@ public class World {
                     sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "door"}));
                     doorStart = null;
                     doorFinish = null;
+                    worldChangeFlag = true;
                 }
             }
             
@@ -314,7 +318,7 @@ public class World {
                 if (b.getNode().equals(enemyNode)) {
                     b.setDead(true);
                     sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "death"}));
-                    
+                    worldChangeFlag = true;
                 }
             }
         }
@@ -331,6 +335,7 @@ public class World {
                         b.addCoins(((Coins)e).getValue());
                         itemItr.remove();
                         sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "coin"}));
+                        worldChangeFlag = true;
                     }
                 }
             }
