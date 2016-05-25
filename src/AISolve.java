@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -177,7 +178,7 @@ public class AISolve implements AI {
         Node current = this.world.getBeingCoordinate(this.id);
         int currX = current.getX();
         int currY = current.getY();
-        LinkedList<Node> reachable = this.getReachable(current);
+        ArrayList<Node> reachable = current.getConnectedNodes();
         current.addVisitCost(1);
         this.visited.add(current);
         
@@ -249,31 +250,7 @@ public class AISolve implements AI {
     	return deadEnd;
     }
     
-    private LinkedList<Node> getReachable(Node node) {
-    	LinkedList<Node> reachable = new LinkedList<Node>();
-    	int x = node.getX();
-    	int y = node.getY();
-    	
-    	if(this.world.getNode(x, y).getUp() != null) {
-    		reachable.add(this.world.getNode(x, y).getUp());
-    	}
-    	
-    	if(this.world.getNode(x, y).getDown() != null) {
-    		reachable.add(this.world.getNode(x, y).getDown());
-    	}
-    	
-    	if(this.world.getNode(x, y).getLeft() != null) {
-    		reachable.add(this.world.getNode(x, y).getLeft());
-    	}
-    	
-    	if(this.world.getNode(x, y).getRight() != null) {
-    		reachable.add(this.world.getNode(x, y).getRight());
-    	}
-    	
-    	return reachable;
-    }
-    
-    private boolean isReachableInVisited(LinkedList<Node> reachable) {
+    private boolean isReachableInVisited(ArrayList<Node> reachable) {
     	boolean isAllIn = true;
     	
     	for(Node node: reachable) {

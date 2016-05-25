@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class AIEnemy implements AI {
@@ -45,68 +46,111 @@ public class AIEnemy implements AI {
         		message[3] = "down";
         	} 
         } else {
+        	boolean playerReached = false;
+        	boolean goRandom = false;
+        	
         	if(currX == playerX) {
         		// Player is below
         		if(currY < playerY) {
         			// Tries to get to where player is
         			while(this.world.getNode(currX, currY).getDown() != null) {
+        				if(this.world.getNode(currX, currY).getDown().equals(player)) {
+        					playerReached = true;
+        				}
+        				
             			this.explore.add(this.world.getNode(currX, currY).getDown());
             			currY++;
             		}
         			
-        			// Returns towards the opposite direction
-        			while(this.world.getNode(currX, currY).getUp() != null) {
-            			this.explore.add(this.world.getNode(currX, currY).getUp());
-            			currY--;
-            		}
+        			if(playerReached) {
+        				// Returns towards the opposite direction
+            			while(this.world.getNode(currX, currY).getUp() != null) {
+                			this.explore.add(this.world.getNode(currX, currY).getUp());
+                			currY--;
+                		}
+        			} else {
+        				this.explore.clear();
+        				goRandom = true;
+        			}
         		}
         		
         		// Player is above
         		else {
         			// Tries to get to where player is
         			while(this.world.getNode(currX, currY).getUp() != null) {
+        				if(this.world.getNode(currX, currY).getUp().equals(player)) {
+        					playerReached = true;
+        				}
+        				
             			this.explore.add(this.world.getNode(currX, currY).getUp());
             			currY--;
             		}
         			
-        			// Returns towards the opposite direction
-        			while(this.world.getNode(currX, currY).getDown() != null) {
-            			this.explore.add(this.world.getNode(currX, currY).getDown());
-            			currY++;
-            		}
+        			if(playerReached) {
+        				// Returns towards the opposite direction
+            			while(this.world.getNode(currX, currY).getDown() != null) {
+                			this.explore.add(this.world.getNode(currX, currY).getDown());
+                			currY++;
+                		}
+        			} else {
+        				this.explore.clear();
+        				goRandom = true;
+        			}
         		}
         	} else if(currY == playerY) {
         		// Player is on the right
         		if(currX < playerX) {
         			// Tries to get to where player is
         			while(this.world.getNode(currX, currY).getRight() != null) {
+        				if(this.world.getNode(currX, currY).getRight().equals(player)) {
+        					playerReached = true;
+        				}
+        				
             			this.explore.add(this.world.getNode(currX, currY).getRight());
             			currX++;
             		}
         			
-        			// Returns towards the opposite direction
-        			while(this.world.getNode(currX, currY).getLeft() != null) {
-            			this.explore.add(this.world.getNode(currX, currY).getLeft());
-            			currX--;
-            		}
+        			if(playerReached) {
+        				// Returns towards the opposite direction
+            			while(this.world.getNode(currX, currY).getLeft() != null) {
+                			this.explore.add(this.world.getNode(currX, currY).getLeft());
+                			currX--;
+                		}
+        			} else {
+        				this.explore.clear();
+        				goRandom = true;
+        			}
         		}
         		
         		// Player is on the left
         		else {
         			// Tries to get to where player is
         			while(this.world.getNode(currX, currY).getLeft() != null) {
+        				if(this.world.getNode(currX, currY).getLeft().equals(player)) {
+        					playerReached = true;
+        				}
+        				
             			this.explore.add(this.world.getNode(currX, currY).getLeft());
             			currX--;
             		}
         			
-        			// Returns towards the opposite direction
-        			while(this.world.getNode(currX, currY).getRight() != null) {
-            			this.explore.add(this.world.getNode(currX, currY).getRight());
-            			currX++;
-            		}
+        			if(playerReached) {
+        				// Returns towards the opposite direction
+            			while(this.world.getNode(currX, currY).getRight() != null) {
+                			this.explore.add(this.world.getNode(currX, currY).getRight());
+                			currX++;
+                		}
+        			} else {
+        				this.explore.clear();
+        				goRandom = true;
+        			}
         		}
         	} else {
-        		LinkedList<Node> reachable = this.getReachable(current);
+        		goRandom = true;
+        	}
+        	
+        	if(goRandom) {
+        		ArrayList<Node> reachable = current.getConnectedNodes();
                 current.addVisitCost(1);
                 this.visited.add(current);
                 
@@ -131,6 +175,8 @@ public class AIEnemy implements AI {
                 
                 next.addVisitCost(1);
                 this.visited.add(next);
+                currX = current.getX();
+                currY = current.getY();
                 int nextX = next.getX();
             	int nextY = next.getY();
             	
@@ -150,32 +196,8 @@ public class AIEnemy implements AI {
 
         return new Message(Message.GAME_MSG, message);
 	}
-	
-	private LinkedList<Node> getReachable(Node node) {
-    	LinkedList<Node> reachable = new LinkedList<Node>();
-    	int x = node.getX();
-    	int y = node.getY();
-    	
-    	if(this.world.getNode(x, y).getUp() != null) {
-    		reachable.add(this.world.getNode(x, y).getUp());
-    	}
-    	
-    	if(this.world.getNode(x, y).getDown() != null) {
-    		reachable.add(this.world.getNode(x, y).getDown());
-    	}
-    	
-    	if(this.world.getNode(x, y).getLeft() != null) {
-    		reachable.add(this.world.getNode(x, y).getLeft());
-    	}
-    	
-    	if(this.world.getNode(x, y).getRight() != null) {
-    		reachable.add(this.world.getNode(x, y).getRight());
-    	}
-    	
-    	return reachable;
-    }
     
-    private boolean isReachableInVisited(LinkedList<Node> reachable) {
+    private boolean isReachableInVisited(ArrayList<Node> reachable) {
     	boolean isAllIn = true;
     	
     	for(Node node: reachable) {
