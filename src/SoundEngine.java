@@ -15,7 +15,7 @@ public class SoundEngine {
 	private List<FloatControl> volControls;
 	private Preferences pref;
 	private int gameSoundsPlaying;
-	final private int MAX_GAME_SOUNDS = 5;
+	final private int MAX_GAME_SOUNDS = 50;
 	
 	//Locking System
 	private Semaphore soundsPlayingSemaphore;

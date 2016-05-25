@@ -51,6 +51,8 @@ public class World {
     
     //Synchronization
     private Semaphore visibilitySemaphore;
+    private Semaphore itemSemaphore;
+    private Semaphore beingSemaphore;
     
     public World (MazePuzzleGame manager, String name, int width, int height, boolean doorAndKey) {
         this.manager = manager;
@@ -84,9 +86,10 @@ public class World {
         
         //Synchronization
         this.visibilitySemaphore = new Semaphore(1, true);
+        this.itemSemaphore = new Semaphore(1, true);
+        this.beingSemaphore = new Semaphore(1, true);
         
         // If visibility is turned off make all the tiles bright.
-        System.out.println(maxVisDistance);
         if (maxVisDistance == -1) {
             for (ArrayList<Node> an : nodes) {
                 for (Node n : an) {
@@ -240,6 +243,11 @@ public class World {
     }
     
     private void beingCollision() {
+    	try {
+			this.beingSemaphore.acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
         Iterator<String> iter = beings.keySet().iterator();
         while (iter.hasNext()) {
             Being b = beings.get(iter.next());
@@ -272,8 +280,14 @@ public class World {
                 }
             }
         }
+        beingSemaphore.release();
     }
     private void itemCollision () {
+    	try {
+			this.itemSemaphore.acquire();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
         Iterator<Item> iter = items.iterator();
         while (iter.hasNext()) {
             Entity e = iter.next();
@@ -289,6 +303,7 @@ public class World {
                 }
             }
         }
+        this.itemSemaphore.release();
     }
     
     private void sendMessage(Message c) {
