@@ -42,8 +42,8 @@ public class AIPlayer implements AI {
      */
     private Message easyMove() {
         String[] message = new String[4];
-        message[0] = "move";
-        message[1] = worldName;
+        message[0] = worldName;
+        message[1] = "move";
         message[2] = id;
         
         int randValue = (new Random()).nextInt(4);
@@ -63,9 +63,9 @@ public class AIPlayer implements AI {
      * @return
      */
     private Message medMove() {
-    	String[] message = new String[4];
-        message[0] = "move";
-        message[1] = worldName;
+        String[] message = new String[4];
+        message[0] = worldName;
+        message[1] = "move";
         message[2] = id;
         
         Node current = this.world.getBeingNode(this.id);
@@ -169,9 +169,9 @@ public class AIPlayer implements AI {
      * @return
      */
     private Message hardMove() {
-    	String[] message = new String[4];
-        message[0] = "move";
-        message[1] = worldName;
+        String[] message = new String[4];
+        message[0] = worldName;
+        message[1] = "move";
         message[2] = id;
         
         Node current = this.world.getBeingNode(this.id);

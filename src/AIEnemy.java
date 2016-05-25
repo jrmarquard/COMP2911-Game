@@ -19,8 +19,8 @@ public class AIEnemy implements AI {
 	@Override
 	public Message makeMove() {
 		String[] message = new String[4];
-        message[0] = "move";
-        message[1] = worldName;
+        message[0] = worldName;
+        message[1] = "move";
         message[2] = id;
         
         Node current = this.world.getBeingNode(this.id);

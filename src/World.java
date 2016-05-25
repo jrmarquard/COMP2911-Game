@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class World {
     // World properies
     private String name;
-    private App manager;
+    private App app;
     private boolean updateFlag;
     private boolean worldChangeFlag;
     
@@ -48,7 +48,7 @@ public class World {
     private ArrayList<Item> items;
     
     public World (App manager, String name, int width, int height, boolean doorAndKey) {
-        this.manager = manager;
+        this.app = manager;
         this.name = name;
         this.updateFlag = false;
         this.worldChangeFlag = false;
@@ -142,8 +142,46 @@ public class World {
         }
         return coords;
     }
+
+    /**
+     * Method allowing external objects to update the game state.
+     * @param string The message send to the world.
+     */
+    synchronized public void sendMessage(String[] message) {
+        switch (message[1]) {
+            case "move": beingMove(message[2], message[3]); break;
+            case "attack": beingAttack(message[2]); break;
+        
+        }
+    }
     
-    synchronized public void moveBeing(String id, String dir) {
+    private void beingAttack(String beingName) {
+        Being being = beings.get(beingName);
+        if (being.isDead()) return;
+        
+        System.out.println("ATTACK!");
+        
+        Node beingNode = being.getNode();
+
+        Iterator<String> iterBeing = beings.keySet().iterator();
+        while (iterBeing.hasNext()) {
+            Being b = beings.get(iterBeing.next());
+            Node n = b.getNode();
+            
+            // If the being is dead can't kill it twice
+            if (b.isDead()) continue;
+            
+            for (Node m : n.getConnectedNodes()) {
+                if (beingNode.equals(m)) {
+                    System.out.println("Killed");
+                    sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "death"}));
+                    b.setDead(true);
+                }
+            }
+        }
+    }
+    
+    synchronized private void beingMove(String id, String dir) {
         Being b = beings.get(id);
         if (b.isDead()) return;
         
@@ -163,7 +201,7 @@ public class World {
                 updateFlag = true;
             }
             if (updateFlag) {
-                sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "step"}));
+                sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "step"}));
                 updateFlag = false;
                 worldChangeFlag = true;
             }
@@ -247,14 +285,14 @@ public class World {
             // Finish check
             if (b.getName().equals("Moneymaker") && b.getNode().equals(finish)) {
                 // winner winner chicken dinner
-                sendMessage(new Message(Message.GAME_MSG, new String[]{"pause"}));
-                sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "finish"}));
+                sendMessageToApp(new Message(Message.GAME_MSG, new String[]{"pause"}));
+                sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "finish"}));
             }
             
             // Key check
             if (b.getNode().equals(key)) {
                 b.setKey(true);
-                sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "key"}));
+                sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "key"}));
                 key = null;
             }
             
@@ -262,7 +300,7 @@ public class World {
             if (b.getNode().equals(doorStart)) {
                 if (b.getKey()) {
                     connectNodes(doorStart, doorFinish);
-                    sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "door"}));
+                    sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "door"}));
                     doorStart = null;
                     doorFinish = null;
                 }
@@ -270,10 +308,12 @@ public class World {
             
             // Being attack check
             if (b.getName().equals("Moneymaker")) {
-                Node enemyNode = getBeingNode("Enemy");
+                Being enemyBeing = beings.get("Enemy");
+                Node enemyNode = enemyBeing.getNode();
+                if (enemyBeing.isDead()) continue;
                 if (b.getNode().equals(enemyNode)) {
                     b.setDead(true);
-                    sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "death"}));
+                    sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "death"}));
                     
                 }
             }
@@ -290,7 +330,7 @@ public class World {
                     if (e instanceof Coins) {
                         b.addCoins(((Coins)e).getValue());
                         itemItr.remove();
-                        sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "coin"}));
+                        sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "coin"}));
                     }
                 }
             }
@@ -319,8 +359,8 @@ public class World {
      * A wrapper to send a message to the App
      * @param c
      */
-    private void sendMessage(Message m) {
-        manager.sendMessage(m);
+    private void sendMessageToApp(Message m) {
+        app.sendMessage(m);
     }
 
     /**
@@ -713,5 +753,9 @@ public class World {
                 node.resetCost();
             }
         }
+    }
+
+    public boolean isBeingDead(String string) {
+        return beings.get(string).isDead();
     }
 }

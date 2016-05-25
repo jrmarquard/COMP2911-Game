@@ -98,25 +98,26 @@ public class GUI extends JFrame  {
                 
                 Map<Integer, String[]> controls = new HashMap<Integer, String[]>();
                 // Player 1
-                controls.put(KeyEvent.VK_UP, new String[]{"move", "world1", "Moneymaker", "up"});
-                controls.put(KeyEvent.VK_LEFT, new String[]{"move", "world1", "Moneymaker", "left"});
-                controls.put(KeyEvent.VK_DOWN, new String[]{"move", "world1", "Moneymaker", "down"});
-                controls.put(KeyEvent.VK_RIGHT, new String[]{"move", "world1", "Moneymaker", "right"});
+                controls.put(KeyEvent.VK_UP, new String[]{"world1", "move", "Moneymaker", "up"});
+                controls.put(KeyEvent.VK_LEFT, new String[]{"world1", "move", "Moneymaker", "left"});
+                controls.put(KeyEvent.VK_DOWN, new String[]{"world1", "move", "Moneymaker", "down"});
+                controls.put(KeyEvent.VK_RIGHT, new String[]{"world1", "move", "Moneymaker", "right"});
+                controls.put(KeyEvent.VK_SPACE, new String[]{"world1", "attack", "Moneymaker"});
                 // Player 2
-                controls.put(KeyEvent.VK_W, new String[]{"move", "world2", "Moneymaker", "up"});
-                controls.put(KeyEvent.VK_A, new String[]{"move", "world2", "Moneymaker", "left"});
-                controls.put(KeyEvent.VK_S, new String[]{"move", "world2", "Moneymaker", "down"});
-                controls.put(KeyEvent.VK_D, new String[]{"move", "world2", "Moneymaker", "right"});
+                controls.put(KeyEvent.VK_W, new String[]{"world2", "move", "Moneymaker", "up"});
+                controls.put(KeyEvent.VK_A, new String[]{"world2", "move", "Moneymaker", "left"});
+                controls.put(KeyEvent.VK_S, new String[]{"world2", "move", "Moneymaker", "down"});
+                controls.put(KeyEvent.VK_D, new String[]{"world2", "move", "Moneymaker", "right"});
                 // Player 3
-                controls.put(KeyEvent.VK_T, new String[]{"move", "world3", "Moneymaker", "up"});
-                controls.put(KeyEvent.VK_F, new String[]{"move", "world3", "Moneymaker", "left"});
-                controls.put(KeyEvent.VK_G, new String[]{"move", "world3", "Moneymaker", "down"});
-                controls.put(KeyEvent.VK_H, new String[]{"move", "world3", "Moneymaker", "right"});
+                controls.put(KeyEvent.VK_T, new String[]{"world3", "move", "Moneymaker", "up"});
+                controls.put(KeyEvent.VK_F, new String[]{"world3", "move", "Moneymaker", "left"});
+                controls.put(KeyEvent.VK_G, new String[]{"world3", "move", "Moneymaker", "down"});
+                controls.put(KeyEvent.VK_H, new String[]{"world3", "move", "Moneymaker", "right"});
                 // Player 4
-                controls.put(KeyEvent.VK_I, new String[]{"move", "world4", "Moneymaker", "up"});
-                controls.put(KeyEvent.VK_J, new String[]{"move", "world4", "Moneymaker", "left"});
-                controls.put(KeyEvent.VK_K, new String[]{"move", "world4", "Moneymaker", "down"});
-                controls.put(KeyEvent.VK_L, new String[]{"move", "world4", "Moneymaker", "right"});
+                controls.put(KeyEvent.VK_I, new String[]{"world4", "move", "Moneymaker", "up"});
+                controls.put(KeyEvent.VK_J, new String[]{"world4", "move", "Moneymaker", "left"});
+                controls.put(KeyEvent.VK_K, new String[]{"world4", "move", "Moneymaker", "down"});
+                controls.put(KeyEvent.VK_L, new String[]{"world4", "move", "Moneymaker", "right"});
                 
                 String[] message = controls.get(keyPressed);
                 if (message != null) {

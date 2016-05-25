@@ -132,10 +132,6 @@ public class Game {
 
     synchronized public void inbox(String[] message) {
         switch(message[0]) {
-            case "move":
-                if (pause) return;
-                worlds.get(message[1]).moveBeing(message[2], message[3]);
-                break;                    
             case "newGame":
                 newGame();
                 break;
@@ -146,6 +142,13 @@ public class Game {
                 togglePause();
                 break;
             default:
+                if (pause) return;
+                try {
+                    worlds.get(message[0]).sendMessage(message);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.out.println("Game message error.");
+                }
                 break;
         }
     }

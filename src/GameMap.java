@@ -115,21 +115,15 @@ public class GameMap extends JPanel {
         g2d.setColor(App.pref.getColour("finishColour"));
         g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
 
-        // Draw on character
-        n = world.getBeingNode("Moneymaker");
-        g2d.setColor(App.pref.getColour("playerColour"));
-        Ellipse2D.Double circle = new Ellipse2D.Double(
-                wallWidth+(n.getX()*(wallWidth+tileSize))+tileSize/4, 
-                wallWidth+(n.getY()*(wallWidth+tileSize))+tileSize/4, 
-                tileSize/2, 
-                tileSize/2
-        );
-        g2d.fill(circle);
         
         // Draw on Enemy
         if(App.pref.getBool("enemy")) {
-        	n = world.getBeingNode("Enemy");
-            g2d.setColor(App.pref.getColour("enemyColour"));
+            n = world.getBeingNode("Enemy");
+            if (world.isBeingDead("Enemy")) {
+                g2d.setColor(Color.black);
+            } else {
+                g2d.setColor(App.pref.getColour("enemyColour"));
+            }
             Ellipse2D.Double circleE = new Ellipse2D.Double(
                     wallWidth+(n.getX()*(wallWidth+tileSize))+tileSize/4, 
                     wallWidth+(n.getY()*(wallWidth+tileSize))+tileSize/4, 
@@ -138,6 +132,21 @@ public class GameMap extends JPanel {
             );
             g2d.fill(circleE);
         }
+        
+        // Draw on character
+        n = world.getBeingNode("Moneymaker");
+        if (world.isBeingDead("Moneymaker")) {
+            g2d.setColor(Color.black);
+        } else {
+            g2d.setColor(App.pref.getColour("playerColour"));
+        }        
+        Ellipse2D.Double circle = new Ellipse2D.Double(
+                wallWidth+(n.getX()*(wallWidth+tileSize))+tileSize/4, 
+                wallWidth+(n.getY()*(wallWidth+tileSize))+tileSize/4, 
+                tileSize/2, 
+                tileSize/2
+        );
+        g2d.fill(circle);
         
         // Draw on coins
         ArrayList<Node> nodes = world.getEntityNodes();
