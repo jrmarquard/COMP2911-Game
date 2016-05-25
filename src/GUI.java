@@ -242,15 +242,15 @@ public class GUI extends JFrame  {
         navPanelTop.add(backButton);
         
         // Settings Panel Layout Begin
-        JPanel settingsPanel = new JPanel() {
+        JPanel gameSettingsPanel = new JPanel() {
             @Override
             public Dimension getPreferredSize() {
                 Dimension d = this.getParent().getSize();
                 return new Dimension(d.height,d.height);
             }
         };
-        settingsPanel.setLayout(new GridBagLayout());
-        windowPanel.add(settingsPanel);
+        gameSettingsPanel.setLayout(new GridBagLayout());
+        windowPanel.add(gameSettingsPanel);
         
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(6,0,6,0);
@@ -261,16 +261,20 @@ public class GUI extends JFrame  {
         c.gridx = 0;
         c.gridy = 0;
         c.weightx = 5;
-        settingsPanel.add(blankColumnLeft, c);
+        gameSettingsPanel.add(blankColumnLeft, c);
         c.gridx = 3;
-        settingsPanel.add(blankColumnRight, c);
+        gameSettingsPanel.add(blankColumnRight, c);
 
         String gameMode = pref.getText("gameMode");
 
-        // Start building the settings list
+        /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         * Start building the settings list
+         * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         */
         c.weightx = 1;
+        int row = 0;
 
-        // Map size selection        
+        // Door and key generation option       
         JCheckBox doorAndKey = new JCheckBox("", pref.getBool("doorAndKey"));
         doorAndKey.addActionListener(new ActionListener() {
             @Override
@@ -280,29 +284,67 @@ public class GUI extends JFrame  {
             }
         });
         
+        c.gridx = 1;
+        c.gridy = row++;
+        c.anchor = GridBagConstraints.WEST;
+        gameSettingsPanel.add(new JLabel("Generate door and key?"), c);
+        c.gridx = 2;
+        c.anchor = GridBagConstraints.EAST;
+        gameSettingsPanel.add(doorAndKey, c);
+        
+        // Enemy generation option
         JCheckBox enemy = new JCheckBox("", pref.getBool("enemy"));
         enemy.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "click"}));
                 pref.toggleBool("enemy");
             }
         });
-        
-        c.gridx = 1;
-        c.gridy = 0;
-        c.anchor = GridBagConstraints.WEST;
-        settingsPanel.add(new JLabel("Generate door and key?"), c);
-        c.gridx = 2;
-        c.anchor = GridBagConstraints.EAST;
-        settingsPanel.add(doorAndKey, c);
 
         c.gridx = 1;
-        c.gridy = 1;
+        c.gridy = row++;
         c.anchor = GridBagConstraints.WEST;
-        settingsPanel.add(new JLabel("Enemy in maze?"), c);
+        gameSettingsPanel.add(new JLabel("Enemy in maze?"), c);
         c.gridx = 2;
         c.anchor = GridBagConstraints.EAST;
-        settingsPanel.add(enemy, c);
+        gameSettingsPanel.add(enemy, c);
+        
+        // Visibility selection
+        String[] visModes = new String[]{"Off", "Low", "Med", "High"};
+        JComboBox<String> visSelection = new JComboBox<String>(visModes);
+        int vis = pref.getValue("visibleRange");
+        switch (vis) {
+            case 3: visSelection.setSelectedItem("Low");     break;
+            case 6: visSelection.setSelectedItem("Med");     break;
+            case 10: visSelection.setSelectedItem("High");   break;
+            default:  visSelection.setSelectedItem("Off");    break;
+        }
+        
+        visSelection.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (ItemEvent.SELECTED == e.getStateChange()) {
+                    sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "click"}));
+                    switch ((String)e.getItem()) {
+                        case "Off": pref.setPreference("value.visibleRange=-1");    break;
+                        case "Low": pref.setPreference("value.visibleRange=3");     break;
+                        case "Med": pref.setPreference("value.visibleRange=6");     break;
+                        case "High": pref.setPreference("value.visibleRange=10");   break;
+                    }
+                    refresh();
+                }
+            }
+        });
+        gameSettingsPanel.add(visSelection, c);
+        
+        c.gridx = 1;
+        c.gridy = row++;
+        c.anchor = GridBagConstraints.WEST;
+        gameSettingsPanel.add(new JLabel("Visibility"), c);
+        c.gridx = 2;
+        c.anchor = GridBagConstraints.EAST;
+        gameSettingsPanel.add(visSelection, c);
         
         JFormattedTextField widthSize = new JFormattedTextField();
         widthSize.setValue(Integer.toString(pref.getValue("defaultMapWidth")));
@@ -310,32 +352,32 @@ public class GUI extends JFrame  {
         widthSize.getDocument().addDocumentListener(new PrefUpdate("value", "defaultMapWidth"));
         
         c.gridx = 1;
-        c.gridy = 2;
+        c.gridy = row++;
         c.anchor = GridBagConstraints.WEST;
-        settingsPanel.add(new JLabel("Width"), c);
+        gameSettingsPanel.add(new JLabel("Width"), c);
         c.gridx = 2;
         c.anchor = GridBagConstraints.EAST;
-        settingsPanel.add(widthSize, c);
+        gameSettingsPanel.add(widthSize, c);
 
         JFormattedTextField heightSize = new JFormattedTextField();
         heightSize.setValue(Integer.toString(pref.getValue("defaultMapHeight")));
         heightSize.setColumns(2);
         heightSize.getDocument().addDocumentListener(new PrefUpdate("value", "defaultMapHeight"));
         c.gridx = 1;
-        c.gridy = 3;
+        c.gridy = row++;
         c.anchor = GridBagConstraints.WEST;
-        settingsPanel.add(new JLabel("Height"), c);
+        gameSettingsPanel.add(new JLabel("Height"), c);
         c.gridx = 2;
         c.anchor = GridBagConstraints.EAST;
-        settingsPanel.add(heightSize, c);
+        gameSettingsPanel.add(heightSize, c);
                 
         // Gamemode selection 
         c.gridx = 1;
-        c.gridy = 4;
+        c.gridy = row++;
         c.anchor = GridBagConstraints.WEST;
         JLabel gameModeText = new JLabel();
         gameModeText.setText("Gamemode: ");
-        settingsPanel.add(gameModeText, c);
+        gameSettingsPanel.add(gameModeText, c);
 
         c.gridx = 2;
         c.anchor = GridBagConstraints.EAST;
@@ -352,31 +394,36 @@ public class GUI extends JFrame  {
                 }
             }
         });
-        settingsPanel.add(gameModeSelection, c);
+        gameSettingsPanel.add(gameModeSelection, c);
 
         String[] playerOptions = new String[]{"Human", "Easy AI", "Med AI", "Hard AI", "Off"};
-        
+
+        for (int x = 1; x <= 4; x++) {
+            row++;
+            c.gridx = 1;
+            c.gridy = x+row;
+            c.anchor = GridBagConstraints.WEST;
+            gameSettingsPanel.add(new JLabel("Player "+x+": "), c);
+            c.gridx = 2;
+            c.anchor = GridBagConstraints.EAST;
+            gameSettingsPanel.add(new PlayerOptions(playerOptions, "player"+x), c);      
+        }
+        // turned off gamemode selection changing the avaiable options for the moment
+        /*
         if (gameMode.equals("Solve")) {
             c.gridx = 1;
             c.gridy = 5;
             c.anchor = GridBagConstraints.WEST;
-            settingsPanel.add(new JLabel("Player 1: "), c);
+            gameSettingsPanel.add(new JLabel("Player 1: "), c);
             c.gridx = 2;
             c.anchor = GridBagConstraints.EAST;
-            settingsPanel.add(new PlayerOptions(playerOptions, "player1"), c);
+            gameSettingsPanel.add(new PlayerOptions(playerOptions, "player1"), c);
         } else if (gameMode.equals("Race")) {
-            for (int x = 1; x <= 4; x++) {
-                c.gridx = 1;
-                c.gridy = x+4;
-                c.anchor = GridBagConstraints.WEST;
-                settingsPanel.add(new JLabel("Player "+x+": "), c);
-                c.gridx = 2;
-                c.anchor = GridBagConstraints.EAST;
-                settingsPanel.add(new PlayerOptions(playerOptions, "player"+x), c);                
-            }
         }
-        
-        c.gridy = 9;
+        */
+        // Button should always be at the bottom, so it's y is 99. For some reason
+        // using row as with the rest of the buttons did not work
+        c.gridy = 99;
         c.gridx = 1;
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.CENTER;
@@ -390,10 +437,10 @@ public class GUI extends JFrame  {
                 setAppState(AppState.GAME);
             }
         });
-        settingsPanel.add(startGameButton, c);
+        gameSettingsPanel.add(startGameButton, c);
 
         
-        windowPanel.add(settingsPanel);
+        windowPanel.add(gameSettingsPanel);
         // Settings Panel Layout End        
     }
     

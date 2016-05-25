@@ -77,7 +77,18 @@ public class World {
         // Maze generator connects nodes together and sets start/finish.
         mazeGenerator();
         generateCoins();
-        calculateVisibility(start);
+        
+        // If visibility is turned off make all the tiles bright.
+        System.out.println(maxVisDistance);
+        if (maxVisDistance == -1) {
+            for (ArrayList<Node> an : nodes) {
+                for (Node n : an) {
+                    n.setVisibility(0f);
+                }
+            }
+        } else {
+            calculateVisibility(start);            
+        }
         if (doorAndKey) doorAndKeyGenerator();
     }
     
@@ -183,6 +194,10 @@ public class World {
      * @param node The node to start from.
      */
     public void calculateVisibility(Node startNode) {
+        
+        // if visibility is turned off don't calculate
+        if (maxVisDistance == -1) return;
+        
         // Resets the that were visibile to be dark
         for (Node n : visibileNodes) {
             n.setVisibility(0);
