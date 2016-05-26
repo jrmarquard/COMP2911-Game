@@ -11,7 +11,8 @@ public class SoundEngine {
 	private boolean soundEnabled;
 	private Clip menuMusic;
 	private Clip backgroundMusic;
-	private float masterVolume;
+	private float musicVolume;
+	private float soundEffectsVolume;
 	private List<FloatControl> volControls;
 	private Preferences pref;
 	private int gameSoundsPlaying;
@@ -26,7 +27,8 @@ public class SoundEngine {
 	public SoundEngine(Preferences pref) {
 	    this.pref = pref;
 		this.soundEnabled = true;
-		this.masterVolume = 0f;
+		this.musicVolume = 0f;
+		this.soundEffectsVolume = 0f;
 		this.volControls = new ArrayList<FloatControl>();
 		this.gameSoundsPlaying = 0;
 		
@@ -54,10 +56,11 @@ public class SoundEngine {
             
             FloatControl menuVolumeControl = (FloatControl) menuMusic.getControl(FloatControl.Type.MASTER_GAIN);
             volControls.add(menuVolumeControl);
-            FloatControl bgBolumeControl = (FloatControl) backgroundMusic.getControl(FloatControl.Type.MASTER_GAIN);
-            volControls.add(bgBolumeControl);
+            FloatControl bgVolumeControl = (FloatControl) backgroundMusic.getControl(FloatControl.Type.MASTER_GAIN);
+            volControls.add(bgVolumeControl);
         
-            setMasterVolume();
+            setMusicVolume();
+            setSoundEffectVolume();
 		} 
 		catch (Exception e){
 			this.soundEnabled = false;
@@ -70,8 +73,10 @@ public class SoundEngine {
 
     public void inbox(String[] message) {
         try {
-            SoundRunnable run = new SoundRunnable(message);
-            soundPool.execute(run);
+        	if (this.soundEnabled) {
+	            SoundRunnable run = new SoundRunnable(message);
+	            soundPool.execute(run);
+        	}
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -83,25 +88,35 @@ public class SoundEngine {
      * 
      * @param volume A number between 0 and 100. Where 0 is mute and 100 max volume.
      */
-    private void setMasterVolume() {
-        if (this.soundEnabled) {
-	        int volume = pref.getValue("masterVolume");
+    private void setMusicVolume() {
+	        int volume = pref.getValue("musicVolume");
 	        
 	        float minVol = -20.0f;
 	        float maxVol = 2.0f;
 	        float volUnit = (maxVol-minVol)/100f;
 	        
-	        masterVolume = minVol + volUnit*(float)volume;
-	        if (volume == 0) masterVolume = -64f;
+	        musicVolume = minVol + volUnit*(float)volume;
+	        if (volume == 0) musicVolume = -64f;
 	        
 	        for (FloatControl f : volControls) {
-	            f.setValue(masterVolume);
+	            f.setValue(musicVolume);
 	        }
-        }
     }
+    
+    private void setSoundEffectVolume() {
+    	int volume = pref.getValue("soundEffectsVolume");
+        
+        float minVol = -20.0f;
+        float maxVol = 2.0f;
+        float volUnit = (maxVol-minVol)/100f;
+        
+        soundEffectsVolume = minVol + volUnit*(float)volume;
+        if (volume == 0) soundEffectsVolume = -64f;
+    }
+	        
+	 
 	
 	private void playSound(String soundName) {
-		if (this.soundEnabled) {
 			try {
 				this.soundsPlayingSemaphore.acquire();
 			} catch (InterruptedException e1) {
@@ -136,7 +151,7 @@ public class SoundEngine {
 
 		        /* Get and set the volume control*/
 		        FloatControl volumeControl = (FloatControl) audioOutputLine.getControl(FloatControl.Type.MASTER_GAIN);
-		        volumeControl.setValue(masterVolume);
+		        volumeControl.setValue(soundEffectsVolume);
 		        
                 // buffer of 32 kb
 		        byte[] sampleByte = new byte[32*1024];
@@ -160,8 +175,7 @@ public class SoundEngine {
 			}
 			catch (Exception e){
 			    e.printStackTrace();
-			}
-		} 
+			} 
 	}
 	
 	private void startMenuMusic() {
@@ -190,22 +204,6 @@ public class SoundEngine {
 		}
 	}
 	
-	public void setVolume(float volume) {
-		this.masterVolume = (0.5f + (0.4f*volume));
-	}
-	
-	public void increaseVolume() {
-		if (this.masterVolume < 0.9f) {
-			this.masterVolume = (this.masterVolume + 0.1f);
-		}
-	}
-	
-	public void decreaseVolume() {
-		if (this.masterVolume > 0.5f) {
-			this.masterVolume = (this.masterVolume - 0.1f);
-		}
-	}
-	
 	private class SoundRunnable implements Runnable {
         String[] msg;
         
@@ -228,7 +226,8 @@ public class SoundEngine {
                     else if (msg[1].equals("menu")) endMenuMusic();
                     break;
                 case "changeVolume":
-                    setMasterVolume();
+                	if (msg[1].equals("soundEffects")) setSoundEffectVolume();
+                	else if (msg[1].equals("music")) setMusicVolume();
                     break;
                 default:
                     break;

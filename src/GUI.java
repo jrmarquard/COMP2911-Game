@@ -554,22 +554,37 @@ public class GUI extends JFrame  {
         }
         
         JPanel volSliderPanel = new JPanel();
-        JLabel volSliderLabel = new JLabel("Master Volume: ");
-        JSlider volSlider = new JSlider(0, 100, pref.getValue("masterVolume"));
-        volSlider.addChangeListener(new ChangeListener(){
+        JLabel musicSliderLabel = new JLabel("Music Volume: ");
+        JSlider musicSlider = new JSlider(0, 100, pref.getValue("musicVolume"));
+        musicSlider.addChangeListener(new ChangeListener(){
             @Override
             public void stateChanged(ChangeEvent e) {
                 JSlider source = (JSlider) e.getSource();
                 int newVolume = (int)source.getValue();
-                pref.setPreference("value.masterVolume="+newVolume);
-                sendMessage(new Message(Message.SOUND_MSG, new String[]{"changeVolume"}));
+                pref.setPreference("value.musicVolume="+newVolume);
+                sendMessage(new Message(Message.SOUND_MSG, new String[]{"changeVolume", "music"}));
                 
             }
         });
-        volSliderPanel.add(volSliderLabel);
-        volSliderPanel.add(volSlider);
-        windowPanel.add(volSliderPanel);
+        volSliderPanel.add(musicSliderLabel);
+        volSliderPanel.add(musicSlider);
         
+        JLabel effectsSliderLabel = new JLabel("Sound Effects Volume: ");
+        JSlider effectsSlider = new JSlider(0, 100, pref.getValue("soundEffectsVolume"));
+        effectsSlider.addChangeListener(new ChangeListener(){
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                JSlider source = (JSlider) e.getSource();
+                int newVolume = (int)source.getValue();
+                pref.setPreference("value.soundEffectsVolume="+newVolume);
+                sendMessage(new Message(Message.SOUND_MSG, new String[]{"changeVolume", "soundEffects"}));
+                
+            }
+        });
+        volSliderPanel.add(effectsSliderLabel);
+        volSliderPanel.add(effectsSlider);
+        
+        windowPanel.add(volSliderPanel);
     }
     
     /**
