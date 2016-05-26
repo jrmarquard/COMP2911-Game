@@ -22,7 +22,7 @@ import java.util.concurrent.Semaphore;
  *
  */
 public class World {
-    // World properies
+    // World properties
     private String name;
     private App app;
     private boolean updateFlag;
@@ -297,8 +297,8 @@ public class World {
                     }
                 }
             }
-            
         }
+        this.visibilitySemaphore.release();
     }
     
     private void beingAttack(String beingName) {
