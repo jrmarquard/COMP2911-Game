@@ -309,6 +309,7 @@ public class World {
         Entity entityAttacking = entities.get(beingName);
         
         if (entityAttacking.isDead()) {
+        	this.entitySemaphore.release();
             return;
         } else {
             sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "sword_swing"}));Node enemyAttackingNode = entityAttacking.getNode();        
