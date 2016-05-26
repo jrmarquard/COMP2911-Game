@@ -10,10 +10,10 @@ import java.util.Random;
  */
 public class AISolve implements AI {
 
-    World world;
-    String worldName;
-    String id;
-    String diff;
+	private World world;
+	private String worldName;
+	private String id;
+	private String diff;
     private LinkedList<Node> explore;
     private HashMap<Node, Integer> visited;
     
@@ -27,6 +27,10 @@ public class AISolve implements AI {
     }
     
     @Override
+    /**
+	 * Returns a message which contains the move that
+	 * the AI would like to make
+	 */
     public Message makeMove() {
         switch (diff) {
             case "easy": return easyMove();
@@ -40,7 +44,7 @@ public class AISolve implements AI {
     /**
      * Easiest setting on the AI.
      * Makes a completely random move, sometimes stays still
-     * @return
+     * @return a message which contains the move that the AI would like to make
      */
     private Message easyMove() {
         String[] message = new String[4];
@@ -62,7 +66,8 @@ public class AISolve implements AI {
 
     /**
      * Medium Difficulty
-     * @return
+     * Picks a random corridor and goes through it until it reaches the end of it
+     * @return a message which contains the move that the AI would like to make
      */
     private Message medMove() {
     	String[] message = new String[4];
@@ -77,18 +82,7 @@ public class AISolve implements AI {
         
         if(!this.explore.isEmpty()) {
         	Node next = this.explore.remove();
-        	int nextX = next.getX();
-        	int nextY = next.getY();
-        	
-        	if(nextX == currX - 1 && nextY == currY) {
-        		message[3] = "left";
-        	} else if(nextX == currX + 1 && nextY == currY) {
-        		message[3] = "right";
-        	} else if(nextX == currX && nextY == currY - 1) {
-        		message[3] = "up";
-        	} else if(nextX == currX && nextY == currY + 1) {
-        		message[3] = "down";
-        	} 
+        	putDirectionInMessage(current, next, message);
         } else {
         	boolean deadEnd = current.isDeadEnd();
 
@@ -167,7 +161,10 @@ public class AISolve implements AI {
 
     /**
      * Hard difficulty
-     * @return
+     * Looks for the neighbour nodes each time and pick one depending on their
+     * visited cost which will be increased by one each time that node is 
+     * being visited
+     * @return a message which contains the move that the AI would like to make
      */
     private Message hardMove() {
     	String[] message = new String[4];
@@ -176,10 +173,8 @@ public class AISolve implements AI {
         message[2] = id;
         
         Node current = this.world.getBeingCoordinate(this.id);
-        int currX = current.getX();
-        int currY = current.getY();
-        
         ArrayList<Node> reachable = current.getConnectedNodes();
+        
         if(this.visited.containsKey(current)) {
 			int currentCost = this.visited.get(current);
 			this.visited.put(current, currentCost += 1);
@@ -218,6 +213,21 @@ public class AISolve implements AI {
         	}
         }
         
+        putDirectionInMessage(current, next, message);
+        
+        return new Message(Message.GAME_MSG, message);
+    }
+    
+    /**
+     * Stores the direction that the AI would like to go in message
+     * base on its current location and the node that it is trying to get to
+     * @param current the node where the AI is
+     * @param next the node where the AI is trying to get to
+     * @param message the message to store the direction
+     */
+	private void putDirectionInMessage(Node current, Node next, String[] message) {
+		int currX = current.getX();
+        int currY = current.getY();
         int nextX = next.getX();
     	int nextY = next.getY();
     	
@@ -229,13 +239,14 @@ public class AISolve implements AI {
     		message[3] = "up";
     	} else if(nextX == currX && nextY == currY + 1) {
     		message[3] = "down";
-    	} else {
-    		message[3] = "";
     	}
-        
-        return new Message(Message.GAME_MSG, message);
-    }
+	}
     
+	/**
+	 * Returns if all the nodes in reachable are in the visited list
+	 * @param reachable the list that contains the reachable nodes
+	 * @return if all the nodes in reachable are in the visited list
+	 */
     private boolean isReachableInVisited(ArrayList<Node> reachable) {
     	boolean isAllIn = true;
     	

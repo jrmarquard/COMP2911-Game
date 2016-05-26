@@ -4,12 +4,17 @@ import java.util.LinkedList;
 
 public class AIEnemy implements AI {
 
-	World world;
-    String worldName;
-    String id;
+	private World world;
+	private String worldName;
+	private String id;
     private LinkedList<Node> explore;
     private HashMap<Node, Integer> visited;
 	
+    /**
+     * Constructs an AIEnemy with the given world and ID
+     * @param world the world
+     * @param id the ID of the maze
+     */
     public AIEnemy(World world, String id) {
     	this.world = world;
         this.worldName = world.getName();;
@@ -18,7 +23,11 @@ public class AIEnemy implements AI {
         this.visited = new HashMap<Node, Integer>();
     }
     
-	@Override
+    @Override
+	/**
+	 * Returns a message which contains the move that
+	 * the AI would like to make
+	 */
 	public Message makeMove() {
 		String[] message = new String[4];
         message[0] = "move";
@@ -32,27 +41,22 @@ public class AIEnemy implements AI {
         int playerX = player.getX();
         int playerY = player.getY();
         
-        if(currX == playerX && currY == playerY) {
+        if(current.equals(player)) {
         	message[3] = "";
         } else {
         	if(!this.explore.isEmpty()) {
             	Node next = this.explore.remove();
-            	int nextX = next.getX();
-            	int nextY = next.getY();
-            	
-            	if(nextX == currX - 1 && nextY == currY) {
-            		message[3] = "left";
-            	} else if(nextX == currX + 1 && nextY == currY) {
-            		message[3] = "right";
-            	} else if(nextX == currX && nextY == currY - 1) {
-            		message[3] = "up";
-            	} else if(nextX == currX && nextY == currY + 1) {
-            		message[3] = "down";
-            	} 
+            	putDirectionInMessage(current, next, message);
             } else {
+            	/*
+            	 * A boolean to tell when the AI is in the same row/column
+            	 * with the player, the AI will try to get to where the player is
+            	 * with that row/column. If the AI doesn't reach the player,
+            	 * this boolean will be false, ie there is a wall between
+            	 * the AI and the player
+            	 */
             	boolean playerReached = false;
             	boolean goRandom = false;
-            	boolean playerAtDeadEnd = player.isDeadEnd();
             	
             	if(currX == playerX) {
             		// Player is below
@@ -67,7 +71,7 @@ public class AIEnemy implements AI {
                 			currY++;
                 		}
             			
-            			if(!playerReached || playerAtDeadEnd) {
+            			if(!playerReached) {
             				this.explore.clear();
             				goRandom = true;
             			}
@@ -85,7 +89,7 @@ public class AIEnemy implements AI {
                 			currY--;
                 		}
             			
-            			if(!playerReached || playerAtDeadEnd) {
+            			if(!playerReached) {
             				this.explore.clear();
             				goRandom = true;
             			}
@@ -103,7 +107,7 @@ public class AIEnemy implements AI {
                 			currX++;
                 		}
             			
-            			if(!playerReached || playerAtDeadEnd) {
+            			if(!playerReached) {
             				this.explore.clear();
             				goRandom = true;
             			}
@@ -121,7 +125,7 @@ public class AIEnemy implements AI {
                 			currX--;
                 		}
             			
-            			if(!playerReached || playerAtDeadEnd) {
+            			if(!playerReached) {
             				this.explore.clear();
             				goRandom = true;
             			}
@@ -130,25 +134,8 @@ public class AIEnemy implements AI {
             		goRandom = true;
             	}
             	
+            	// Cannot reach player/player has not been seen
             	if(goRandom) {
-            		if(playerAtDeadEnd) {
-            			if(this.visited.containsKey(player)) {
-            				int playerCost = this.visited.get(player);
-            				this.visited.put(player, playerCost += 1);
-            			} else {
-            				this.visited.put(player, 1);
-            			}
-            			
-            			for(Node node: player.getConnectedNodes()) {
-            				if(this.visited.containsKey(node)) {
-                				int nodeCost = this.visited.get(node);
-                				this.visited.put(node, nodeCost += 1);
-                			} else {
-                				this.visited.put(node, 1);
-                			}
-            			}
-            		}
-            		
             		ArrayList<Node> reachable = current.getConnectedNodes();
             		if(this.visited.containsKey(current)) {
         				int currentCost = this.visited.get(current);
@@ -161,7 +148,7 @@ public class AIEnemy implements AI {
                     boolean allVisited = isReachableInVisited(reachable);
                     
                     for(Node node: reachable) {
-                    	if(allVisited || playerAtDeadEnd) {
+                    	if(allVisited) {
                     		if(next == null) {
                     			next = node;
                     		} else {
@@ -188,22 +175,7 @@ public class AIEnemy implements AI {
                     	}
                     }
                     
-                    currX = current.getX();
-                    currY = current.getY();
-                    int nextX = next.getX();
-                	int nextY = next.getY();
-                	
-                	if(nextX == currX - 1 && nextY == currY) {
-                		message[3] = "left";
-                	} else if(nextX == currX + 1 && nextY == currY) {
-                		message[3] = "right";
-                	} else if(nextX == currX && nextY == currY - 1) {
-                		message[3] = "up";
-                	} else if(nextX == currX && nextY == currY + 1) {
-                		message[3] = "down";
-                	} else {
-                		message[3] = "";
-                	}
+                    putDirectionInMessage(current, next, message);
             	} else {
             		message[3] = "";
             	}
@@ -213,6 +185,35 @@ public class AIEnemy implements AI {
         return new Message(Message.GAME_MSG, message);
 	}
     
+    /**
+     * Stores the direction that the AI would like to go in message
+     * base on its current location and the node that it is trying to get to
+     * @param current the node where the AI is
+     * @param next the node where the AI is trying to get to
+     * @param message the message to store the direction
+     */
+	private void putDirectionInMessage(Node current, Node next, String[] message) {
+		int currX = current.getX();
+        int currY = current.getY();
+        int nextX = next.getX();
+    	int nextY = next.getY();
+    	
+    	if(nextX == currX - 1 && nextY == currY) {
+    		message[3] = "left";
+    	} else if(nextX == currX + 1 && nextY == currY) {
+    		message[3] = "right";
+    	} else if(nextX == currX && nextY == currY - 1) {
+    		message[3] = "up";
+    	} else if(nextX == currX && nextY == currY + 1) {
+    		message[3] = "down";
+    	}
+	}
+	
+	/**
+	 * Returns if all the nodes in reachable are in the visited list
+	 * @param reachable the list that contains the reachable nodes
+	 * @return if all the nodes in reachable are in the visited list
+	 */
     private boolean isReachableInVisited(ArrayList<Node> reachable) {
     	boolean isAllIn = true;
     	
