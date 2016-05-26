@@ -5,8 +5,6 @@ public class Node {
 	
 	private int x;
 	private int y;
-	private int cost;
-	private int visitCost;
 	private Node up;
 	private Node right;
 	private Node down;
@@ -22,8 +20,6 @@ public class Node {
 	public Node(int x, int y) {
 		this.x = x;
 		this.y = y;
-		this.cost = 0;
-		this.visitCost = 0;
 		this.up = null;
 		this.right = null;
 		this.down = null;
@@ -49,26 +45,6 @@ public class Node {
 	
 	public int getY() {
 		return this.y;
-	}
-	
-	public int getCost() {
-		return this.cost;
-	}
-	
-	public void addCost(int cost) {
-		this.cost += cost;
-	}
-	
-	public void resetCost() {
-		this.cost = 0;
-	}
-	
-	public int getVisitCost() {
-		return this.visitCost;
-	}
-	
-	public void addVisitCost(int visitCost) {
-		this.visitCost += visitCost;
 	}
 	
 	public Node getUp() {
@@ -110,6 +86,19 @@ public class Node {
 	    if (this.left != null) nodes.add(this.left);
 	    if (this.right != null) nodes.add(this.right);
 	    return nodes;
+	}
+	
+	public boolean isDeadEnd() {
+	    boolean deadEnd = false;
+	    int count = 0;
+	    
+	    if (this.up == null) count++;
+	    if (this.down == null) count++;
+	    if (this.left == null) count++;
+	    if (this.right == null) count++;
+	    if (count == 3) deadEnd = true;
+	    
+	    return deadEnd;
 	}
 	
 	public boolean isConnected(Node n) {

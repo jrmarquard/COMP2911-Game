@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 public class AIEnemy implements AI {
@@ -7,14 +8,14 @@ public class AIEnemy implements AI {
     String worldName;
     String id;
     private LinkedList<Node> explore;
-    private LinkedList<Node> visited;
+    private HashMap<Node, Integer> visited;
 	
     public AIEnemy(World world, String id) {
     	this.world = world;
         this.worldName = world.getName();;
         this.id = id;
         this.explore = new LinkedList<Node>();
-        this.visited = new LinkedList<Node>();
+        this.visited = new HashMap<Node, Integer>();
     }
     
 	@Override
@@ -51,7 +52,7 @@ public class AIEnemy implements AI {
             } else {
             	boolean playerReached = false;
             	boolean goRandom = false;
-            	boolean playerAtDeadEnd = isAtDeadEnd(player);
+            	boolean playerAtDeadEnd = player.isDeadEnd();
             	
             	if(currX == playerX) {
             		// Player is below
@@ -131,34 +132,59 @@ public class AIEnemy implements AI {
             	
             	if(goRandom) {
             		if(playerAtDeadEnd) {
-            			player.addVisitCost(1);
+            			if(this.visited.containsKey(player)) {
+            				int playerCost = this.visited.get(player);
+            				this.visited.put(player, playerCost += 1);
+            			} else {
+            				this.visited.put(player, 1);
+            			}
             			
             			for(Node node: player.getConnectedNodes()) {
-            				node.addVisitCost(1);
+            				if(this.visited.containsKey(node)) {
+                				int nodeCost = this.visited.get(node);
+                				this.visited.put(node, nodeCost += 1);
+                			} else {
+                				this.visited.put(node, 1);
+                			}
             			}
             		}
             		
             		ArrayList<Node> reachable = current.getConnectedNodes();
-                    current.addVisitCost(1);
-                    this.visited.add(current);
+            		if(this.visited.containsKey(current)) {
+        				int currentCost = this.visited.get(current);
+        				this.visited.put(current, currentCost += 1);
+        			} else {
+        				this.visited.put(current, 1);
+        			}
                     
                     Node next = null;
-                    boolean first = true;
                     boolean allVisited = isReachableInVisited(reachable);
                     
                     for(Node node: reachable) {
                     	if(allVisited || playerAtDeadEnd) {
-                    		if(first) {
+                    		if(next == null) {
                     			next = node;
-                    			first = false;
                     		} else {
-                    			if(node.getVisitCost() < next.getVisitCost()) {
+                    			int nodeCost, nextCost;
+                    			
+                    			if(this.visited.containsKey(node)) {
+                    				nodeCost = this.visited.get(node);
+                    			} else {
+                    				nodeCost = 0;
+                    			}
+                    			
+                    			if(this.visited.containsKey(next)) {
+                    				nextCost = this.visited.get(next);
+                    			} else {
+                    				nextCost = 0;
+                    			}
+                    			
+                    			if(nodeCost < nextCost) {
                     				next = node;
                     			}
                     		}
-                    	} else if(!visited.contains(node)) {
+                    	} else if(!visited.containsKey(node)) {
                     		next = node;
-                    		this.visited.add(next);
                     	}
                     }
                     
@@ -186,41 +212,12 @@ public class AIEnemy implements AI {
 
         return new Message(Message.GAME_MSG, message);
 	}
-	
-	private boolean isAtDeadEnd(Node node) {
-		boolean deadEnd = false;
-    	int x = node.getX();
-    	int y = node.getY();
-    	int count = 0;
-    	
-    	if(this.world.getNode(x, y).getUp() == null) {
-    		count++;
-    	}
-    	
-    	if(this.world.getNode(x, y).getDown() == null) {
-    		count++;
-    	}
-    	
-    	if(this.world.getNode(x, y).getLeft() == null) {
-    		count++;
-    	}
-    	
-    	if(this.world.getNode(x, y).getRight() == null) {
-    		count++;
-    	}
-    	
-    	if(count == 3) {
-    		deadEnd = true;
-    	}
-    	
-    	return deadEnd;
-	}
     
     private boolean isReachableInVisited(ArrayList<Node> reachable) {
     	boolean isAllIn = true;
     	
     	for(Node node: reachable) {
-    		if(!this.visited.contains(node)) {
+    		if(!this.visited.containsKey(node)) {
     			isAllIn = false;
     			break;
     		}

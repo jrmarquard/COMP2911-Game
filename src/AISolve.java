@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -14,7 +15,7 @@ public class AISolve implements AI {
     String id;
     String diff;
     private LinkedList<Node> explore;
-    private LinkedList<Node> visited;
+    private HashMap<Node, Integer> visited;
     
     public AISolve(World world, String id, String diff) {
         this.world = world;
@@ -22,7 +23,7 @@ public class AISolve implements AI {
         this.id = id;
         this.diff = diff;
         this.explore = new LinkedList<Node>();
-        this.visited = new LinkedList<Node>();
+        this.visited = new HashMap<Node, Integer>();
     }
     
     @Override
@@ -70,13 +71,12 @@ public class AISolve implements AI {
         message[2] = id;
         
         Node current = this.world.getBeingCoordinate(this.id);
-        this.visited.add(current);
+        this.visited.put(current, 0);
         int currX = current.getX();
         int currY = current.getY();
         
         if(!this.explore.isEmpty()) {
         	Node next = this.explore.remove();
-        	this.visited.add(next);
         	int nextX = next.getX();
         	int nextY = next.getY();
         	
@@ -90,7 +90,7 @@ public class AISolve implements AI {
         		message[3] = "down";
         	} 
         } else {
-        	boolean deadEnd = isAtDeadEnd(current);
+        	boolean deadEnd = current.isDeadEnd();
 
         	if(deadEnd) {
         		boolean addedToExplore = false;
@@ -129,28 +129,28 @@ public class AISolve implements AI {
         		int randValue = (new Random()).nextInt(4);
         		
         		if(randValue == 0) {
-        			if(!this.visited.contains(this.world.getNode(currX, currY).getUp())) {
+        			if(!this.visited.containsKey(this.world.getNode(currX, currY).getUp())) {
             			while(this.world.getNode(currX, currY).getUp() != null) {
                 			this.explore.add(this.world.getNode(currX, currY).getUp());
                 			currY--;
                 		}
             		}
         		} else if(randValue == 1) {
-        			if(!this.visited.contains(this.world.getNode(currX, currY).getDown())) {
+        			if(!this.visited.containsKey(this.world.getNode(currX, currY).getDown())) {
             			while(this.world.getNode(currX, currY).getDown() != null) {
                 			this.explore.add(this.world.getNode(currX, currY).getDown());
                 			currY++;
                 		}
         			}
         		} else if(randValue == 2) {
-        			if(!this.visited.contains(this.world.getNode(currX, currY).getLeft())) {
+        			if(!this.visited.containsKey(this.world.getNode(currX, currY).getLeft())) {
             			while(this.world.getNode(currX, currY).getLeft() != null) {
                 			this.explore.add(this.world.getNode(currX, currY).getLeft());
                 			currX--;
                 		}
         			}
         		} else if(randValue == 3) {
-        			if(!this.visited.contains(this.world.getNode(currX, currY).getRight())) {
+        			if(!this.visited.containsKey(this.world.getNode(currX, currY).getRight())) {
             			while(this.world.getNode(currX, currY).getRight() != null) {
                 			this.explore.add(this.world.getNode(currX, currY).getRight());
                 			currX++;
@@ -178,27 +178,43 @@ public class AISolve implements AI {
         Node current = this.world.getBeingCoordinate(this.id);
         int currX = current.getX();
         int currY = current.getY();
+        
         ArrayList<Node> reachable = current.getConnectedNodes();
-        current.addVisitCost(1);
-        this.visited.add(current);
+        if(this.visited.containsKey(current)) {
+			int currentCost = this.visited.get(current);
+			this.visited.put(current, currentCost += 1);
+		} else {
+			this.visited.put(current, 1);
+		}
         
         Node next = null;
-        boolean first = true;
         boolean allVisited = isReachableInVisited(reachable);
         
         for(Node node: reachable) {
         	if(allVisited) {
-        		if(first) {
+        		if(next == null) {
         			next = node;
-        			first = false;
         		} else {
-        			if(node.getVisitCost() < next.getVisitCost()) {
+        			int nodeCost, nextCost;
+        			
+        			if(this.visited.containsKey(node)) {
+        				nodeCost = this.visited.get(node);
+        			} else {
+        				nodeCost = 0;
+        			}
+        			
+        			if(this.visited.containsKey(next)) {
+        				nextCost = this.visited.get(next);
+        			} else {
+        				nextCost = 0;
+        			}
+        			
+        			if(nodeCost < nextCost) {
         				next = node;
         			}
         		}
-        	} else if(!visited.contains(node)) {
+        	} else if(!visited.containsKey(node)) {
         		next = node;
-        		this.visited.add(next);
         	}
         }
         
@@ -220,40 +236,11 @@ public class AISolve implements AI {
         return new Message(Message.GAME_MSG, message);
     }
     
-    private boolean isAtDeadEnd(Node node) {
-    	boolean deadEnd = false;
-    	int x = node.getX();
-    	int y = node.getY();
-    	int count = 0;
-    	
-    	if(this.world.getNode(x, y).getUp() == null) {
-    		count++;
-    	}
-    	
-    	if(this.world.getNode(x, y).getDown() == null) {
-    		count++;
-    	}
-    	
-    	if(this.world.getNode(x, y).getLeft() == null) {
-    		count++;
-    	}
-    	
-    	if(this.world.getNode(x, y).getRight() == null) {
-    		count++;
-    	}
-    	
-    	if(count == 3) {
-    		deadEnd = true;
-    	}
-    	
-    	return deadEnd;
-    }
-    
     private boolean isReachableInVisited(ArrayList<Node> reachable) {
     	boolean isAllIn = true;
     	
     	for(Node node: reachable) {
-    		if(!this.visited.contains(node)) {
+    		if(!this.visited.containsKey(node)) {
     			isAllIn = false;
     			break;
     		}

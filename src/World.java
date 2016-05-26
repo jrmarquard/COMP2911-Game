@@ -560,9 +560,9 @@ public class World {
         this.disconnectNodes(this.doorStart, this.doorFinish);
         
         // Sets the cost of each of the nodes of the starting side
-        this.resetNodeCost();
-        this.setNodeCost(this.start);
-        this.setNodeCost(this.doorStart);
+        HashMap<Node, Integer> nodeCostMap = new HashMap<Node, Integer>();
+        this.setNodeCost(this.start, nodeCostMap);
+        this.setNodeCost(this.doorStart, nodeCostMap);
         
         // Finds the node with the greatest cost from start
         // and from the door and set this as the location of the key
@@ -570,8 +570,24 @@ public class World {
             for(Node node: aList) {
                 if(this.key == null) {
                     this.key = node;
-                } else if(node.getCost() > this.key.getCost()) {
-                    this.key = node;
+                } else {
+                	int nodeCost, keyCost;
+        			
+        			if(nodeCostMap.containsKey(node)) {
+        				nodeCost = nodeCostMap.get(node);
+        			} else {
+        				nodeCost = 0;
+        			}
+        			
+        			if(nodeCostMap.containsKey(key)) {
+        				keyCost = nodeCostMap.get(key);
+        			} else {
+        				keyCost = 0;
+        			}
+        			
+        			if(nodeCost > keyCost) {
+        				this.key = node;
+        			}
                 }
             }
         }
@@ -619,7 +635,7 @@ public class World {
      * Sets the cost of the nodes from the given node by doing a bfs
      * @param node the starting node
      */
-    private void setNodeCost(Node node) {
+    private void setNodeCost(Node node, HashMap<Node, Integer> nodeCostMap) {
         Queue<Node> explore = new LinkedList<Node>();
         LinkedList<Node> visited = new LinkedList<Node>();
         int i = 1;
@@ -637,22 +653,17 @@ public class World {
             
             for(Node neighbour: reachable){
                 if (!visited.contains(neighbour)){
-                    neighbour.addCost(i);
+                	if(nodeCostMap.containsKey(neighbour)) {
+            			int neighbourCost = nodeCostMap.get(neighbour);
+            			nodeCostMap.put(neighbour, neighbourCost += i);
+            		} else {
+            			nodeCostMap.put(neighbour, i);
+            		}
                     explore.add(neighbour);
                 }
             }
             
             i++;
-        }
-    }
-    /**
-     * Resets the cost of all the nodes
-     */
-    private void resetNodeCost() {
-        for(ArrayList<Node> aList: this.nodes) {
-            for(Node node: aList) {
-                node.resetCost();
-            }
         }
     }
 
