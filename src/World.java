@@ -152,15 +152,19 @@ public class World {
         if (b != null) {
             if (dir == "up" && n.getUp() != null) {
                 b.setNode(n.getUp()); 
+                b.setDirection("up");
                 updateFlag = true;
             } else if (dir == "down" && n.getDown() != null) {
                 b.setNode(n.getDown()); 
+                b.setDirection("down");
                 updateFlag = true;
             } else if (dir == "left" && n.getLeft() != null) {
                 b.setNode(n.getLeft());
+                b.setDirection("left");
                 updateFlag = true;
             } else if (dir == "right" && n.getRight() != null) {
                 b.setNode(n.getRight());
+                b.setDirection("right");
                 updateFlag = true;
             }
             if (updateFlag) {
@@ -324,6 +328,14 @@ public class World {
     public Node getEnemyNode() {
         return beings.get("Enemy").getNode();
     }
+    
+	public String getPlayerDirection() {
+		return beings.get("Moneymaker").getDirection();
+	}
+	
+	public String getEnemyDirection() {
+		return beings.get("Enemy").getDirection();
+	}
     
     /**
      * Get the node at the x and y coordinates given.
@@ -672,4 +684,5 @@ public class World {
     public float getNodeVisibility(int x, int y) {
         return getNode(x, y).getVisibility();
     }
+
 }

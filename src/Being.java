@@ -5,13 +5,18 @@ public class Being extends Entity {
     private boolean AIControl;
     private int coins;
     private boolean key;
+    private String direction;
     
-    public Being(Node node, String name) {
+	public Being(Node node, String name) {
         super(node);        
         this.AIControl = false;
         this.name = name;
         this.coins = 0;
         this.key = false;
+        if (node.getDown() != null) this.direction = "down";
+        else if (node.getUp() != null) this.direction = "up";
+        else if (node.getLeft() != null) this.direction = "left";
+        else if (node.getRight() != null) this.direction = "right";
     }
 
     public String getName() {
@@ -55,4 +60,13 @@ public class Being extends Entity {
     public void setKey(boolean key) {
         this.key = key;
     }
+    
+    public String getDirection() {
+		return direction;
+	}
+
+	public void setDirection(String direction) {
+		this.direction = direction;
+	}
+
 }
