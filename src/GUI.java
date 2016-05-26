@@ -82,7 +82,7 @@ public class GUI extends JFrame  {
         
         // windowPanel is the root panel within this object
         windowPanel = new JPanel();
-        windowPanel.setPreferredSize(new Dimension(600, 600));
+        windowPanel.setPreferredSize(new Dimension(560, 640));
         this.add(windowPanel);
         
         // Set more information
@@ -177,34 +177,72 @@ public class GUI extends JFrame  {
     private void drawMenu() {
         windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
 
+        String pack = App.pref.getText("texturePack");
+        
+        if (pack.equals("castle")) windowPanel.setBackground(new Color(66, 132, 157));
+        else if (pack.equals("desert")) windowPanel.setBackground(new Color(255, 188, 131));
+        else if (pack.equals("space")) windowPanel.setBackground(new Color(175, 175, 175));
+        
+        Icon start = new ImageIcon("Images/"+pack+"/startGame.png");
+        Icon settings = new ImageIcon("Images/"+pack+"/settings.png");
+        Icon about = new ImageIcon("Images/"+pack+"/about.png");
+        Icon quit = new ImageIcon("Images/"+pack+"/quit.png");
+        Icon title = new ImageIcon("Images/"+pack+"/title.gif");
+        
+        ImagePanel buttonBackground = new ImagePanel(new ImageIcon("Images/"+pack+"/background.png").getImage());
+        buttonBackground.setLayout(new BoxLayout(buttonBackground, BoxLayout.PAGE_AXIS));
+        
+        JLabel titleLabel = new JLabel(title);
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
         // Button will start a new game
-        JClickButton startGameButton = new JClickButton("Play");
+        JButton startGameButton = new JButton(start);
+        startGameButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        startGameButton.setBorderPainted(false);
+        startGameButton.setFocusPainted(false);
+        startGameButton.setContentAreaFilled(false);
         startGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setAppState(AppState.GAME_INIT);
+                sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "click"}));
             }
         });
 
         // Button will go to settings
-        JClickButton settingsButton = new JClickButton("Settings");
+        JButton settingsButton = new JButton(settings);
+        settingsButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        settingsButton.setBorderPainted(false);
+        settingsButton.setFocusPainted(false);
+        settingsButton.setContentAreaFilled(false);
         settingsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setAppState(AppState.SETTINGS);
+                sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "click"}));
             }
         });
         
         // Button will go to settings
-        JClickButton aboutButton = new JClickButton("About");
+        JButton aboutButton = new JButton(about);
+        aboutButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        aboutButton.setBorderPainted(false);
+        aboutButton.setFocusPainted(false);
+        aboutButton.setContentAreaFilled(false);
         aboutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setAppState(AppState.ABOUT);
+                sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "click"}));
             }
         });
+        
         // Button will quit the game
-        JClickButton exitButton = new JClickButton("Exit");
+        JButton exitButton = new JButton(quit);
+        exitButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        exitButton.setBorderPainted(false);
+        exitButton.setFocusPainted(false);
+        exitButton.setContentAreaFilled(false);
         exitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -213,10 +251,18 @@ public class GUI extends JFrame  {
             }
         });
 
-        windowPanel.add(startGameButton);
-        windowPanel.add(settingsButton);
-        windowPanel.add(aboutButton);
-        windowPanel.add(exitButton);
+        buttonBackground.add(Box.createRigidArea(new Dimension(0,70)));
+        buttonBackground.add(titleLabel);
+        buttonBackground.add(Box.createRigidArea(new Dimension(0,40)));
+        buttonBackground.add(startGameButton);
+        buttonBackground.add(Box.createRigidArea(new Dimension(0,15)));
+        buttonBackground.add(settingsButton);
+        buttonBackground.add(Box.createRigidArea(new Dimension(0,15)));
+        buttonBackground.add(aboutButton);
+        buttonBackground.add(Box.createRigidArea(new Dimension(0,15)));
+        buttonBackground.add(exitButton);
+        
+        windowPanel.add(buttonBackground);
     }
     
     /**
@@ -226,28 +272,11 @@ public class GUI extends JFrame  {
     private void drawGameInit() {
         windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
         
-        // Navigation panel across the top of the screen.
-        JPanel navPanelTop = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        navPanelTop.setBackground(windowPanel.getBackground().darker());
-        windowPanel.add(navPanelTop);
-        
-        JClickButton backButton = new JClickButton("Back");
-        backButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setAppState(AppState.MENU);
-            }
-        });
-        navPanelTop.add(backButton);
+        String pack = App.pref.getText("texturePack");
         
         // Settings Panel Layout Begin
-        JPanel gameSettingsPanel = new JPanel() {
-            @Override
-            public Dimension getPreferredSize() {
-                Dimension d = this.getParent().getSize();
-                return new Dimension(d.height,d.height);
-            }
-        };
+        ImagePanel gameSettingsPanel = new ImagePanel(new ImageIcon("Images/"+pack+"/settingsBackground.png").getImage());
+       
         gameSettingsPanel.setLayout(new GridBagLayout());
         windowPanel.add(gameSettingsPanel);
         
@@ -435,7 +464,16 @@ public class GUI extends JFrame  {
             }
         });
         gameSettingsPanel.add(startGameButton, c);
-
+        
+        c.gridy = 100;
+        JClickButton backButton = new JClickButton("Back");
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setAppState(AppState.MENU);
+            }
+        });
+        gameSettingsPanel.add(backButton, c);
         
         windowPanel.add(gameSettingsPanel);
         // Settings Panel Layout End        
@@ -553,7 +591,6 @@ public class GUI extends JFrame  {
         JPanel textureSelectPanel = new JPanel();
         JLabel textureSelectLabel = new JLabel("Select texture: ");
         JRadioButton textureCastle = new JRadioButton("Castle");
-        textureCastle.setSelected(true);
         textureCastle.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -588,38 +625,24 @@ public class GUI extends JFrame  {
         windowPanel.add(textureSelectPanel);
         
         JPanel volSliderPanel = new JPanel();
-        JLabel musicSliderLabel = new JLabel("Music Volume: ");
-        JSlider musicSlider = new JSlider(0, 100, App.pref.getValue("musicVolume"));
-        musicSlider.addChangeListener(new ChangeListener(){
+        JLabel volSliderLabel = new JLabel("Master Volume: ");
+        JSlider volSlider = new JSlider(0, 100, App.pref.getValue("masterVolume"));
+        volSlider.addChangeListener(new ChangeListener(){
             @Override
             public void stateChanged(ChangeEvent e) {
                 JSlider source = (JSlider) e.getSource();
                 int newVolume = (int)source.getValue();
-                App.pref.setPreference("value.musicVolume="+newVolume);
-                sendMessage(new Message(Message.SOUND_MSG, new String[]{"changeVolume", "music"}));                
-            }
-        });
-        volSliderPanel.add(musicSliderLabel);
-        volSliderPanel.add(musicSlider);
-
-        JPanel effectsSliderPanel = new JPanel();
-        JLabel effectsSliderLabel = new JLabel("Sound Effects Volume: ");
-        JSlider effectsSlider = new JSlider(0, 100, App.pref.getValue("soundEffectsVolume"));
-        effectsSlider.addChangeListener(new ChangeListener(){
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                JSlider source = (JSlider) e.getSource();
-                int newVolume = (int)source.getValue();
-                App.pref.setPreference("value.soundEffectsVolume="+newVolume);
-                sendMessage(new Message(Message.SOUND_MSG, new String[]{"changeVolume", "soundEffects"}));
+                App.pref.setPreference("value.masterVolume="+newVolume);
+                sendMessage(new Message(Message.SOUND_MSG, new String[]{"changeVolume"}));
                 
             }
         });
-        effectsSliderPanel.add(effectsSliderLabel);
-        effectsSliderPanel.add(effectsSlider);
-        
+        volSliderPanel.add(volSliderLabel);
+        volSliderPanel.add(volSlider);
         windowPanel.add(volSliderPanel);
-        windowPanel.add(effectsSliderPanel);
+        
+        windowPanel.add(Box.createRigidArea(new Dimension(0,50)));
+        
     }
     
     /**
@@ -794,5 +817,33 @@ public class GUI extends JFrame  {
             });
         }
     }
+    
+    /**
+     * Class used to add a background image to a JPanel
+     * @author Tyler
+     */
+    class ImagePanel extends JPanel {
+
+    	  private Image img;
+
+    	  public ImagePanel(String img) {
+    	    this(new ImageIcon(img).getImage());
+    	  }
+
+    	  public ImagePanel(Image img) {
+    	    this.img = img;
+    	    Dimension size = new Dimension(img.getWidth(null), img.getHeight(null));
+    	    setPreferredSize(size);
+    	    setMinimumSize(size);
+    	    setMaximumSize(size);
+    	    setSize(size);
+    	    setLayout(null);
+    	  }
+
+    	  public void paintComponent(Graphics g) {
+    	    g.drawImage(img, 0, 0, null);
+    	  }
+
+   	}
     
 }
