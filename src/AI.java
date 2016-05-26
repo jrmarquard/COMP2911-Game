@@ -6,5 +6,6 @@
  *
  */
 public interface AI {
+	
     public Message makeMove(); 
 }
