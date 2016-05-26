@@ -42,11 +42,14 @@ public class GUI extends JFrame  {
         EXIT
     }
     
-    Game game;
-    Queue<Message> messages;
-    AppState appState;
-    JPanel windowPanel;
-    App manager;
+    private Game game;
+    private AppState appState;
+    private JPanel windowPanel;
+    private App manager;
+    
+    private Map<Integer, String[]> adventureControls;
+    private Map<Integer, String[]> raceControls;
+    private Map<Integer, String[]> battleControls;
     
     public GUI (App manager, Game game) {
         this.manager = manager;
@@ -90,36 +93,67 @@ public class GUI extends JFrame  {
         pack();
         setLocationRelativeTo(null);
         setVisible(true);
+
+        this.adventureControls = new HashMap<Integer, String[]>();
+        this.raceControls = new HashMap<Integer, String[]>();
+        this.battleControls = new HashMap<Integer, String[]>();
+        
+        // Add keystrokes to controls
+        // Adventure gamemode
+        adventureControls.put(KeyEvent.VK_UP, new String[]{"world1", "move", "Moneymaker", "up"});
+        adventureControls.put(KeyEvent.VK_LEFT, new String[]{"world1", "move", "Moneymaker", "left"});
+        adventureControls.put(KeyEvent.VK_DOWN, new String[]{"world1", "move", "Moneymaker", "down"});
+        adventureControls.put(KeyEvent.VK_RIGHT, new String[]{"world1", "move", "Moneymaker", "right"});
+        adventureControls.put(KeyEvent.VK_SPACE, new String[]{"world1", "melee", "Moneymaker"});
+        adventureControls.put(KeyEvent.VK_W, new String[]{"world1", "range", "Moneymaker", "up"});
+        adventureControls.put(KeyEvent.VK_A, new String[]{"world1", "range", "Moneymaker", "down"});
+        adventureControls.put(KeyEvent.VK_S, new String[]{"world1", "range", "Moneymaker", "left"});
+        adventureControls.put(KeyEvent.VK_D, new String[]{"world1", "range", "Moneymaker", "right"});
+
+        // Race gamemode
+        raceControls.put(KeyEvent.VK_UP, new String[]{"world1", "move", "Moneymaker", "up"});
+        raceControls.put(KeyEvent.VK_LEFT, new String[]{"world1", "move", "Moneymaker", "left"});
+        raceControls.put(KeyEvent.VK_DOWN, new String[]{"world1", "move", "Moneymaker", "down"});
+        raceControls.put(KeyEvent.VK_RIGHT, new String[]{"world1", "move", "Moneymaker", "right"});
+        raceControls.put(KeyEvent.VK_W, new String[]{"world2", "move", "Moneymaker", "up"});
+        raceControls.put(KeyEvent.VK_A, new String[]{"world2", "move", "Moneymaker", "left"});
+        raceControls.put(KeyEvent.VK_S, new String[]{"world2", "move", "Moneymaker", "down"});
+        raceControls.put(KeyEvent.VK_D, new String[]{"world2", "move", "Moneymaker", "right"});
+        raceControls.put(KeyEvent.VK_T, new String[]{"world3", "move", "Moneymaker", "up"});
+        raceControls.put(KeyEvent.VK_F, new String[]{"world3", "move", "Moneymaker", "left"});
+        raceControls.put(KeyEvent.VK_G, new String[]{"world3", "move", "Moneymaker", "down"});
+        raceControls.put(KeyEvent.VK_H, new String[]{"world3", "move", "Moneymaker", "right"});
+        raceControls.put(KeyEvent.VK_I, new String[]{"world4", "move", "Moneymaker", "up"});
+        raceControls.put(KeyEvent.VK_J, new String[]{"world4", "move", "Moneymaker", "left"});
+        raceControls.put(KeyEvent.VK_K, new String[]{"world4", "move", "Moneymaker", "down"});
+        raceControls.put(KeyEvent.VK_L, new String[]{"world4", "move", "Moneymaker", "right"});
+        
+        // Battle controls
+        // Player 1
+        battleControls.put(KeyEvent.VK_UP, new String[]{"world1", "move", "Moneymaker", "up"});
+        battleControls.put(KeyEvent.VK_LEFT, new String[]{"world1", "move", "Moneymaker", "left"});
+        battleControls.put(KeyEvent.VK_DOWN, new String[]{"world1", "move", "Moneymaker", "down"});
+        battleControls.put(KeyEvent.VK_RIGHT, new String[]{"world1", "move", "Moneymaker", "right"});
+        battleControls.put(KeyEvent.VK_CONTROL, new String[]{"world1", "melee", "Moneymaker"});
+        battleControls.put(KeyEvent.VK_I, new String[]{"world1", "range", "Moneymaker", "up"});
+        battleControls.put(KeyEvent.VK_J, new String[]{"world1", "range", "Moneymaker", "down"});
+        battleControls.put(KeyEvent.VK_K, new String[]{"world1", "range", "Moneymaker", "left"});
+        battleControls.put(KeyEvent.VK_L, new String[]{"world1", "range", "Moneymaker", "right"});
+        // Player 2
+        battleControls.put(KeyEvent.VK_W, new String[]{"world1", "move", "Teadrinker", "up"});
+        battleControls.put(KeyEvent.VK_A, new String[]{"world1", "move", "Teadrinker", "left"});
+        battleControls.put(KeyEvent.VK_S, new String[]{"world1", "move", "Teadrinker", "down"});
+        battleControls.put(KeyEvent.VK_D, new String[]{"world1", "move", "Teadrinker", "right"});
+        battleControls.put(KeyEvent.VK_SPACE, new String[]{"world1", "melee", "Teadrinker"});
+        battleControls.put(KeyEvent.VK_T, new String[]{"world1", "range", "Teadrinker", "up"});
+        battleControls.put(KeyEvent.VK_F, new String[]{"world1", "range", "Teadrinker", "down"});
+        battleControls.put(KeyEvent.VK_G, new String[]{"world1", "range", "Teadrinker", "left"});
+        battleControls.put(KeyEvent.VK_H, new String[]{"world1", "range", "Teadrinker", "right"});
         
         // Register a keystroke
         this.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
-                int keyPressed = e.getKeyCode();
-                
-                Map<Integer, String[]> controls = new HashMap<Integer, String[]>();
-                // Player 1
-                controls.put(KeyEvent.VK_UP, new String[]{"world1", "move", "Moneymaker", "up"});
-                controls.put(KeyEvent.VK_LEFT, new String[]{"world1", "move", "Moneymaker", "left"});
-                controls.put(KeyEvent.VK_DOWN, new String[]{"world1", "move", "Moneymaker", "down"});
-                controls.put(KeyEvent.VK_RIGHT, new String[]{"world1", "move", "Moneymaker", "right"});
-                controls.put(KeyEvent.VK_SPACE, new String[]{"world1", "attack", "Moneymaker"});
-                // Player 2
-                controls.put(KeyEvent.VK_W, new String[]{"world2", "move", "Moneymaker", "up"});
-                controls.put(KeyEvent.VK_A, new String[]{"world2", "move", "Moneymaker", "left"});
-                controls.put(KeyEvent.VK_S, new String[]{"world2", "move", "Moneymaker", "down"});
-                controls.put(KeyEvent.VK_D, new String[]{"world2", "move", "Moneymaker", "right"});
-                // Player 3
-                controls.put(KeyEvent.VK_T, new String[]{"world3", "move", "Moneymaker", "up"});
-                controls.put(KeyEvent.VK_F, new String[]{"world3", "move", "Moneymaker", "left"});
-                controls.put(KeyEvent.VK_G, new String[]{"world3", "move", "Moneymaker", "down"});
-                controls.put(KeyEvent.VK_H, new String[]{"world3", "move", "Moneymaker", "right"});
-                // Player 4
-                controls.put(KeyEvent.VK_I, new String[]{"world4", "move", "Moneymaker", "up"});
-                controls.put(KeyEvent.VK_J, new String[]{"world4", "move", "Moneymaker", "left"});
-                controls.put(KeyEvent.VK_K, new String[]{"world4", "move", "Moneymaker", "down"});
-                controls.put(KeyEvent.VK_L, new String[]{"world4", "move", "Moneymaker", "right"});
-                
-                String[] message = controls.get(keyPressed);
+                String[] message = getControlMessage(e.getKeyCode());
                 if (message != null) {
                     sendMessage(new Message(Message.GAME_MSG, message));
                 }
@@ -137,6 +171,22 @@ public class GUI extends JFrame  {
             }
         });
     }
+    
+    private String[] getControlMessage(int keyPressed ) {
+        String gameMode = App.pref.getText("gameMode");
+        try {
+            if (gameMode.equals("Race")) {
+                return raceControls.get(keyPressed);
+            } else if (gameMode.equals("Adventure")) {
+                return adventureControls.get(keyPressed);            
+            } else if (gameMode.equals("Battle")) {
+                return battleControls.get(keyPressed);            
+            }
+        } catch (Exception e) {    
+        }
+        return null;
+    }
+    
     
     private void draw() {
         // Reset game panels, remove them (hopefully clears memory)
@@ -314,7 +364,7 @@ public class GUI extends JFrame  {
 
         c.gridx = 2;
         c.anchor = GridBagConstraints.EAST;
-        String[] gameModes = new String[]{"Infinite Mazes", "Race"};
+        String[] gameModes = new String[]{"Race", "Infinite Mazes", "Adventure"};
         JComboBox<String> gameModeSelection = new JComboBox<String>(gameModes);
         gameModeSelection.setSelectedItem(App.pref.getText("gameMode"));
         gameModeSelection.addItemListener(new ItemListener() {

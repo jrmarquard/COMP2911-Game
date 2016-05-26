@@ -24,10 +24,12 @@ public class GameMap extends JPanel {
     private World world;
     private Graphics2D g2d;
     private PaintRefresh timer;
+    
+    // Textures
+    private BufferedImage floor = null;
+    private BufferedImage wallC = null;
     private BufferedImage wallV = null;
     private BufferedImage wallH = null;
-    private BufferedImage wallC = null;
-    private BufferedImage floor = null;
     private BufferedImage doorV = null;
     private BufferedImage doorH = null;
     private BufferedImage coin = null;
@@ -51,10 +53,10 @@ public class GameMap extends JPanel {
         this.world = world;
         
         String pack = App.pref.getText("texturePack");
-        
         timer = new PaintRefresh(this);
         timer.start();
         try{
+            // Maze textures
 	        wallV = ImageIO.read(new File("Images/"+pack+"/wallVertical.png"));
 	        wallH = ImageIO.read(new File("Images/"+pack+"/wallHorizontal.png"));
 	        wallC = ImageIO.read(new File("Images/"+pack+"/wallCorner.png"));
@@ -151,41 +153,96 @@ public class GameMap extends JPanel {
         int wallWidth = mazeWidth/mazeUnitCols;
         int tileSize = tileRatio*wallWidth;
         
-        Rectangle2D wallVSize = new Rectangle2D.Double(0, 0, wallWidth, tileSize+wallWidth);
-        Rectangle2D wallHSize = new Rectangle2D.Double(0, 0, tileSize+wallWidth, wallWidth);
-        Rectangle2D wallCSize = new Rectangle2D.Double(0, 0, wallWidth, wallWidth);
-        Rectangle2D floorSize = new Rectangle2D.Double(0, 0, tileSize+wallWidth, tileSize+wallWidth);
+        /*
+         * Load textures into TexturePaint objects.
+         * Loading the textures loads them to a specific size to be draw on the maze.
+         */
         
-        TexturePaint floorTexture = new TexturePaint(floor, floorSize);
-        TexturePaint wallVTexture = new TexturePaint(wallV, wallVSize);
-        TexturePaint wallHTexture = new TexturePaint(wallH, wallHSize);
-        TexturePaint wallCTexture = new TexturePaint(wallC, wallCSize);
-        TexturePaint doorVTexture = new TexturePaint(doorV, wallVSize);
-        TexturePaint doorHTexture = new TexturePaint(doorH, wallHSize);
-        TexturePaint coinTexture = new TexturePaint(coin, floorSize);
-        TexturePaint playerUTexture = new TexturePaint(playerU, floorSize);
-        TexturePaint playerDTexture = new TexturePaint(playerD, floorSize);
-        TexturePaint playerLTexture = new TexturePaint(playerL, floorSize);
-        TexturePaint playerRTexture = new TexturePaint(playerR, floorSize);
-        TexturePaint keyTexture = new TexturePaint(key, floorSize);
-        TexturePaint finishUTexture = new TexturePaint(finishU, floorSize);
-        TexturePaint finishDTexture = new TexturePaint(finishD, floorSize);
-        TexturePaint finishLTexture = new TexturePaint(finishL, floorSize);
-        TexturePaint finishRTexture = new TexturePaint(finishR, floorSize);
-        TexturePaint startTexture = new TexturePaint(start, floorSize);
-        TexturePaint enemyUTexture = new TexturePaint(enemyU, floorSize);
-        TexturePaint enemyDTexture = new TexturePaint(enemyD, floorSize);
-        TexturePaint enemyLTexture = new TexturePaint(enemyL, floorSize);
-        TexturePaint enemyRTexture = new TexturePaint(enemyR, floorSize);
+        // The 
+        Rectangle2D wallVertRect2D = new Rectangle2D.Double(0, 0, wallWidth, tileSize+wallWidth);
+        Rectangle2D wallHoriRect2D = new Rectangle2D.Double(0, 0, tileSize+wallWidth, wallWidth);
+        Rectangle2D wallCornRect2D = new Rectangle2D.Double(0, 0, wallWidth, wallWidth);
+        Rectangle2D floorTileRect2D = new Rectangle2D.Double(0, 0, wallWidth+tileSize, wallWidth+tileSize);
         
+        // Maze textures
+        TexturePaint floorTexture = new TexturePaint(floor, floorTileRect2D);
+        TexturePaint wallCTexture = new TexturePaint(wallC, wallCornRect2D);
+        TexturePaint finishUTexture = new TexturePaint(finishU, floorTileRect2D);
+        TexturePaint finishDTexture = new TexturePaint(finishD, floorTileRect2D);
+        TexturePaint finishLTexture = new TexturePaint(finishL, floorTileRect2D);
+        TexturePaint finishRTexture = new TexturePaint(finishR, floorTileRect2D);
+        TexturePaint startTexture = new TexturePaint(start, floorTileRect2D);
         
+        // Walls
+        TexturePaint wallVTexture = new TexturePaint(wallV, wallVertRect2D);
+        TexturePaint wallHTexture = new TexturePaint(wallH, wallHoriRect2D);
+        
+        // Door
+        TexturePaint doorVTexture = new TexturePaint(doorV, wallVertRect2D);
+        TexturePaint doorHTexture = new TexturePaint(doorH, wallHoriRect2D);
+        
+        // Items
+        TexturePaint coinTexture = new TexturePaint(coin, floorTileRect2D);
+        TexturePaint keyTexture = new TexturePaint(key, floorTileRect2D);
+        
+        // Entities
+        TexturePaint playerUTexture = new TexturePaint(playerU, floorTileRect2D);
+        TexturePaint playerDTexture = new TexturePaint(playerD, floorTileRect2D);
+        TexturePaint playerLTexture = new TexturePaint(playerL, floorTileRect2D);
+        TexturePaint playerRTexture = new TexturePaint(playerR, floorTileRect2D);
+        TexturePaint enemyUTexture = new TexturePaint(enemyU, floorTileRect2D);
+        TexturePaint enemyDTexture = new TexturePaint(enemyD, floorTileRect2D);
+        TexturePaint enemyLTexture = new TexturePaint(enemyL, floorTileRect2D);
+        TexturePaint enemyRTexture = new TexturePaint(enemyR, floorTileRect2D);
+
         // Translate the maze to be centred in the given panel
         g2d.translate(offsetX + (mazeWidth - mazeUnitCols*wallWidth)/2, offsetY + (mazeHeight - mazeUnitRows*wallWidth)/2);
         
-        // Draw floor
-        //g2d.setColor(pref.getColour("floorColour"));
-        g2d.setPaint(floorTexture);
-        g2d.fillRect(0, 0, mazeUnitCols*wallWidth, mazeUnitRows*wallWidth);
+        /*
+         * Draws maze
+         */
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                // Wall Corners
+                if (col%2 == 0 && row%2 == 0) {
+                    g2d.setPaint(wallCTexture);
+                    g2d.fillRect((col/2)*(wallWidth+tileSize),(row/2)*(wallWidth+tileSize),wallWidth,wallWidth);                    
+                } 
+                // Horizontal walls
+                else if (col%2 != 0 && row%2 == 0) {
+                    String wallType = world.getWallType((col-1)/2, (row/2)-1, (col-1)/2, (row/2));
+                    if (wallType.equals("wall")) {
+                        g2d.setPaint(wallHTexture);
+                    } else if (wallType.equals("door")) {
+                        g2d.setPaint(doorHTexture);
+                    } else if (wallType.equals("space")) {
+                        g2d.setPaint(floorTexture);
+                    }
+                    g2d.fillRect(wallWidth + (tileSize+wallWidth)*((col-1)/2), (tileSize+wallWidth)*(row/2), tileSize, wallWidth);
+                } 
+                // Vertical walls
+                else if (col%2 == 0 && row%2 != 0) {
+                    String wallType = world.getWallType((col/2)-1, (row-1)/2, col/2, (row-1)/2);
+                    if (wallType.equals("wall")) {
+                        g2d.setPaint(wallVTexture);
+                    } else if (wallType.equals("door")) {
+                        g2d.setPaint(doorVTexture);
+                    } else if (wallType.equals("space")) {
+                        g2d.setPaint(floorTexture);
+                    }
+                    g2d.fillRect((tileSize+wallWidth)*((col/2)), wallWidth + (tileSize+wallWidth)*((row-1)/2), wallWidth, tileSize);
+                } 
+                // Floor tiles
+                else if (col%2 != 0 && row%2 != 0) {
+                    g2d.setPaint(floorTexture);
+                    g2d.fillRect(wallWidth+(((col-1)/2)*(wallWidth+tileSize)), wallWidth+(((row-1)/2)*(wallWidth+tileSize)), tileSize, tileSize);                    
+                } 
+            }
+        }
+        
+        /*
+         * Draw items, entities, and other objects in the maze
+         */
         
         // Draw on start
         Node n = world.getStartNode();
@@ -246,91 +303,57 @@ public class GameMap extends JPanel {
         
         // Draw key
         n = world.getKeyNode();
-        //g2d.setColor(pref.getColour("keyColour"));
         g2d.setPaint(keyTexture);
         if(n != null) {
             g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
         }
-
-        // Draw the east/north/west/south walls of entire maze
-        g2d.setPaint(wallVTexture);
-        g2d.fillRect(0, 0, wallWidth, mazeUnitRows*wallWidth);
-        g2d.setPaint(wallHTexture);
-        g2d.fillRect(0, 0, mazeUnitCols*wallWidth, wallWidth);
-        g2d.setPaint(wallVTexture);
-        g2d.fillRect((mazeUnitCols-1)*wallWidth, 0, wallWidth, mazeUnitRows*wallWidth);
-        g2d.setPaint(wallHTexture);
-        g2d.fillRect(0, (mazeUnitRows-1)*wallWidth, mazeUnitCols*wallWidth, wallWidth);
         
-        // Draw inside of maze
+        /*
+         * Draws the lighting on the maze
+         */
+        Color shade = Color.black;
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
-                g2d.setColor(App.pref.getColour("wallColour"));
-                Color shade = App.pref.getColour("wallColour");
+                // Wall Corners
                 if (col%2 == 0 && row%2 == 0) {
-                    // Wall corners
-                	g2d.setPaint(wallCTexture);
+                    float vis = world.getCornerVisibility((col/2)-1, (row/2)-1, (col/2)-1, row/2, col/2, (row/2)-1, col/2, row/2);
+                    float opacity = (255f/100f)*vis;
+                    g2d.setColor(new Color(shade.getRed(), shade.getGreen(), shade.getBlue(), (int)opacity));
                     g2d.fillRect((col/2)*(wallWidth+tileSize),(row/2)*(wallWidth+tileSize),wallWidth,wallWidth);                    
-                } else if (col == 0 || col == cols-1 || row == 0 || row == rows-1) {
-                    // Skips north/east/south/west boundaries
-                } else if (col%2 != 0 && row%2 != 0) {
-                    // TILES!!
+                } 
+                // Horizontal walls
+                else if (col%2 != 0 && row%2 == 0) {
+                    float vis = world.getWallVisibility((col-1)/2, (row/2)-1, (col-1)/2, (row/2));
+                    float opacity = (255f/100f)*vis;
+                    g2d.setColor(new Color(shade.getRed(), shade.getGreen(), shade.getBlue(), (int)opacity));
+                    g2d.fillRect(wallWidth + (tileSize+wallWidth)*((col-1)/2), (tileSize+wallWidth)*(row/2), tileSize, wallWidth);
+                } 
+                // Vertical walls
+                else if (col%2 == 0 && row%2 != 0) {
+                    float vis = world.getWallVisibility((col/2)-1, (row-1)/2, col/2, (row-1)/2);
+                    float opacity = (255f/100f)*vis;
+                    g2d.setColor(new Color(shade.getRed(), shade.getGreen(), shade.getBlue(), (int)opacity));
+                    g2d.fillRect((tileSize+wallWidth)*((col/2)), wallWidth + (tileSize+wallWidth)*((row-1)/2), wallWidth, tileSize);  
+                } 
+                // Floor tiles
+                else if (col%2 != 0 && row%2 != 0) {
                     float vis = world.getNodeVisibility((col-1)/2, (row-1)/2);
                     float opacity = (255f/100f)*vis;
                     g2d.setColor(new Color(shade.getRed(), shade.getGreen(), shade.getBlue(), (int)opacity));
-                    g2d.fillRect(wallWidth+(((col-1)/2)*(wallWidth+tileSize)), wallWidth+(((row-1)/2)*(wallWidth+tileSize)), tileSize, tileSize);
-                } else {
-                    // Vertical walls
-                    if (col%2 == 0) {
-                        if (world.isDoor((col/2)-1, (row-1)/2, col/2, (row-1)/2)) {
-                            // Draw the door
-                        	g2d.setPaint(doorVTexture);
-                            g2d.fillRect((tileSize+wallWidth)*((col/2)), wallWidth + (tileSize+wallWidth)*((row-1)/2), wallWidth, tileSize);
-                            // Draw the shade on top
-                            float vis = world.getWallVisibility((col/2)-1, (row-1)/2, col/2, (row-1)/2);
-                            float opacity = (255f/100f)*vis;
-                            g2d.setColor(new Color(shade.getRed(), shade.getGreen(), shade.getBlue(), (int)opacity));
-                            g2d.fillRect((tileSize+wallWidth)*((col/2)), wallWidth + (tileSize+wallWidth)*((row-1)/2), wallWidth, tileSize);  
-                    	} else if (!world.isConnected((col/2)-1, (row-1)/2, col/2, (row-1)/2)){
-                    	    // Draw a wall
-                    		g2d.setPaint(wallVTexture);
-                            g2d.fillRect((tileSize+wallWidth)*((col/2)), wallWidth + (tileSize+wallWidth)*((row-1)/2), wallWidth, tileSize);   
-                        } else {
-                            // Draw shade
-                            float vis = world.getWallVisibility((col/2)-1, (row-1)/2, col/2, (row-1)/2);
-                            float opacity = (255f/100f)*vis;
-                            g2d.setColor(new Color(shade.getRed(), shade.getGreen(), shade.getBlue(), (int)opacity));
-                            g2d.fillRect((tileSize+wallWidth)*((col/2)), wallWidth + (tileSize+wallWidth)*((row-1)/2), wallWidth, tileSize);  
-                        }
-                    }
-                    // Horizontal walls
-                    else if (row%2 == 0) {
-                    	if (world.isDoor((col-1)/2, (row/2)-1, (col-1)/2, (row/2))) {
-                            // Draw the door
-                    		g2d.setPaint(doorHTexture);
-                            g2d.fillRect(wallWidth + (tileSize+wallWidth)*((col-1)/2), (tileSize+wallWidth)*(row/2), tileSize, wallWidth);
-                            // Draw the shade on top
-                            float vis = world.getWallVisibility((col-1)/2, (row/2)-1, (col-1)/2, (row/2));
-                            float opacity = (255f/100f)*vis;
-                            g2d.setColor(new Color(shade.getRed(), shade.getGreen(), shade.getBlue(), (int)opacity));
-                    		g2d.fillRect(wallWidth + (tileSize+wallWidth)*((col-1)/2), (tileSize+wallWidth)*(row/2), tileSize, wallWidth);
-                    	} else if (!world.isConnected((col-1)/2, (row/2)-1, (col-1)/2, (row/2))){
-                            // Draw a wall
-                    		g2d.setPaint(wallHTexture);
-                            g2d.fillRect(wallWidth + (tileSize+wallWidth)*((col-1)/2), (tileSize+wallWidth)*(row/2), tileSize, wallWidth);   
-                        } else {
-                            // Draw shade
-                            float vis = world.getWallVisibility((col-1)/2, (row/2)-1, (col-1)/2, (row/2));
-                            float opacity = (255f/100f)*vis;
-                            g2d.setColor(new Color(shade.getRed(), shade.getGreen(), shade.getBlue(), (int)opacity));
-                            g2d.fillRect(wallWidth + (tileSize+wallWidth)*((col-1)/2), (tileSize+wallWidth)*(row/2), tileSize, wallWidth);
-                        }
-                    }
+                    g2d.fillRect(wallWidth+(((col-1)/2)*(wallWidth+tileSize)), wallWidth+(((row-1)/2)*(wallWidth+tileSize)), tileSize, tileSize);                    
                 } 
             }
         }
         
     }
+    
+    /*      Code to calculate visibility
+    
+            float vis = world.getNodeVisibility((col-1)/2, (row-1)/2);
+            float opacity = (255f/100f)*vis;
+            g2d.setColor(new Color(shade.getRed(), shade.getGreen(), shade.getBlue(), (int)opacity));
+            g2d.fillRect(wallWidth+(((col-1)/2)*(wallWidth+tileSize)), wallWidth+(((row-1)/2)*(wallWidth+tileSize)), tileSize, tileSize);
+     */
     
     /*
      * Pushes the size of this panel to the dimensions of its parent.

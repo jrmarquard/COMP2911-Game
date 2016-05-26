@@ -94,8 +94,32 @@ public class Game {
                     aiPool.scheduleAtFixedRate(air, aiRefreshRate*(8/10), aiRefreshRate, timeUnit);
                 }
             }
-        } else if (gameMode.equals("Infinite Mazes")) {
-            // not implemented yet
+        } else if (gameMode.equals("Adventure")) {
+            String opt = App.pref.getText("player1");
+            World world = new World(manager, "world1", height, width, doorAndKey);
+            worlds.put("world1", world);
+            
+            // Add player
+            world.addPlayer("Moneymaker");
+            
+            // If enemy is selected, add it to the world and attach an AI
+            if (enemy) {
+                world.addEnemy("Enemy");
+                aiRunnable AIRunEnemy = new aiRunnable(new AIEnemy(world,"Enemy"));
+                aiPool.scheduleAtFixedRate(AIRunEnemy, 650, aiRefreshRate, timeUnit);
+            }
+            
+            // If AI is specified add it
+            if (opt.equals("Easy AI")) {
+                aiRunnable AIRun = new aiRunnable(new AIPlayer(world,"Moneymaker", "easy"));
+                aiPool.scheduleAtFixedRate(AIRun, 650, aiRefreshRate, timeUnit);
+            } else if (opt.equals("Med AI")) {
+                aiRunnable air = new aiRunnable(new AIPlayer(world,"Moneymaker", "med"));
+                aiPool.scheduleAtFixedRate(air, aiRefreshRate*(5/10), aiRefreshRate, timeUnit);
+            } else if (opt.equals("Hard AI")) {
+                aiRunnable air = new aiRunnable(new AIPlayer(world,"Moneymaker", "hard"));
+                aiPool.scheduleAtFixedRate(air, aiRefreshRate*(8/10), aiRefreshRate, timeUnit);
+            }            
         } else if (gameMode.equals("Battle")) {
             // Create a world with 2 players
             // Start them at start/finish
@@ -143,6 +167,7 @@ public class Game {
                 break;
             default:
                 if (pause) return;
+                if (worlds.isEmpty()) return;
                 try {
                     worlds.get(message[0]).sendMessage(message);
                 } catch (Exception e) {
