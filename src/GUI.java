@@ -175,7 +175,7 @@ public class GUI extends JFrame  {
      * drawMenu displays the menu screen.
      */
     private void drawMenu() {
-        windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
+        windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.PAGE_AXIS));
 
         String pack = App.pref.getText("texturePack");
         
@@ -271,7 +271,11 @@ public class GUI extends JFrame  {
      */
     private void drawGameInit() {
         windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
-        
+
+        // Navigation panel across the top of the screen.
+        //JPanel navPanelTop = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        //navPanelTop.setBackground(windowPanel.getBackground().darker());
+        //windowPanel.add(navPanelTop);
         String pack = App.pref.getText("texturePack");
         
         // Settings Panel Layout Begin
@@ -623,23 +627,41 @@ public class GUI extends JFrame  {
         textureSelectPanel.add(textureDesert);
         textureSelectPanel.add(textureSpace);
         windowPanel.add(textureSelectPanel);
-        
-        JPanel volSliderPanel = new JPanel();
-        JLabel volSliderLabel = new JLabel("Master Volume: ");
-        JSlider volSlider = new JSlider(0, 100, App.pref.getValue("masterVolume"));
-        volSlider.addChangeListener(new ChangeListener(){
+
+        JPanel musicSliderPanel = new JPanel();
+        JLabel musicSliderLabel = new JLabel("Music Volume: ");
+        JSlider musicSlider = new JSlider(0, 100, App.pref.getValue("musicVolume"));
+        musicSlider.addChangeListener(new ChangeListener(){
             @Override
             public void stateChanged(ChangeEvent e) {
                 JSlider source = (JSlider) e.getSource();
                 int newVolume = (int)source.getValue();
-                App.pref.setPreference("value.masterVolume="+newVolume);
-                sendMessage(new Message(Message.SOUND_MSG, new String[]{"changeVolume"}));
+                App.pref.setPreference("value.musicVolume="+newVolume);
+                sendMessage(new Message(Message.SOUND_MSG, new String[]{"changeVolume", "music"}));
                 
             }
         });
-        volSliderPanel.add(volSliderLabel);
-        volSliderPanel.add(volSlider);
-        windowPanel.add(volSliderPanel);
+        musicSliderPanel.add(musicSliderLabel);
+        musicSliderPanel.add(musicSlider);
+        windowPanel.add(musicSliderPanel);
+        
+        JPanel effectsSliderPanel = new JPanel();
+        JLabel effectsSliderLabel = new JLabel("Effects Volume: ");
+        JSlider effectsSlider = new JSlider(0, 100, App.pref.getValue("effectsVolume"));
+        effectsSlider.addChangeListener(new ChangeListener(){
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                JSlider source = (JSlider) e.getSource();
+                int newVolume = (int)source.getValue();
+                App.pref.setPreference("value.effectsVolume="+newVolume);
+                sendMessage(new Message(Message.SOUND_MSG, new String[]{"changeVolume", "effects"}));
+                
+            }
+        });
+        
+        effectsSliderPanel.add(effectsSliderLabel);
+        effectsSliderPanel.add(effectsSlider);
+        windowPanel.add(effectsSliderPanel);
         
         windowPanel.add(Box.createRigidArea(new Dimension(0,50)));
         
@@ -735,7 +757,7 @@ public class GUI extends JFrame  {
     public void close() {
         this.dispose();
     }
-    
+
     private class PrefUpdate implements DocumentListener {
         String spaceName;
         String prefName;
@@ -823,27 +845,23 @@ public class GUI extends JFrame  {
      * @author Tyler
      */
     class ImagePanel extends JPanel {
-
-    	  private Image img;
-
-    	  public ImagePanel(String img) {
-    	    this(new ImageIcon(img).getImage());
-    	  }
-
-    	  public ImagePanel(Image img) {
-    	    this.img = img;
-    	    Dimension size = new Dimension(img.getWidth(null), img.getHeight(null));
-    	    setPreferredSize(size);
-    	    setMinimumSize(size);
-    	    setMaximumSize(size);
-    	    setSize(size);
-    	    setLayout(null);
-    	  }
-
-    	  public void paintComponent(Graphics g) {
-    	    g.drawImage(img, 0, 0, null);
-    	  }
-
-   	}
-    
+        private Image img;
+        public ImagePanel(String img) {
+            this(new ImageIcon(img).getImage());
+        }
+        
+        public ImagePanel(Image img) {
+            this.img = img;
+            Dimension size = new Dimension(img.getWidth(null), img.getHeight(null));
+            setPreferredSize(size);
+            setMinimumSize(size);
+            setMaximumSize(size);
+            setSize(size);
+            setLayout(null);
+        }
+        
+        public void paintComponent(Graphics g) {
+            g.drawImage(img, 0, 0, null);
+        }
+    }
 }

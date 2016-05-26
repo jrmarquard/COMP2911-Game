@@ -244,9 +244,9 @@ public class World {
                 }
             }
         }
-
-        this.itemSemaphore.release();
+        
         this.entitySemaphore.release();
+        this.itemSemaphore.release();
     }
 
     /**

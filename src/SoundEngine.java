@@ -66,6 +66,7 @@ public class SoundEngine {
 		catch (Exception e){
 			this.soundEnabled = false;
 			System.out.println("Sound disabled");
+			e.printStackTrace();
 		}
 		
 
@@ -105,7 +106,7 @@ public class SoundEngine {
     }
     
     private void setSoundEffectVolume() {
-    	int volume = App.pref.getValue("soundEffectsVolume");
+    	int volume = App.pref.getValue("effectsVolume");
         
         float minVol = -20.0f;
         float maxVol = 2.0f;
@@ -227,8 +228,13 @@ public class SoundEngine {
                     else if (msg[1].equals("menu")) endMenuMusic();
                     break;
                 case "changeVolume":
-                	if (msg[1].equals("soundEffects")) setSoundEffectVolume();
-                	else if (msg[1].equals("music")) setMusicVolume();
+                	if (msg[1].equals("effects")) {
+                	    System.out.println("changing effects");
+                	    setSoundEffectVolume();
+                	} else if (msg[1].equals("music")) {
+                	    System.out.println("changing music");
+                	    setMusicVolume();
+                	}
                     break;
                 default:
                     break;
