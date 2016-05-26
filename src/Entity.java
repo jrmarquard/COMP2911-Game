@@ -7,6 +7,7 @@ public class Entity {
     private boolean key;
     private boolean dead;
     private Node node;
+    private String direction;
     
     public Entity(Node node, String name) {
         this.node = node;        
@@ -15,6 +16,10 @@ public class Entity {
         this.coins = 0;
         this.key = false;
         this.dead = false;
+        if (node.getDown() != null) this.direction = "down";
+        else if (node.getUp() != null) this.direction = "up";
+        else if (node.getLeft() != null) this.direction = "left";
+        else if (node.getRight() != null) this.direction = "right";
     }
 
     public boolean isDead() {
@@ -72,5 +77,13 @@ public class Entity {
     
     public void setKey(boolean key) {
         this.key = key;
+    }
+    
+    public String getDirection() {
+        return direction;
+    }
+
+    public void setDirection(String direction) {
+        this.direction = direction;
     }
 }

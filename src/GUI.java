@@ -550,6 +550,43 @@ public class GUI extends JFrame  {
             settingsPanel.add(settingRow);
         }
         
+        JPanel textureSelectPanel = new JPanel();
+        JLabel textureSelectLabel = new JLabel("Select texture: ");
+        JRadioButton textureCastle = new JRadioButton("Castle");
+        textureCastle.setSelected(true);
+        textureCastle.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "click"}));
+                App.pref.setPreference("text.texturePack=castle");
+            }
+        });
+        JRadioButton textureDesert = new JRadioButton("Desert");
+        textureDesert.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "click"}));
+                App.pref.setPreference("text.texturePack=desert");
+            }
+        });
+        JRadioButton textureSpace = new JRadioButton("Space");
+        textureSpace.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "click"}));
+                App.pref.setPreference("text.texturePack=space");
+            }
+        });
+        ButtonGroup group = new ButtonGroup();
+        group.add(textureCastle);
+        group.add(textureDesert);
+        group.add(textureSpace);
+        textureSelectPanel.add(textureSelectLabel);
+        textureSelectPanel.add(textureCastle);
+        textureSelectPanel.add(textureDesert);
+        textureSelectPanel.add(textureSpace);
+        windowPanel.add(textureSelectPanel);
+        
         JPanel volSliderPanel = new JPanel();
         JLabel volSliderLabel = new JLabel("Master Volume: ");
         JSlider volSlider = new JSlider(0, 100, App.pref.getValue("masterVolume"));

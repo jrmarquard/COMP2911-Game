@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Semaphore;
 
 /**
  * World contains:
@@ -49,7 +50,10 @@ public class World {
     // Multiple items in a world.
     // Items are stationary objects that can be interacted with by 
     private ArrayList<Item> items;
-    
+
+    //Synchronization
+    private Semaphore visibilitySemaphore;
+
     // Settings for the 
     private ScheduledExecutorService worldTickTock;
     private static final int WORLD_TICK_DELAY = 200; 
@@ -96,6 +100,9 @@ public class World {
         // Maze generator connects nodes together and sets start/finish.
         mazeGenerator();
         generateCoins();
+        
+        //Synchronization
+        this.visibilitySemaphore = new Semaphore(1, true);
         
         // If visibility is turned off make all the tiles bright.
         if (maxVisDistance == -1) {
@@ -310,15 +317,19 @@ public class World {
         if (b != null) {
             if (dir == "up" && n.getUp() != null) {
                 b.setNode(n.getUp()); 
+                b.setDirection("up");
                 updateFlag = true;
             } else if (dir == "down" && n.getDown() != null) {
                 b.setNode(n.getDown()); 
+                b.setDirection("down");
                 updateFlag = true;
             } else if (dir == "left" && n.getLeft() != null) {
                 b.setNode(n.getLeft());
+                b.setDirection("left");
                 updateFlag = true;
             } else if (dir == "right" && n.getRight() != null) {
                 b.setNode(n.getRight());
+                b.setDirection("right");
                 updateFlag = true;
             }
             if (updateFlag) {
@@ -443,6 +454,15 @@ public class World {
     public Node getEntityNode(String name) {
         return entities.get(name).getNode();
     }
+
+    /**
+     * Gets the direction of an entity
+     * @param name the entity name
+     * @return the direction of the entity
+     */
+	public String getEntityDirection(String name) {
+		return entities.get(name).getDirection();
+	}
     
     /**
      * Get the node at the x and y coordinates given.
@@ -844,4 +864,5 @@ public class World {
             }
         }
     }
+
 }
