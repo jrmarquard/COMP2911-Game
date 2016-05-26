@@ -57,29 +57,6 @@ public class World {
     private static final TimeUnit WORLD_TICK_TIME_UNIT = TimeUnit.MILLISECONDS;
     private int worldTickCount;
     
-    /**
-     * This updates parts of the world that need to change every
-     * WORLD_TICK_RATE number of milliseconds.
-     */
-    private void tickTock() {
-        worldTickCount++;
-        
-        // Go through items and decay energy
-        Iterator<Item> itemItr = items.iterator();
-        while (itemItr.hasNext()) {
-            Item i = itemItr.next();
-            if (i.getType() == Item.ENERGY) {
-                i.decay();
-                System.out.println("DECAY! (" +i.getDecay()+ ")");
-                if (i.getDecay() == 0) {
-                    System.out.println("removing");
-                    itemItr.remove();
-                    worldChangeFlag = true;
-                }
-            }
-        }
-    }
-    
     public World (App manager, String name, int width, int height, boolean doorAndKey) {
         this.app = manager;
         this.name = name;
@@ -133,28 +110,33 @@ public class World {
         if (doorAndKey) doorAndKeyGenerator();
     }
     
-    private void generateCoins() {
-        float h = (float)getHeight();
-        float w = (float)getWidth();
-        float r = (float)15;
-        int numberOfCoins = (int)(h*w*(r/100));
+    /**
+     * A wrapper to send a message to the App
+     * @param c
+     */
+    private void sendMessageToApp(Message m) {
+        app.sendMessage(m);
+    }
+
+    
+    /**
+     * This updates parts of the world that need to change every
+     * WORLD_TICK_RATE number of milliseconds.
+     */
+    private void tickTock() {
+        worldTickCount++;
         
-        Random rand = new Random();
-        int coinXCoord = rand.nextInt(getWidth());
-        int coinYCoord = rand.nextInt(getHeight());
-        int coinValue = 50;
-        
-        for (int x = 0; x < numberOfCoins; x++) {
-            coinXCoord = rand.nextInt(getWidth());
-            coinYCoord = rand.nextInt(getHeight());
-            Node n = getNode(coinXCoord, coinYCoord);
-            if (start.equals(n)) continue;
-            if (finish.equals(n)) continue;
-            for (Item i : items) {
-                if (i.getNode().equals(n)) continue;
+        // Go through items and decay energy
+        Iterator<Item> itemItr = items.iterator();
+        while (itemItr.hasNext()) {
+            Item i = itemItr.next();
+            if (i.getType() == Item.ENERGY) {
+                i.decay();
+                if (i.getDecay() == 0) {
+                    itemItr.remove();
+                    worldChangeFlag = true;
+                }
             }
-            Item coin = new Item(n, Item.COIN, coinValue);
-            items.add(coin);
         }
     }
 
@@ -173,155 +155,9 @@ public class World {
         // Recalculates the lighting
         calculateVisibility(entities.get("Moneymaker").getNode());
     }
-
-    public int getPlayerCoins(String id) {
-        return entities.get(id).getCoins();
-    }
     
-    public ArrayList<Node> getEntityNodes() {
-        ArrayList<Node> coords = new ArrayList<Node>();
-        for (Item i : items) {
-            coords.add(i.getNode());
-        }
-        return coords;
-    }
-
-    /**
-     * Method allowing external objects to update the game state.
-     * @param string The message send to the world.
-     */
-    public void sendMessage(String[] message) {
-        switch (message[1]) {
-            case "move": beingMove(message[2], message[3]); break;
-            case "attack": beingAttack(message[2]); break;
-        
-        }
-    }
     
-    private void beingAttack(String beingName) {
-        Entity entityAttacking = entities.get(beingName);
-        if (entityAttacking.isDead()) return;
-        
-        System.out.println("ATTACK!");
-        sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "sword_swing"}));
-        
-        Node enemyAttackingNode = entityAttacking.getNode();        
-        
-        Iterator<String> iterEntity = entities.keySet().iterator();
-        while (iterEntity.hasNext()) {
-            Entity entity = entities.get(iterEntity.next());
-            Node entityNode = entity.getNode();
-            
-            //entityAttacking 
-            
-            // If the being is dead can't kill it twice
-            if (entity.isDead()) continue;
-            
-            for (Node m : enemyAttackingNode.getConnectedNodes()) {
-                Item energy = new Item(m, Item.ENERGY, 3);
-                items.add(energy);
-                if (entityNode.equals(m)) {
-                    System.out.println("Killed");
-                    sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "death"}));
-                    entity.setDead(true);
-                }
-            }
-        }
-        worldChangeFlag = true;
-    }
-    
-    private void beingMove(String id, String dir) {
-        Entity b = entities.get(id);
-        if (b.isDead()) return;
-        
-        Node n = b.getNode();
-        if (b != null) {
-            if (dir == "up" && n.getUp() != null) {
-                b.setNode(n.getUp()); 
-                updateFlag = true;
-            } else if (dir == "down" && n.getDown() != null) {
-                b.setNode(n.getDown()); 
-                updateFlag = true;
-            } else if (dir == "left" && n.getLeft() != null) {
-                b.setNode(n.getLeft());
-                updateFlag = true;
-            } else if (dir == "right" && n.getRight() != null) {
-                b.setNode(n.getRight());
-                updateFlag = true;
-            }
-            if (updateFlag) {
-                sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "step"}));
-                updateFlag = false;
-                worldChangeFlag = true;
-            }
-        }
-        update();
-    }    
 
-    public boolean isWorldChangeFlag() {
-        return worldChangeFlag;
-    }
-
-    public void setWorldChangeFlag(boolean worldChangeFlag) {
-        this.worldChangeFlag = worldChangeFlag;
-    }
-    
-    /**
-     * Calculate the visibility of each node from a given node.
-     * 
-     * @param node The node to start from.
-     */
-    public void calculateVisibility(Node startNode) {
-        
-        // if visibility is turned off don't calculate
-        if (maxVisDistance == -1) return;
-        
-        // Resets the that were visibile to be dark
-        for (Node n : visibileNodes) {
-            n.setVisibility(0);
-        }
-        visibileNodes.clear();
-        
-        // Calculate the visibility 'resolution'
-        float visRes = 100.0f/(float)maxVisDistance;
-        
-        // Queue of nodes to check
-        Queue<Node> nodesToCheck = new LinkedList<Node>();
-        nodesToCheck.add(startNode);
-        
-        // Set the starting node to be completely lit
-        startNode.setVisibility(0.0f);
-        while (!nodesToCheck.isEmpty()) {
-            Node n = nodesToCheck.remove();
-
-            // If the node has visibility lower than the darkest possible visibiliity
-            if (n.getVisibility() <= 100-visRes) {
-                // Add it to the list of all visibile nodes
-                visibileNodes.add(n);
-                
-                // Add all it's children to the list of nodes to check if they haven't been checked already
-                // and then set their visibility based on the current node.
-                for (Node m : n.getConnectedNodes()) {
-                    if (!nodesToCheck.contains(m) && !visibileNodes.contains(m)) {
-                        nodesToCheck.add(m);
-                        m.setVisibility(n.getVisibility()+visRes);
-                    }
-                }
-            }
-            
-        }
-    }
-
-    /**
-     * Gets the visibility of the node at x and y.
-     * @param x the x coordinate of the node.
-     * @param y the y coordinate of the node.
-     * @return the visibility of the node.
-     */
-    public float getNodeVisibility(int x, int y) {
-        return getNode(x, y).getVisibility();
-    }
-    
     private void collision() {
         // Being collision
         Iterator<String> iterBeing = entities.keySet().iterator();
@@ -392,6 +228,149 @@ public class World {
     }
 
     /**
+     * Calculate the visibility of each node from a given node.
+     * 
+     * @param node The node to start from.
+     */
+    private void calculateVisibility(Node startNode) {
+        
+        // if visibility is turned off don't calculate
+        if (maxVisDistance == -1) return;
+        
+        // Resets the that were visibile to be dark
+        for (Node n : visibileNodes) {
+            n.setVisibility(0);
+        }
+        visibileNodes.clear();
+        
+        // Calculate the visibility 'resolution'
+        float visRes = 100.0f/(float)maxVisDistance;
+        
+        // Queue of nodes to check
+        Queue<Node> nodesToCheck = new LinkedList<Node>();
+        nodesToCheck.add(startNode);
+        
+        // Set the starting node to be completely lit
+        startNode.setVisibility(0.0f);
+        while (!nodesToCheck.isEmpty()) {
+            Node n = nodesToCheck.remove();
+
+            // If the node has visibility lower than the darkest possible visibiliity
+            if (n.getVisibility() <= 100-visRes) {
+                // Add it to the list of all visibile nodes
+                visibileNodes.add(n);
+                
+                // Add all it's children to the list of nodes to check if they haven't been checked already
+                // and then set their visibility based on the current node.
+                for (Node m : n.getConnectedNodes()) {
+                    if (!nodesToCheck.contains(m) && !visibileNodes.contains(m)) {
+                        nodesToCheck.add(m);
+                        m.setVisibility(n.getVisibility()+visRes);
+                    }
+                }
+            }
+            
+        }
+    }
+    
+    private void beingAttack(String beingName) {
+        Entity entityAttacking = entities.get(beingName);
+        if (entityAttacking.isDead()) {
+            return;
+        } else {
+            sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "sword_swing"}));Node enemyAttackingNode = entityAttacking.getNode();        
+            
+            Iterator<String> iterEntity = entities.keySet().iterator();
+            while (iterEntity.hasNext()) {
+                Entity entity = entities.get(iterEntity.next());
+                Node entityNode = entity.getNode();
+                
+                // If the being is dead can't kill it twice
+                if (entity.isDead()) continue;
+                
+                // Swing in every direction
+                for (Node m : enemyAttackingNode.getConnectedNodes()) {
+                    Item energy = new Item(m, Item.ENERGY, 3);
+                    items.add(energy);
+                    if (entityNode.equals(m)) {
+                        sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "death"}));
+                        entity.setDead(true);
+                    }
+                }
+            }
+            worldChangeFlag = true;
+        }        
+    }
+    
+    private void beingMove(String id, String dir) {
+        Entity b = entities.get(id);
+        if (b.isDead()) return;
+        
+        Node n = b.getNode();
+        if (b != null) {
+            if (dir == "up" && n.getUp() != null) {
+                b.setNode(n.getUp()); 
+                updateFlag = true;
+            } else if (dir == "down" && n.getDown() != null) {
+                b.setNode(n.getDown()); 
+                updateFlag = true;
+            } else if (dir == "left" && n.getLeft() != null) {
+                b.setNode(n.getLeft());
+                updateFlag = true;
+            } else if (dir == "right" && n.getRight() != null) {
+                b.setNode(n.getRight());
+                updateFlag = true;
+            }
+            if (updateFlag) {
+                sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "step"}));
+                updateFlag = false;
+                worldChangeFlag = true;
+            }
+        }
+        update();
+    }
+
+    public int getPlayerCoins(String id) {
+        return entities.get(id).getCoins();
+    }
+    
+    public ArrayList<Node> getEntityNodes() {
+        ArrayList<Node> coords = new ArrayList<Node>();
+        for (Item i : items) {
+            coords.add(i.getNode());
+        }
+        return coords;
+    }
+
+    public boolean isBeingDead(String string) {
+        return entities.get(string).isDead();
+    }
+
+    public ArrayList<Item> getItems() {
+        return items;
+    }
+
+    /**
+     * Method allowing external objects to update the game state.
+     * @param string The message send to the world.
+     */
+    public void sendMessage(String[] message) {
+        switch (message[1]) {
+            case "move": beingMove(message[2], message[3]); break;
+            case "attack": beingAttack(message[2]); break;
+        
+        }
+    }
+    
+    public boolean isWorldChangeFlag() {
+        return worldChangeFlag;
+    }
+
+    public void setWorldChangeFlag(boolean worldChangeFlag) {
+        this.worldChangeFlag = worldChangeFlag;
+    }    
+
+    /**
      * Add being into the world.
      * @param name Name of the player.
      */
@@ -408,15 +387,6 @@ public class World {
         Entity player = new Entity(this.start, name);
         entities.put(name, player);
     }
-    
-    /**
-     * A wrapper to send a message to the App
-     * @param c
-     */
-    private void sendMessageToApp(Message m) {
-        app.sendMessage(m);
-    }
-
     /**
      * Get's the name of the world
      * @return world name
@@ -457,12 +427,21 @@ public class World {
         return this.height;
     }
     
+    /**
+     * gets the node the key is at
+     * @return the node of the key
+     */
     public Node getKeyNode() {
         return key;
     }
 
-    public Node getBeingNode(String id) {
-        return entities.get(id).getNode();
+    /**
+     * Gets the node an entity is at
+     * @param name the entity name
+     * @return the node of the entity
+     */
+    public Node getEntityNode(String name) {
+        return entities.get(name).getNode();
     }
     
     /**
@@ -477,15 +456,34 @@ public class World {
     
     /**
      * Checks if the x and y coordinates given are corrected to each other.
-     * @param x1
-     * @param y1
-     * @param x2
-     * @param y2
-     * @return
+     * @param x1 x coordinate of node A
+     * @param y1 y coordinate of node A
+     * @param x2 x coordinate of node B
+     * @param y2 y coordinate of node B
+     * @return the visibility of the space
      */
     public boolean isConnected(int x1, int y1, int x2, int y2) {
         return getNode(x1,y1).isConnected(getNode(x2,y2));
     }
+
+    /**
+     * Gets the visibility of the node at x and y.
+     * @param x the x coordinate of the node.
+     * @param y the y coordinate of the node.
+     * @return the visibility of the node.
+     */
+    public float getNodeVisibility(int x, int y) {
+        return getNode(x, y).getVisibility();
+    }
+    
+    /** 
+     * Gets the visibility of the space between two nodes
+     * @param x1 x coordinate of node A
+     * @param y1 y coordinate of node A
+     * @param x2 x coordinate of node B
+     * @param y2 y coordinate of node B
+     * @return the visibility of the space
+     */
     public float getWallVisibility(int x1, int y1, int x2, int y2) {
         float visA = getNode(x1,y1).getVisibility();
         float visB = getNode(x2,y2).getVisibility();
@@ -501,7 +499,13 @@ public class World {
         } else {
             return false;
         }
-    }      
+    }
+    
+    /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
+     *                                                                        *
+     *   All of the functions below are used in generating the initial maze   *
+     *                                                                        *  
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
     
     /**
      * Generates a maze
@@ -534,6 +538,37 @@ public class World {
         this.findAndSetFinish();
     }
     
+    /**
+     * Generates the coins for the maze
+     */
+    private void generateCoins() {
+        float h = (float)getHeight();
+        float w = (float)getWidth();
+        float r = (float)15;
+        int numberOfCoins = (int)(h*w*(r/100));
+        
+        Random rand = new Random();
+        int coinXCoord = rand.nextInt(getWidth());
+        int coinYCoord = rand.nextInt(getHeight());
+        int coinValue = 50;
+        
+        for (int x = 0; x < numberOfCoins; x++) {
+            coinXCoord = rand.nextInt(getWidth());
+            coinYCoord = rand.nextInt(getHeight());
+            Node n = getNode(coinXCoord, coinYCoord);
+            if (start.equals(n)) continue;
+            if (finish.equals(n)) continue;
+            for (Item i : items) {
+                if (i.getNode().equals(n)) continue;
+            }
+            Item coin = new Item(n, Item.COIN, coinValue);
+            items.add(coin);
+        }
+    }
+    
+    /**
+     * Sets the finish for the maze
+     */
     private void findAndSetFinish() {
         Queue<Node> newExplore = new LinkedList<Node>();
         LinkedList<Node> newVisited = new LinkedList<Node>();
@@ -798,6 +833,7 @@ public class World {
             i++;
         }
     }
+    
     /**
      * Resets the cost of all the nodes
      */
@@ -807,13 +843,5 @@ public class World {
                 node.resetCost();
             }
         }
-    }
-
-    public boolean isBeingDead(String string) {
-        return entities.get(string).isDead();
-    }
-
-    public ArrayList<Item> getItems() {
-        return items;
     }
 }

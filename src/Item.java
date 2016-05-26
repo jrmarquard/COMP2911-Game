@@ -44,7 +44,7 @@ public class Item {
         this.type = type;
     }
 
-    public float getDecay() {
+    public int getDecay() {
         return decay;
     }
 

@@ -129,7 +129,7 @@ public class GameMap extends JPanel {
         
         // Draw on Enemy
         if(App.pref.getBool("enemy")) {
-            n = world.getBeingNode("Enemy");
+            n = world.getEntityNode("Enemy");
             if (world.isBeingDead("Enemy")) {
                 g2d.setColor(Color.black);
             } else {
@@ -145,7 +145,7 @@ public class GameMap extends JPanel {
         }
         
         // Draw on character
-        n = world.getBeingNode("Moneymaker");
+        n = world.getEntityNode("Moneymaker");
         if (world.isBeingDead("Moneymaker")) {
             g2d.setColor(Color.black);
         } else {
