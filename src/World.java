@@ -6,6 +6,9 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * World contains:
@@ -41,20 +44,60 @@ public class World {
     
     // Multiple beings in a world
     // Beings are things that can move/make decisions
-    private Map<String, Being> beings;
+    private Map<String, Entity> entities;
     
     // Multiple items in a world.
     // Items are stationary objects that can be interacted with by 
     private ArrayList<Item> items;
+    
+    // Settings for the 
+    private ScheduledExecutorService worldTickTock;
+    private static final int WORLD_TICK_DELAY = 200; 
+    private static final int WORLD_TICK_RATE = 50; 
+    private static final TimeUnit WORLD_TICK_TIME_UNIT = TimeUnit.MILLISECONDS;
+    private int worldTickCount;
+    
+    /**
+     * This updates parts of the world that need to change every
+     * WORLD_TICK_RATE number of milliseconds.
+     */
+    private void tickTock() {
+        worldTickCount++;
+        
+        // Go through items and decay energy
+        Iterator<Item> itemItr = items.iterator();
+        while (itemItr.hasNext()) {
+            Item i = itemItr.next();
+            if (i.getType() == Item.ENERGY) {
+                i.decay();
+                System.out.println("DECAY! (" +i.getDecay()+ ")");
+                if (i.getDecay() == 0) {
+                    System.out.println("removing");
+                    itemItr.remove();
+                    worldChangeFlag = true;
+                }
+            }
+        }
+    }
     
     public World (App manager, String name, int width, int height, boolean doorAndKey) {
         this.app = manager;
         this.name = name;
         this.updateFlag = false;
         this.worldChangeFlag = false;
+        this.worldTickTock = Executors.newSingleThreadScheduledExecutor();
+        this.worldTickCount = 0;
+        
+        worldTickTock.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                tickTock();
+            }
+        }, WORLD_TICK_DELAY, WORLD_TICK_RATE, WORLD_TICK_TIME_UNIT);
+        
         
         this.nodes = new ArrayList<ArrayList<Node>>();
-        this.beings = new ConcurrentHashMap<String, Being>();
+        this.entities = new ConcurrentHashMap<String, Entity>();
         this.items = new ArrayList<Item>();
         this.visibileNodes = new ArrayList<Node>();
         maxVisDistance = App.pref.getValue("visibleRange");
@@ -97,21 +140,21 @@ public class World {
         int numberOfCoins = (int)(h*w*(r/100));
         
         Random rand = new Random();
-        int xC = rand.nextInt(getWidth());
-        int yC = rand.nextInt(getHeight());
+        int coinXCoord = rand.nextInt(getWidth());
+        int coinYCoord = rand.nextInt(getHeight());
         int coinValue = 50;
         
         for (int x = 0; x < numberOfCoins; x++) {
-            xC = rand.nextInt(getWidth());
-            yC = rand.nextInt(getHeight());
-            Node n = getNode(xC, yC);
+            coinXCoord = rand.nextInt(getWidth());
+            coinYCoord = rand.nextInt(getHeight());
+            Node n = getNode(coinXCoord, coinYCoord);
             if (start.equals(n)) continue;
             if (finish.equals(n)) continue;
             for (Item i : items) {
                 if (i.getNode().equals(n)) continue;
             }
-            Coins coins = new Coins(n,coinValue);
-            items.add(coins);
+            Item coin = new Item(n, Item.COIN, coinValue);
+            items.add(coin);
         }
     }
 
@@ -123,19 +166,19 @@ public class World {
      *     - player picks up coins
      *     - player dies
      */
-    synchronized private void update() {
+    private void update() {
         // runs the collision checks for the world
         collision();
         
         // Recalculates the lighting
-        calculateVisibility(beings.get("Moneymaker").getNode());
+        calculateVisibility(entities.get("Moneymaker").getNode());
     }
 
-    synchronized public int getPlayerCoins(String id) {
-        return beings.get(id).getCoins();
+    public int getPlayerCoins(String id) {
+        return entities.get(id).getCoins();
     }
     
-    synchronized public ArrayList<Node> getEntityNodes() {
+    public ArrayList<Node> getEntityNodes() {
         ArrayList<Node> coords = new ArrayList<Node>();
         for (Item i : items) {
             coords.add(i.getNode());
@@ -147,7 +190,7 @@ public class World {
      * Method allowing external objects to update the game state.
      * @param string The message send to the world.
      */
-    synchronized public void sendMessage(String[] message) {
+    public void sendMessage(String[] message) {
         switch (message[1]) {
             case "move": beingMove(message[2], message[3]); break;
             case "attack": beingAttack(message[2]); break;
@@ -156,34 +199,39 @@ public class World {
     }
     
     private void beingAttack(String beingName) {
-        Being being = beings.get(beingName);
-        if (being.isDead()) return;
+        Entity entityAttacking = entities.get(beingName);
+        if (entityAttacking.isDead()) return;
         
         System.out.println("ATTACK!");
+        sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "sword_swing"}));
         
-        Node beingNode = being.getNode();
-
-        Iterator<String> iterBeing = beings.keySet().iterator();
-        while (iterBeing.hasNext()) {
-            Being b = beings.get(iterBeing.next());
-            Node n = b.getNode();
+        Node enemyAttackingNode = entityAttacking.getNode();        
+        
+        Iterator<String> iterEntity = entities.keySet().iterator();
+        while (iterEntity.hasNext()) {
+            Entity entity = entities.get(iterEntity.next());
+            Node entityNode = entity.getNode();
+            
+            //entityAttacking 
             
             // If the being is dead can't kill it twice
-            if (b.isDead()) continue;
+            if (entity.isDead()) continue;
             
-            for (Node m : n.getConnectedNodes()) {
-                if (beingNode.equals(m)) {
+            for (Node m : enemyAttackingNode.getConnectedNodes()) {
+                Item energy = new Item(m, Item.ENERGY, 3);
+                items.add(energy);
+                if (entityNode.equals(m)) {
                     System.out.println("Killed");
                     sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "death"}));
-                    b.setDead(true);
-                    worldChangeFlag = true;
+                    entity.setDead(true);
                 }
             }
         }
+        worldChangeFlag = true;
     }
     
-    synchronized private void beingMove(String id, String dir) {
-        Being b = beings.get(id);
+    private void beingMove(String id, String dir) {
+        Entity b = entities.get(id);
         if (b.isDead()) return;
         
         Node n = b.getNode();
@@ -210,11 +258,11 @@ public class World {
         update();
     }    
 
-    synchronized public boolean isWorldChangeFlag() {
+    public boolean isWorldChangeFlag() {
         return worldChangeFlag;
     }
 
-    synchronized public void setWorldChangeFlag(boolean worldChangeFlag) {
+    public void setWorldChangeFlag(boolean worldChangeFlag) {
         this.worldChangeFlag = worldChangeFlag;
     }
     
@@ -223,7 +271,7 @@ public class World {
      * 
      * @param node The node to start from.
      */
-    synchronized public void calculateVisibility(Node startNode) {
+    public void calculateVisibility(Node startNode) {
         
         // if visibility is turned off don't calculate
         if (maxVisDistance == -1) return;
@@ -270,15 +318,15 @@ public class World {
      * @param y the y coordinate of the node.
      * @return the visibility of the node.
      */
-    synchronized public float getNodeVisibility(int x, int y) {
+    public float getNodeVisibility(int x, int y) {
         return getNode(x, y).getVisibility();
     }
     
-    synchronized private void collision() {
+    private void collision() {
         // Being collision
-        Iterator<String> iterBeing = beings.keySet().iterator();
+        Iterator<String> iterBeing = entities.keySet().iterator();
         while (iterBeing.hasNext()) {
-            Being b = beings.get(iterBeing.next());
+            Entity b = entities.get(iterBeing.next());
             
             // If the player is dead they can't do anything
             if (b.isDead()) continue;
@@ -312,7 +360,7 @@ public class World {
             
             // Being attack check
             if (b.getName().equals("Moneymaker")) {
-                Being enemyBeing = beings.get("Enemy");
+                Entity enemyBeing = entities.get("Enemy");
                 Node enemyNode = enemyBeing.getNode();
                 if (enemyBeing.isDead()) continue;
                 if (b.getNode().equals(enemyNode)) {
@@ -326,13 +374,14 @@ public class World {
         // Item collision
         Iterator<Item> itemItr = items.iterator();
         while (itemItr.hasNext()) {
-            Entity e = itemItr.next();
+            Item i = itemItr.next();
             
-            for(Map.Entry<String,Being> entry : beings.entrySet()) {
-                Being b = entry.getValue();
-                if (b.getNode().equals(e.getNode())) {
-                    if (e instanceof Coins) {
-                        b.addCoins(((Coins)e).getValue());
+            for(Map.Entry<String, Entity> entry : entities.entrySet()) {
+                Entity b = entry.getValue();
+                
+                if (b.getNode().equals(i.getNode())) {
+                    if (i.getType() == Item.COIN) {
+                        b.addCoins((i).getValue());
                         itemItr.remove();
                         sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "coin"}));
                         worldChangeFlag = true;
@@ -346,18 +395,18 @@ public class World {
      * Add being into the world.
      * @param name Name of the player.
      */
-    synchronized public void addEnemy(String name) {
-        Being player = new Being(this.finish, name);
-        beings.put(name, player);
+    public void addEnemy(String name) {
+        Entity enemy = new Entity(this.finish, name);
+        entities.put(name, enemy);
     }
 
     /**
      * Add enemy into the world.
      * @param name Name of the enemy
      */
-    synchronized public void addPlayer(String name) {
-        Being player = new Being(this.start, name);
-        beings.put(name, player);
+    public void addPlayer(String name) {
+        Entity player = new Entity(this.start, name);
+        entities.put(name, player);
     }
     
     /**
@@ -372,7 +421,7 @@ public class World {
      * Get's the name of the world
      * @return world name
      */
-    synchronized public String getName() {
+    public String getName() {
         return this.name;
     }
     
@@ -380,7 +429,7 @@ public class World {
      * Gets the start node.
      * @return start node
      */
-    synchronized public Node getStartNode() {
+    public Node getStartNode() {
         return this.start;
     }
     
@@ -388,7 +437,7 @@ public class World {
      * Gets the finish node
      * @return finish node
      */
-    synchronized public Node getFinishNode() {
+    public Node getFinishNode() {
         return this.finish;
     }
     
@@ -396,7 +445,7 @@ public class World {
      * Gets the width of the maze
      * @return maze width
      */
-    synchronized public int getWidth() {
+    public int getWidth() {
         return this.width;
     }
     
@@ -404,16 +453,16 @@ public class World {
      * Gets the height of the maze
      * @return maze height
      */
-    synchronized public int getHeight() {
+    public int getHeight() {
         return this.height;
     }
     
-    synchronized public Node getKeyNode() {
+    public Node getKeyNode() {
         return key;
     }
 
-    synchronized public Node getBeingNode(String id) {
-        return beings.get(id).getNode();
+    public Node getBeingNode(String id) {
+        return entities.get(id).getNode();
     }
     
     /**
@@ -422,7 +471,7 @@ public class World {
      * @param y The y coordinate.
      * @return Node at x and y.
      */
-    synchronized public Node getNode(int x, int y) {
+    public Node getNode(int x, int y) {
         return this.nodes.get(x).get(y);
     }
     
@@ -434,16 +483,16 @@ public class World {
      * @param y2
      * @return
      */
-    synchronized public boolean isConnected(int x1, int y1, int x2, int y2) {
+    public boolean isConnected(int x1, int y1, int x2, int y2) {
         return getNode(x1,y1).isConnected(getNode(x2,y2));
     }
-    synchronized public float getWallVisibility(int x1, int y1, int x2, int y2) {
+    public float getWallVisibility(int x1, int y1, int x2, int y2) {
         float visA = getNode(x1,y1).getVisibility();
         float visB = getNode(x2,y2).getVisibility();
         return (visA+visB)/2f;
     }
     
-    synchronized public boolean isDoor(int xA, int yA, int xB, int yB) {
+    public boolean isDoor(int xA, int yA, int xB, int yB) {
         if((this.getNode(xA, yA).equals(this.doorStart) &&
                 this.getNode(xB, yB).equals(this.doorFinish)) ||
                 (this.getNode(xA, yA).equals(this.doorFinish) &&
@@ -761,6 +810,10 @@ public class World {
     }
 
     public boolean isBeingDead(String string) {
-        return beings.get(string).isDead();
+        return entities.get(string).isDead();
+    }
+
+    public ArrayList<Item> getItems() {
+        return items;
     }
 }

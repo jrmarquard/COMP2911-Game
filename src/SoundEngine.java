@@ -18,7 +18,7 @@ public class SoundEngine {
 	private int gameSoundsPlaying;
 	
 	// Permanent options
-	private final int MAX_GAME_SOUNDS = 5;
+	private final int MAX_GAME_SOUNDS = 15;
 	
 	// Thread pool to run sounds in
 	ExecutorService soundPool;

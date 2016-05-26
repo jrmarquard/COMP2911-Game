@@ -115,6 +115,17 @@ public class GameMap extends JPanel {
         g2d.setColor(App.pref.getColour("finishColour"));
         g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
 
+        // Draw on items
+        for (Item i : world.getItems()) {
+            n = i.getNode();
+            if (i.getType() == Item.COIN) {
+                g2d.setColor(App.pref.getColour("coinColour"));
+                g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);  
+            } else if (i.getType() == Item.ENERGY) {
+                g2d.setColor(Color.pink);
+                g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);                
+            }
+        }
         
         // Draw on Enemy
         if(App.pref.getBool("enemy")) {
@@ -149,11 +160,11 @@ public class GameMap extends JPanel {
         g2d.fill(circle);
         
         // Draw on coins
-        ArrayList<Node> nodes = world.getEntityNodes();
-        g2d.setColor(App.pref.getColour("coinColour"));
-        for (Node s : nodes) {
-            g2d.fillRect(wallWidth+(s.getX()*(wallWidth+tileSize)), wallWidth+(s.getY()*(wallWidth+tileSize)), tileSize, tileSize);
-        }
+//        ArrayList<Node> nodes = world.getEntityNodes();
+//        g2d.setColor(App.pref.getColour("coinColour"));
+//        for (Node s : nodes) {
+//            g2d.fillRect(wallWidth+(s.getX()*(wallWidth+tileSize)), wallWidth+(s.getY()*(wallWidth+tileSize)), tileSize, tileSize);
+//        }
         
         // Draw key
         n = world.getKeyNode();
