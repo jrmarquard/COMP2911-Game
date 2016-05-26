@@ -84,7 +84,7 @@ public class World {
         mazeGenerator();
         generateCoins();
         
-        //Synchronization
+        //Synchronization (providing mutual exclusion to appropriate resources)
         this.visibilitySemaphore = new Semaphore(1, true);
         this.itemSemaphore = new Semaphore(1, true);
         this.beingSemaphore = new Semaphore(1, true);
@@ -213,7 +213,7 @@ public class World {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-        // Resets the that were visibile to be dark
+        // Resets those that were visible to be dark
         for (Node n : visibileNodes) {
             n.setVisibility(0);
         }
@@ -362,8 +362,14 @@ public class World {
         return getNode(x1,y1).isConnected(getNode(x2,y2));
     }
     public float getWallVisibility(int x1, int y1, int x2, int y2) {
+    	try {
+			this.visibilitySemaphore.acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
         float visA = getNode(x1,y1).getVisibility();
         float visB = getNode(x2,y2).getVisibility();
+        this.visibilitySemaphore.release();
         return (visA+visB)/2f;
     }
     
@@ -685,6 +691,13 @@ public class World {
     }
 
     public float getNodeVisibility(int x, int y) {
-        return getNode(x, y).getVisibility();
-    }
+    	try {
+			this.visibilitySemaphore.acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+    	float visibility = getNode(x, y).getVisibility();
+    	this.visibilitySemaphore.release();
+        return visibility;
+    } 
 }
