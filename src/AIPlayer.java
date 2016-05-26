@@ -17,6 +17,7 @@ public class AIPlayer implements AI {
 	private String diff;
     private LinkedList<Node> explore;
     private HashMap<Node, Integer> visited;
+    private boolean attacked = false;
     
     public AIPlayer(World world, String id, String diff) {
         this.world = world;
@@ -25,6 +26,7 @@ public class AIPlayer implements AI {
         this.diff = diff;
         this.explore = new LinkedList<Node>();
         this.visited = new HashMap<Node, Integer>();
+        this.attacked = false;
     }
     
     @Override
@@ -168,53 +170,65 @@ public class AIPlayer implements AI {
      * @return a message which contains the move that the AI would like to make
      */
     private Message hardMove() {
+    	Node current = this.world.getEntityNode(this.id);
+    	Node enemy = this.world.getEntityNode("Enemy");
+    	boolean attack = false;
+    	
     	String[] message = new String[4];
         message[0] = worldName;
-        message[1] = "move";
         message[2] = id;
         
-        Node current = this.world.getEntityNode(this.id);
-        ArrayList<Node> reachable = current.getConnectedNodes();
-        
-        if(this.visited.containsKey(current)) {
-			int currentCost = this.visited.get(current);
-			this.visited.put(current, currentCost += 1);
-		} else {
-			this.visited.put(current, 1);
-		}
-        
-        Node next = null;
-        boolean allVisited = isReachableInVisited(reachable);
-        
-        for(Node node: reachable) {
-        	if(allVisited) {
-        		if(next == null) {
-        			next = node;
-        		} else {
-        			int nodeCost, nextCost;
-        			
-        			if(this.visited.containsKey(node)) {
-        				nodeCost = this.visited.get(node);
-        			} else {
-        				nodeCost = 0;
-        			}
-        			
-        			if(this.visited.containsKey(next)) {
-        				nextCost = this.visited.get(next);
-        			} else {
-        				nextCost = 0;
-        			}
-        			
-        			if(nodeCost < nextCost) {
-        				next = node;
-        			}
-        		}
-        	} else if(!visited.containsKey(node)) {
-        		next = node;
-        	}
+        if(current.isConnected(enemy) && !this.attacked) {
+        	message[1] = "attack";
+        	attack = true;
+        	this.attacked = true;
+        } else {
+        	message[1] = "move";
         }
         
-        putDirectionInMessage(current, next, message);
+        if(!attack) {
+        	ArrayList<Node> reachable = current.getConnectedNodes();
+            
+            if(this.visited.containsKey(current)) {
+    			int currentCost = this.visited.get(current);
+    			this.visited.put(current, currentCost += 1);
+    		} else {
+    			this.visited.put(current, 1);
+    		}
+            
+            Node next = null;
+            boolean allVisited = isReachableInVisited(reachable);
+            
+            for(Node node: reachable) {
+            	if(allVisited) {
+            		if(next == null) {
+            			next = node;
+            		} else {
+            			int nodeCost, nextCost;
+            			
+            			if(this.visited.containsKey(node)) {
+            				nodeCost = this.visited.get(node);
+            			} else {
+            				nodeCost = 0;
+            			}
+            			
+            			if(this.visited.containsKey(next)) {
+            				nextCost = this.visited.get(next);
+            			} else {
+            				nextCost = 0;
+            			}
+            			
+            			if(nodeCost < nextCost) {
+            				next = node;
+            			}
+            		}
+            	} else if(!visited.containsKey(node)) {
+            		next = node;
+            	}
+            }
+            
+            putDirectionInMessage(current, next, message);
+        }
         
         return new Message(Message.GAME_MSG, message);
     }

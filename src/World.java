@@ -235,12 +235,14 @@ public class World {
             for(Map.Entry<String, Entity> entry : entities.entrySet()) {
                 Entity e = entry.getValue();
                 
-                if (e.getNode().equals(i.getNode())) {
-                    if (i.getType() == Item.COIN) {
-                        e.addCoins((i).getValue());
-                        itemItr.remove();
-                        sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "coin"}));
-                        worldChangeFlag = true;
+                if(!e.getName().equals("Enemy")) {
+                	if (e.getNode().equals(i.getNode())) {
+                        if (i.getType() == Item.COIN) {
+                            e.addCoins((i).getValue());
+                            itemItr.remove();
+                            sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "coin"}));
+                            worldChangeFlag = true;
+                        }
                     }
                 }
             }
