@@ -8,7 +8,7 @@ import java.util.Random;
  * 
  * @author John
  */
-public class AISolve implements AI {
+public class AIPlayer implements AI {
 
 	private World world;
 	private String worldName;
@@ -17,7 +17,7 @@ public class AISolve implements AI {
     private LinkedList<Node> explore;
     private HashMap<Node, Integer> visited;
     
-    public AISolve(World world, String id, String diff) {
+    public AIPlayer(World world, String id, String diff) {
         this.world = world;
         this.worldName = world.getName();;
         this.id = id;
