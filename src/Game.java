@@ -1,5 +1,5 @@
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -7,132 +7,103 @@ import java.util.concurrent.TimeUnit;
 
 
 public class Game {
-    // The game manager, we use this to notify it off messages with the nofity() method
-    private MazePuzzleGame manager;
+    /**
+     * The game manager, we use this to notify it off messages with the nofity() method
+     */
+    private App manager;
     
-    // Used to load preferences set by the user
-    private Preferences pref;
+    /**
+     * Collection of the worlds which are identified by a unique string
+     */
+    private ConcurrentMap<String, World> worlds;
     
-    // Collection of the worlds which are identified by a unique string
-    private Map<String, World> worlds;
-    
-    // Executor to run the AIs in
+    /**
+     * Executor to run the AIs in
+     */
     private ScheduledExecutorService aiPool;
     
-    // false if unpaused, true if paused
+    /**
+     * Pause is used to halt all game state changes if true.
+     */
     private boolean pause;
     
-    public Game (MazePuzzleGame manager, Preferences pref) {
+    /**
+     * The constructor for game. 
+     * @param manager Manager is where to send messages to.
+     */
+    public Game (App manager) {
         this.manager = manager;
-        this.pref = pref;
         this.worlds = new ConcurrentSkipListMap<String, World>();
         this.pause = false;
     }
     
+    /**
+     * Creates a new game based on settings in the preferences class.
+     */
     public void newGame() {
-        pause = false;
-        String gameMode = pref.getText("gameMode");
+        // Pause the game while making it.
+        pause = true;
 
-        int height = pref.getValue("defaultMapHeight");
-        int width = pref.getValue("defaultMapWidth");
-        aiPool = Executors.newScheduledThreadPool(4); 
-        boolean doorAndKey = pref.getBool("doorAndKey");
-        boolean enemy = pref.getBool("enemy");
+        // Create executor service.
+        aiPool = Executors.newScheduledThreadPool(4);
         
+        // Get various game settings
+        String gameMode = App.pref.getText("gameMode");
+        int height = App.pref.getValue("defaultMapHeight");
+        int width = App.pref.getValue("defaultMapWidth");
+        boolean doorAndKey = App.pref.getBool("doorAndKey");
+        boolean enemy = App.pref.getBool("enemy");
+        
+        // AI run settings
         TimeUnit timeUnit = TimeUnit.MILLISECONDS;
         int aiRefreshRate = 150;
+        
+        // Create the game
         if (gameMode.equals("Race")) {
             for (int x = 1; x <= 4; x++) {
-                String opt = pref.getText("player"+x);
-                if (opt.equals("Human")) {
-                    World world = new World(manager, "world"+x, height, width, doorAndKey);
-                    worlds.put("world"+x, world);
-                    world.addPlayer("Moneymaker");
-                    
-                    if(enemy) {
-                    	world.addEnemy("Enemy");
-                        AI aiE = new AIEnemy(world,"Enemy");
-                        aiRunnable airE = new aiRunnable(aiE);
-                        aiPool.scheduleAtFixedRate(airE, aiRefreshRate*(2/10), aiRefreshRate, timeUnit);
-
-                    }
-                } else if (opt.equals("Easy AI")) {
-                    World world = new World(manager, "world"+x, height, width, doorAndKey);
-                    worlds.put("world"+x, world);
-                    world.addPlayer("Moneymaker");
-                    AI ai = new AISolve(world,"Moneymaker", "easy");
-                    aiRunnable air = new aiRunnable(ai);
-                    aiPool.scheduleAtFixedRate(air, aiRefreshRate*(2/10), aiRefreshRate, timeUnit);
-                    
-                    if(enemy) {
-                    	world.addEnemy("Enemy");
-                        AI aiE = new AIEnemy(world,"Enemy");
-                        aiRunnable airE = new aiRunnable(aiE);
-                        aiPool.scheduleAtFixedRate(airE, aiRefreshRate*(2/10), aiRefreshRate, timeUnit);
-
-                    }
+                String opt = App.pref.getText("player"+x);
+                
+                // If this player is turned off, skip this world
+                if (opt.equals("Off")) {
+                    continue;
+                }
+                
+                // Create the world and add it to worlds
+                World world = new World(manager, "world"+x, height, width, doorAndKey);
+                worlds.put("world"+x, world);
+                
+                // Create the default player
+                world.addPlayer("Moneymaker");
+                
+                // If enemy is selected, add it to the world and attach an AI
+                if (enemy) {
+                    world.addEnemy("Enemy");
+                    aiRunnable AIRunEnemy = new aiRunnable(new AIEnemy(world,"Enemy"));
+                    aiPool.scheduleAtFixedRate(AIRunEnemy, 650, aiRefreshRate, timeUnit);
+                }
+                
+                // If AI is specified add it
+                if (opt.equals("Easy AI")) {
+                    aiRunnable AIRun = new aiRunnable(new AIPlayer(world,"Moneymaker", "easy"));
+                    aiPool.scheduleAtFixedRate(AIRun, 650, aiRefreshRate, timeUnit);
                 } else if (opt.equals("Med AI")) {
-                    World world = new World(manager, "world"+x, height, width, doorAndKey);
-                    worlds.put("world"+x, world);
-                    world.addPlayer("Moneymaker");
-                    AI ai = new AISolve(world,"Moneymaker", "med");
-                    aiRunnable air = new aiRunnable(ai);
+                    aiRunnable air = new aiRunnable(new AIPlayer(world,"Moneymaker", "med"));
                     aiPool.scheduleAtFixedRate(air, aiRefreshRate*(5/10), aiRefreshRate, timeUnit);
-                    
-                    if(enemy) {
-                    	world.addEnemy("Enemy");
-                        AI aiE = new AIEnemy(world,"Enemy");
-                        aiRunnable airE = new aiRunnable(aiE);
-                        aiPool.scheduleAtFixedRate(airE, aiRefreshRate*(2/10), aiRefreshRate, timeUnit);
-
-                    }
                 } else if (opt.equals("Hard AI")) {
-                    World world = new World(manager, "world"+x, height, width, doorAndKey);
-                    worlds.put("world"+x, world);
-                    world.addPlayer("Moneymaker");
-                    AI ai = new AISolve(world,"Moneymaker", "hard");
-                    aiRunnable air = new aiRunnable(ai);
+                    aiRunnable air = new aiRunnable(new AIPlayer(world,"Moneymaker", "hard"));
                     aiPool.scheduleAtFixedRate(air, aiRefreshRate*(8/10), aiRefreshRate, timeUnit);
-                    
-                    if(enemy) {
-                    	world.addEnemy("Enemy");
-                        AI aiE = new AIEnemy(world,"Enemy");
-                        aiRunnable airE = new aiRunnable(aiE);
-                        aiPool.scheduleAtFixedRate(airE, aiRefreshRate*(2/10), aiRefreshRate, timeUnit);
-
-                    }
                 }
             }
-        } else if (gameMode.equals("Solve")) {
-            String opt = pref.getText("player"+1);
-            World world = new World(manager, "world"+1, height, width, doorAndKey);
-            worlds.put("world"+1, world);
-            world.addPlayer("Moneymaker");
-            
-            if(enemy) {
-            	world.addEnemy("Enemy");
-                AI aiE = new AIEnemy(world,"Enemy");
-                aiRunnable airE = new aiRunnable(aiE);
-                aiPool.scheduleAtFixedRate(airE, aiRefreshRate*(2/10), aiRefreshRate, timeUnit);
-
-            }
-            
-            if (opt.equals("Easy AI")) {
-                AI ai = new AISolve(world,"Moneymaker", "easy");
-                aiRunnable air = new aiRunnable(ai);
-                aiPool.scheduleAtFixedRate(air, aiRefreshRate*(2/10), aiRefreshRate, timeUnit);
-            } else if (opt.equals("Med AI")) {
-                AI ai = new AISolve(world,"Moneymaker", "med");
-                aiRunnable air = new aiRunnable(ai);
-                aiPool.scheduleAtFixedRate(air, aiRefreshRate*(2/10), aiRefreshRate, timeUnit);
-            } else if (opt.equals("Hard AI")) {
-                AI ai = new AISolve(world,"Moneymaker", "hard");
-                aiRunnable air = new aiRunnable(ai);
-                aiPool.scheduleAtFixedRate(air, aiRefreshRate*(2/10), aiRefreshRate, timeUnit);
-            }
+        } else if (gameMode.equals("Infinite Mazes")) {
+            // not implemented yet
+        } else if (gameMode.equals("Battle")) {
+            // Create a world with 2 players
+            // Start them at start/finish
+            // No key door
+            // No enemy
         }
-            
-        }
+        pause = false;
+    }
     
     /**
      * Returns the coins of each player in each world
@@ -159,12 +130,8 @@ public class Game {
         return worlds;
     }
 
-    public void inbox(String[] message) {
+    synchronized public void inbox(String[] message) {
         switch(message[0]) {
-            case "move":
-                if (pause) return;
-                worlds.get(message[1]).moveBeing(message[2], message[3]);
-                break;                    
             case "newGame":
                 newGame();
                 break;
@@ -175,10 +142,20 @@ public class Game {
                 togglePause();
                 break;
             default:
+                if (pause) return;
+                try {
+                    worlds.get(message[0]).sendMessage(message);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.out.println("Game message error.");
+                }
                 break;
         }
     }
     
+    /**
+     * Toggles the pause on the game.
+     */
     private void togglePause() {
         if (pause == false) {
             pause = true;
@@ -187,15 +164,22 @@ public class Game {
         }
     }
     
+    /**
+     * endGame() clears the game data and stops processing the ai threads.
+     */
     private void endGame() {
-        // Remove old worlds
-        worlds.clear();
         // Stop new submissions and end all currently running tasks immediately
         aiPool.shutdownNow();
+        
+        // Remove old worlds
+        worlds.clear();
+        
     }
 
+    /**
+     * aiRunnable executes an ai's makeMove method and sends it to the app.
+     */
     private class aiRunnable implements Runnable {
-        
         AI ai;
         
         public aiRunnable(AI ai) {
@@ -206,7 +190,7 @@ public class Game {
             try {
                 manager.sendMessage(ai.makeMove());
             } catch (Exception e){
-                System.out.println("AI run error.");
+                System.out.println("AI runnable error.");
                 e.printStackTrace();
             }
         }

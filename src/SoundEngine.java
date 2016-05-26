@@ -8,14 +8,18 @@ import java.util.concurrent.Semaphore;
 import javax.sound.sampled.*;
 
 public class SoundEngine {
-	private boolean soundEnabled;
+    // Sounds
 	private Clip menuMusic;
 	private Clip backgroundMusic;
+	
+	// Sound options
 	private float masterVolume;
 	private List<FloatControl> volControls;
-	private Preferences pref;
+    private boolean soundEnabled;
 	private int gameSoundsPlaying;
-	final private int MAX_GAME_SOUNDS = 50;
+	
+	// Permanent options
+	private final int MAX_GAME_SOUNDS = 20;
 	
 	//Locking System
 	private Semaphore soundsPlayingSemaphore;
@@ -23,8 +27,7 @@ public class SoundEngine {
 	// Thread pool to run sounds in
 	ExecutorService soundPool;
 	
-	public SoundEngine(Preferences pref) {
-	    this.pref = pref;
+	public SoundEngine() {
 		this.soundEnabled = true;
 		this.masterVolume = 0f;
 		this.volControls = new ArrayList<FloatControl>();
@@ -83,20 +86,18 @@ public class SoundEngine {
      * 
      * @param volume A number between 0 and 100. Where 0 is mute and 100 max volume.
      */
-    private void setMasterVolume() {
-        if (this.soundEnabled) {
-	        int volume = pref.getValue("masterVolume");
-	        
-	        float minVol = -20.0f;
-	        float maxVol = 2.0f;
-	        float volUnit = (maxVol-minVol)/100f;
-	        
-	        masterVolume = minVol + volUnit*(float)volume;
-	        if (volume == 0) masterVolume = -64f;
-	        
-	        for (FloatControl f : volControls) {
-	            f.setValue(masterVolume);
-	        }
+    private void setMasterVolume() {        
+        int volume = App.pref.getValue("masterVolume");
+        
+        float minVol = -20.0f;
+        float maxVol = 2.0f;
+        float volUnit = (maxVol-minVol)/100f;
+        
+        masterVolume = minVol + volUnit*(float)volume;
+        if (volume == 0) masterVolume = -64f;
+        
+        for (FloatControl f : volControls) {
+            f.setValue(masterVolume);
         }
     }
 	

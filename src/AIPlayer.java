@@ -6,7 +6,7 @@ import java.util.Random;
  * 
  * @author John
  */
-public class AISolve implements AI {
+public class AIPlayer implements AI {
 
     World world;
     String worldName;
@@ -15,7 +15,7 @@ public class AISolve implements AI {
     private LinkedList<Node> explore;
     private LinkedList<Node> visited;
     
-    public AISolve(World world, String id, String diff) {
+    public AIPlayer(World world, String id, String diff) {
         this.world = world;
         this.worldName = world.getName();;
         this.id = id;
@@ -42,8 +42,8 @@ public class AISolve implements AI {
      */
     private Message easyMove() {
         String[] message = new String[4];
-        message[0] = "move";
-        message[1] = worldName;
+        message[0] = worldName;
+        message[1] = "move";
         message[2] = id;
         
         int randValue = (new Random()).nextInt(4);
@@ -63,12 +63,12 @@ public class AISolve implements AI {
      * @return
      */
     private Message medMove() {
-    	String[] message = new String[4];
-        message[0] = "move";
-        message[1] = worldName;
+        String[] message = new String[4];
+        message[0] = worldName;
+        message[1] = "move";
         message[2] = id;
         
-        Node current = this.world.getBeingCoordinate(this.id);
+        Node current = this.world.getEntityNode(this.id);
         this.visited.add(current);
         int currX = current.getX();
         int currY = current.getY();
@@ -169,12 +169,12 @@ public class AISolve implements AI {
      * @return
      */
     private Message hardMove() {
-    	String[] message = new String[4];
-        message[0] = "move";
-        message[1] = worldName;
+        String[] message = new String[4];
+        message[0] = worldName;
+        message[1] = "move";
         message[2] = id;
         
-        Node current = this.world.getBeingCoordinate(this.id);
+        Node current = this.world.getEntityNode(this.id);
         int currX = current.getX();
         int currY = current.getY();
         LinkedList<Node> reachable = this.getReachable(current);
