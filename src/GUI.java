@@ -512,7 +512,7 @@ public class GUI extends JFrame  {
                 }
             };
         aboutTextPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-        JTextArea aboutText = new JTextArea();
+        JTextArea aboutText = new JTextArea(35, 25);
         aboutText.setMargin(new Insets(10,10,10,10));
         try {
 	        FileReader aboutReader = new FileReader(this.game.getAboutFile());
@@ -521,8 +521,12 @@ public class GUI extends JFrame  {
         catch (Exception e) {
         	e.printStackTrace();
         }
-         
-        aboutTextPanel.add(aboutText);
+        
+        
+        JScrollPane scroll = new JScrollPane(aboutText);
+        scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        
+        aboutTextPanel.add(scroll);
         windowPanel.add(aboutTextPanel);
     }
     

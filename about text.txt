@@ -1,7 +1,7 @@
 Game written by: Tyler, John, Joshua and Tim
 
 
-                         CONTROLS
+                           CONTROLS
                          
 Player 1: 
 - ARROW KEYS to move
@@ -20,7 +20,7 @@ Player 4:
 ESC to return to menu
 
 
-                        GAME MODES
+                          GAME MODES
 
 1. Race
 - Up to 4 players
@@ -34,9 +34,9 @@ ESC to return to menu
 - You have the option of enemies in the maze
 - Infinite number of mazes to continue through
 - If 2 player the winner is the player who beats 
-  the most number of mazes before dying
+   the most number of mazes before dying
 - If 1 player then try and beat your own 
-  highscore
+   highscore
 
 3. Battle
 - 2 players
@@ -46,14 +46,14 @@ ESC to return to menu
 - maze is completely visible in this
 
 
-                        MODIFIERS
+                            MODIFIERS
                  
 - Door which cannot be passed until the key 
-  is found                        
+   is found                        
 - Enemies in the maze which must be avoided or 
-  killed to progress
+   killed to progress
 - Visibility adjustment to change how far ahead 
-  in the maze a player can see
+   in the maze a player can see
 - Size of the maze can be adjusted by changing 
-  the width and height variables
+   the width and height variables
   
