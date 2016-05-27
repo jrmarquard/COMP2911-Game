@@ -159,7 +159,12 @@ public class GUI extends JFrame  {
                 }
                 
                 switch (e.getKeyCode()) {
-                    case KeyEvent.VK_ESCAPE:   setAppState(AppState.MENU);                 break;
+                    case KeyEvent.VK_ESCAPE:   
+	                    sendMessage(new Message(Message.GAME_MSG, new String[]{"endGame"}));
+	                    sendMessage(new Message(Message.SOUND_MSG, new String[]{"stop", "background"}));
+	                    sendMessage(new Message(Message.SOUND_MSG, new String[]{"loop", "menu"}));
+	                    setAppState(AppState.MENU);
+	                    break;
                 }
             }
         });
