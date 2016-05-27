@@ -38,6 +38,7 @@ public class World {
     private Node finish;
     private int width;
     private int height;
+    private int mazeDepth;
     
     // Copying in from merge
     private Node doorStart;
@@ -87,6 +88,7 @@ public class World {
         this.worldTickCount = 0;
         this.maxVisDistance = App.pref.getValue("visibleRange");
         this.visibleNodes = new ArrayList<Node>();
+        this.mazeDepth = 0;
         
         // Semaphore initialisation
         this.visibilitySemaphore = new Semaphore(1, true);
@@ -286,7 +288,7 @@ public class World {
      * Resets the maze keeping the entities
      */
     private void resetMaze() {
-        System.out.println("reseting");
+        mazeDepth++;
         
         // Save the old nodes
         // ArrayList<ArrayList<Node>> oldNodes = nodes;
@@ -308,6 +310,11 @@ public class World {
         Iterator<String> iterEntity = entities.keySet().iterator();
         while (iterEntity.hasNext()) {
             Entity e = entities.get(iterEntity.next());
+            // If the entity is an enemy, ditch it
+            if (e.getType() == Entity.ENEMY) {
+                e.setMode(Entity.MODE_DEAD);
+                continue;
+            }
             e.setKey(false);
             Node oldNode = e.getNode();
             e.setNode(nodes.get(oldNode.getX()).get(oldNode.getY()));
@@ -345,7 +352,15 @@ public class World {
         // If enemies are enabled, create another one.
         // Uniquely identified by worldTickCount
         if (enemiesEnabled) {
-            this.addEnemy("Enemy"+worldTickCount);
+            int x = 0;
+            while (x < mazeDepth) {
+                String name = "Enemy"+worldTickCount+""+x;
+                Entity enemy = new Entity(this.finish, name, Entity.ENEMY);
+                entities.put(name, enemy);
+                aiRunnable AIRunEnemy = new aiRunnable(new AIEnemy(this, name));
+                aiPool.scheduleAtFixedRate(AIRunEnemy, AI_POOL_DELAY + x*200, AI_POOL_RATE, SCHEDULE_TIME_UNIT);
+                x = x+2;
+            }
         }
     }
     
@@ -1259,16 +1274,3 @@ public class World {
         }
     };
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
