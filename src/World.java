@@ -196,28 +196,56 @@ public class World {
         }, WORLD_TICK_DELAY, WORLD_TICK_RATE, SCHEDULE_TIME_UNIT);
         
         // Copy maze and item collections
-        this.nodes = new ArrayList<ArrayList<Node>>(nodes);
-        this.items = new ArrayList<Item>(items);
+        this.nodes = new ArrayList<ArrayList<Node>>();
+        for (int w = 0; w < width; w++) {
+            this.nodes.add(new ArrayList<Node>());
+            for (int h = 0; h < height; h++) {
+                this.nodes.get(w).add(new Node(w, h));
+            }
+        }
+        for (int w = 0; w < width; w++) {
+            for (int h = 0; h < height; h++) {
+                Node tempNode = nodes.get(w).get(h);
+                if (tempNode.getUp() != null) {
+                	this.nodes.get(w).get(h).setUp(this.nodes.get(w).get(h-1));
+                }
+                if (tempNode.getRight() != null) {
+                	this.nodes.get(w).get(h).setRight(this.nodes.get(w+1).get(h));
+                }
+                if (tempNode.getDown() != null) {
+                	this.nodes.get(w).get(h).setDown(this.nodes.get(w).get(h+1));
+                }
+				if (tempNode.getLeft() != null) {
+					this.nodes.get(w).get(h).setLeft(this.nodes.get(w-1).get(h));
+				}
+            }
+        }
+        
+        this.items = new ArrayList<Item>();
+        for (int i = 0; i < items.size(); i++) {
+        	Item item = new Item(this.nodes.get(items.get(i).getNode().getX()).get(items.get(i).getNode().getY()), items.get(i).getType(), items.get(i).getValue());
+        	this.items.add(item);
+        }
         
         // Create entity collection
         this.entities = new ConcurrentHashMap<String, Entity>();
         
         // Copy special nodes in the maze
-        this.start = start;
-        this.finish = finish;
-        this.doorStart = doorStart;
-        this.doorFinish = doorFinish;
-        this.key = key;
+        this.start = this.nodes.get(start.getX()).get(start.getY());
+        this.finish = this.nodes.get(finish.getX()).get(finish.getY());
+        this.doorStart = this.nodes.get(doorStart.getX()).get(doorStart.getY());
+        this.doorFinish = this.nodes.get(doorFinish.getX()).get(doorFinish.getY());
+        this.key = this.nodes.get(key.getX()).get(key.getY());
                 
         // If visibility is turned off make all the tiles bright.
         if (maxVisDistance == -1) {
-            for (ArrayList<Node> an : nodes) {
+            for (ArrayList<Node> an : this.nodes) {
                 for (Node n : an) {
                     n.setVisibility(0f);
                 }
             }
         } else {
-            calculateVisibility(start);            
+            calculateVisibility(this.start);            
         }
         
         // If enemies are enabled, create 1
