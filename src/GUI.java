@@ -12,6 +12,7 @@ import javax.swing.text.BadLocationException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 @SuppressWarnings("serial")
@@ -778,12 +779,10 @@ public class GUI extends JFrame  {
         titlePanel.setBackground(windowPanel.getBackground());
 
         ArrayList<Integer> coins = game.getPlayerCoins();
-        for (Integer i : coins) {
-            JLabel text = new JLabel();
-            text.setText("Coins: "+i);
-            titlePanel.add(text);
-            
-        }
+        JLabel coins1 = new JLabel();
+        JLabel coins2 = new JLabel();
+        JLabel coins3 = new JLabel();
+        JLabel coins4 = new JLabel();
         
         // Game Panel        
         gamePanel.setLayout(new BoxLayout(gamePanel, BoxLayout.Y_AXIS));
@@ -797,23 +796,35 @@ public class GUI extends JFrame  {
         
         if (numWorlds >= 1) {
             JPanel innerPanelA = new JPanel(new GridBagLayout());
-            innerPanelA.add(new GameMap(worlds.get(0)));
+            Integer playerOneCoins = coins.get(0);
+            coins1.setText("Coins: "+playerOneCoins);
+            titlePanel.add(coins1);
+            innerPanelA.add(new GameMap(worlds.get(0), coins1));
             gamePanelTop.add(innerPanelA);
             if (numWorlds >= 2) {            
                 JPanel innerPanelB = new JPanel(new GridBagLayout());
-                innerPanelB.add(new GameMap(worlds.get(1)));
+                Integer playerTwoCoins = coins.get(1);
+                coins2.setText("Coins: "+playerTwoCoins);
+                titlePanel.add(coins2);
+                innerPanelB.add(new GameMap(worlds.get(1), coins2));
                 gamePanelTop.add(innerPanelB);
                 if (numWorlds >= 3) {    
                     JPanel gamePanelBot = new JPanel();
+                    Integer playerThreeCoins = coins.get(2);
+                    coins3.setText("Coins: "+playerThreeCoins);
+                    titlePanel.add(coins3);
                     gamePanelBot.setLayout(new BoxLayout(gamePanelBot, BoxLayout.X_AXIS));
                     gamePanel.add(gamePanelBot);
                     
                     JPanel innerPanelC = new JPanel(new GridBagLayout());
-                    innerPanelC.add(new GameMap(worlds.get(2)));
+                    innerPanelC.add(new GameMap(worlds.get(2), coins3));
                     gamePanelBot.add(innerPanelC);
                     if (numWorlds == 4) {            
                         JPanel innerPanelD = new JPanel(new GridBagLayout());
-                        innerPanelD.add(new GameMap(worlds.get(3)));
+                        Integer playerFourCoins = coins.get(3);
+                        coins4.setText("Coins: "+playerFourCoins);
+                        titlePanel.add(coins4);
+                        innerPanelD.add(new GameMap(worlds.get(3), coins4));
                         gamePanelBot.add(innerPanelD);
                     }
                 }

@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -24,6 +25,7 @@ public class GameMap extends JPanel {
     private World world;
     private Graphics2D g2d;
     private PaintRefresh timer;
+    private JLabel coins;
     
     // Textures
     private BufferedImage floor = null;
@@ -57,9 +59,10 @@ public class GameMap extends JPanel {
     private BufferedImage attackL = null;
     private BufferedImage attackR = null;
     
-    public GameMap (World world) {
+    public GameMap (World world, JLabel coins) {
         super();
         this.world = world;
+        this.coins = coins;
         
         String pack = App.pref.getText("texturePack");
         timer = new PaintRefresh(this);
@@ -123,6 +126,13 @@ public class GameMap extends JPanel {
         g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         
+        //Updates the coin counter at the top of the game screen
+        for (Entity i : world.getEntities()) {
+        	if (i.getType() == Entity.PLAYER) {
+        		coins.setText("coins: "+ i.getCoins());
+        	}
+        }
+        
         // Gets the size of the panel to draw into
         Dimension d = this.getPreferredSize();
         int windowHeight = d.height;
@@ -175,8 +185,7 @@ public class GameMap extends JPanel {
          * Load textures into TexturePaint objects.
          * Loading the textures loads them to a specific size to be draw on the maze.
          */
-        
-        // The 
+
         Rectangle2D wallVSize = new Rectangle2D.Double(0, 0, wallWidth, tileSize+wallWidth);
         Rectangle2D wallHSize = new Rectangle2D.Double(0, 0, tileSize+wallWidth, wallWidth);
         Rectangle2D wallCSize = new Rectangle2D.Double(0, 0, wallWidth, wallWidth);
