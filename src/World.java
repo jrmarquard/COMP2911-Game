@@ -516,7 +516,7 @@ public class World {
     }    
 
     /**
-     * Add being into the world.
+     * Add enemy into the world.
      * @param name Name of the player.
      */
     public void addEnemy(String name) {
@@ -525,9 +525,13 @@ public class World {
         aiRunnable AIRunEnemy = new aiRunnable(new AIEnemy(this, "Enemy"));
         aiPool.scheduleAtFixedRate(AIRunEnemy, AI_POOL_DELAY, AI_POOL_RATE, SCHEDULE_TIME_UNIT);
     }
+    
+    public boolean isEnemyInMaze() {
+    	return this.entities.containsKey("Enemy");
+    }
 
     /**
-     * Add enemy into the world.
+     * Add being into the world.
      * @param name Name of the enemy
      */
     public void addPlayer(String name, String opt) {

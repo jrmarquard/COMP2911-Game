@@ -17,7 +17,8 @@ public class AIPlayer implements AI {
 	private String diff;
     private LinkedList<Node> explore;
     private HashMap<Node, Integer> visited;
-    private boolean attacked = false;
+    private boolean enemyInMaze;
+    private boolean attacked;
     
     public AIPlayer(World world, String id, String diff) {
         this.world = world;
@@ -26,6 +27,7 @@ public class AIPlayer implements AI {
         this.diff = diff;
         this.explore = new LinkedList<Node>();
         this.visited = new HashMap<Node, Integer>();
+        this.enemyInMaze = this.world.isEnemyInMaze();
         this.attacked = false;
     }
     
@@ -51,15 +53,21 @@ public class AIPlayer implements AI {
      */
     private Message easyMove() {
     	Node current = this.world.getEntityNode(this.id);
-    	Node enemy = this.world.getEntityNode("Enemy");
+    	Node enemy = null;
     	boolean attack = false;
+    	
+    	if(this.enemyInMaze) {
+    		enemy = this.world.getEntityNode("Enemy");
+    	} else {
+    		this.attacked = true;
+    	}
     	
     	String[] message = new String[4];
         message[0] = worldName;
         message[2] = id;
         
         if(current.isConnected(enemy) && !this.attacked) {
-        	message[1] = "attack";
+        	message[1] = "melee";
         	attack = true;
         	this.attacked = true;
         } else {
@@ -87,15 +95,21 @@ public class AIPlayer implements AI {
      */
     private Message medMove() {
     	Node current = this.world.getEntityNode(this.id);
-    	Node enemy = this.world.getEntityNode("Enemy");
+    	Node enemy = null;
     	boolean attack = false;
+    	
+    	if(this.enemyInMaze) {
+    		enemy = this.world.getEntityNode("Enemy");
+    	} else {
+    		this.attacked = true;
+    	}
     	
     	String[] message = new String[4];
         message[0] = worldName;
         message[2] = id;
         
         if(current.isConnected(enemy) && !this.attacked) {
-        	message[1] = "attack";
+        	message[1] = "melee";
         	attack = true;
         	this.attacked = true;
         } else {
@@ -196,8 +210,14 @@ public class AIPlayer implements AI {
      */
     private Message hardMove() {
     	Node current = this.world.getEntityNode(this.id);
-    	Node enemy = this.world.getEntityNode("Enemy");
+    	Node enemy = null;
     	boolean attack = false;
+    	
+    	if(this.enemyInMaze) {
+    		enemy = this.world.getEntityNode("Enemy");
+    	} else {
+    		this.attacked = true;
+    	}
     	
     	String[] message = new String[4];
         message[0] = worldName;
