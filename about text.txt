@@ -1,0 +1,59 @@
+Game written by: Tyler, John, Joshua and Tim
+
+
+                           CONTROLS
+                         
+Player 1: 
+- ARROW KEYS to move
+- SPACEBAR to attack
+            
+Player 2: 
+- WASD to move
+- SHIFT to attack
+            
+Player 3: 
+- TFGH to move
+            
+Player 4: 
+- IJKL to move
+
+ESC to return to menu
+
+
+                          GAME MODES
+
+1. Race
+- Up to 4 players
+- The same maze for each player 
+- No enemies
+- First to the finish wins 
+- Coins may be collected but have no value
+
+2. Adventure
+- Maximum 2 players
+- You have the option of enemies in the maze
+- Infinite number of mazes to continue through
+- If 2 player the winner is the player who beats 
+   the most number of mazes before dying
+- If 1 player then try and beat your own 
+   highscore
+
+3. Battle
+- 2 players
+- 1 maze
+- Last person standing is the winner
+- guess we could spawn enemies for fun
+- maze is completely visible in this
+
+
+                            MODIFIERS
+                 
+- Door which cannot be passed until the key 
+   is found                        
+- Enemies in the maze which must be avoided or 
+   killed to progress
+- Visibility adjustment to change how far ahead 
+   in the maze a player can see
+- Size of the maze can be adjusted by changing 
+   the width and height variables
+  

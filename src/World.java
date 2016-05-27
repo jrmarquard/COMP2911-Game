@@ -25,7 +25,7 @@ import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.Collections;
  *
  */
 public class World {
-    // World properies
+    // World properties
     private String name;
     private App app;
     private boolean enemiesEnabled;
@@ -486,7 +486,6 @@ public class World {
                     }
                 }
             }
-            
         }
         this.visibilitySemaphore.release();
     }

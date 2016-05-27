@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentMap;
@@ -5,6 +6,9 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
 
 
 public class Game {
@@ -23,6 +27,8 @@ public class Game {
      */
     private boolean pause;
     
+    private File aboutFile;
+    
     /**
      * The constructor for game. 
      * @param manager Manager is where to send messages to.
@@ -31,6 +37,8 @@ public class Game {
         this.manager = manager;
         this.worlds = new ConcurrentSkipListMap<String, World>();
         this.pause = false;
+        String aboutFileName = new String("about text.txt");
+	    this.aboutFile = new File(aboutFileName);
     }
     
     /**
@@ -166,6 +174,10 @@ public class Game {
         // Remove old worlds
         worlds.clear();
         
+    }
+    
+    public File getAboutFile() {
+    	return this.aboutFile;
     }
     
 }
