@@ -24,29 +24,14 @@ public class AIFighter implements AI {
     
 	@Override
 	public Message makeMove() {
-		Node current = this.world.getEntityNode(this.id);
-		Node enemy = null;
-		boolean attack = false;
-		
-		if(this.id.equals("Moneymaker")) {
-			enemy = this.world.getEntityNode("Teadrinker");
-		} else {
-			enemy = this.world.getEntityNode("Moneymaker");
-		}
-    	
-    	String[] message = new String[4];
+		String[] message = new String[4];
         message[0] = worldName;
         message[2] = id;
-        
-        if(current.isConnected(enemy) && !this.attacked) {
-        	message[1] = "melee";
-        	attack = true;
-        	this.attacked = true;
-        } else {
-        	message[1] = "move";
-        }
-        
+    	
+    	boolean attack = this.attack(message);
+    	
         if(!attack) {
+        	Node current = this.world.getEntityNode(this.id);
         	ArrayList<Node> reachable = current.getConnectedNodes();
     		if(this.visited.containsKey(current)) {
     			int currentCost = this.visited.get(current);
@@ -92,6 +77,63 @@ public class AIFighter implements AI {
         return new Message(Message.GAME_MSG, message);
 	}
 
+	/**
+     * Returns if the AI is going to attack or not
+     * and stores either attack or move inside message
+     * @param message to store either attack or move
+     * @return if the AI is going to attack or not
+     */
+    private boolean attack(String[] message) {
+    	Node current = this.world.getEntityNode(this.id);
+    	Node enemy = null;
+    	String enemyName = null;
+    	boolean attack = false;
+    	
+    	if(this.id.equals("Moneymaker")) {
+    		enemyName = "Teadrinker";
+			enemy = this.world.getEntityNode(enemyName);
+		} else {
+			enemyName = "Moneymaker";
+			enemy = this.world.getEntityNode(enemyName);
+		}
+    	
+    	for (Entity entity : world.getEntities()) {
+    	    if (entity.getName().equals(enemyName) && 
+    	    		entity.getMode() != Entity.MODE_DEAD &&
+    	    		isEnemyClose(current, enemy) && !this.attacked) {
+                message[1] = "melee";
+                attack = true;
+                this.attacked = true;
+                break;
+    	    } else {
+                message[1] = "move";
+                this.attacked = false;
+    	    }
+    	}
+    	
+    	return attack;
+    }
+    
+    /**
+     * Returns if the enemy is within 2 nodes away from current
+     * @param current the current node
+     * @param enemy the enemy node
+     * @return if the enemy is within 2 nodes away from current
+     */
+    private boolean isEnemyClose(Node current, Node enemy) {
+    	boolean enemyClose = false;
+    	int currX = current.getX();
+    	int currY = current.getY();
+    	int enemyX = enemy.getX();
+    	int enemyY = enemy.getY();
+    	
+    	if((enemyX >= currX - 2 && enemyX <= currX + 2 && currY == enemyY) || 
+    			(enemyY >= currY - 2 && enemyY <= currY + 2 && currX == enemyX)) {
+    		enemyClose = true;
+    	}
+    	
+    	return enemyClose;
+    }
 
     /**
      * Stores the direction that the AI would like to go in message
