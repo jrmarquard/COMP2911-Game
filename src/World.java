@@ -73,6 +73,15 @@ public class World {
     private static final int AI_POOL_DELAY = 600; 
     private static final int AI_POOL_RATE = 150; 
     
+    /**
+     * Constructor for World which associates it with an input app, name 
+     * and creates a maze of size width*height
+     * 
+     * @param app The associate app that is creating the World
+     * @param name Name of the world 
+     * @param width Width of the maze to be created
+     * @param height Height of the maze to be created
+     */
     public World (App app, String name, int width, int height) {        
         // Global settings
         this.app = app;
@@ -154,6 +163,7 @@ public class World {
     
     /**
      * Constructor creates a copy of the maze without the entities.
+     * 
      * @param app App references
      * @param name Name of the maze
      * @param height Height of the maze
@@ -258,7 +268,8 @@ public class World {
     
     /**
      * A wrapper to send a message to the App
-     * @param c
+     * 
+     * @param m The message to send to the app
      */
     private void sendMessageToApp(Message m) {
         app.sendMessage(m);
@@ -390,7 +401,7 @@ public class World {
     }
     
     /**
-     * collision runs checks for all the entities and items in the game
+     * Runs checks for all the entities and items in the game
      */
     private void collision() {
         try {
@@ -535,20 +546,21 @@ public class World {
 
     /**
      * Method allowing external objects to update the game state.
+     * 
      * @param string The message send to the world.
      */
     public void sendMessage(String[] message) {
         switch (message[1]) {
             case "move": entityMove(message[2], message[3]); break;
             case "melee": entityMeleeAttack(message[2]); break;
-            case "range": entityRangeAttack(message[2], message[3]); break;
         }
     }
     
-    private void entityRangeAttack(String name, String dir) {
-        
-    }
-
+    /**
+     * Attempts to order the entity of input name to attack
+     * 
+     * @param entityName Name of the entity to attack
+     */
     private void entityMeleeAttack(String entityName) {
         try {
             this.entitySemaphore.acquire();
@@ -609,6 +621,12 @@ public class World {
         }
     }
     
+    /**
+     * Attempts to move the input entity in the input direction in the maze
+     * 
+     * @param name Name of the entity to move
+     * @param dir Direction of the movement
+     */
     private void entityMove(String name, String dir) {
         Entity entity = entities.get(name);
         
@@ -642,6 +660,7 @@ public class World {
     /**
      * Makes a deep copy of the world except for parts of the world that
      * need to remain independent from other worlds (e.g. ai pool).
+     * 
      * @return copy of world
      */
     public World copy() {
@@ -669,8 +688,9 @@ public class World {
     }
     
     /**
-     * Set the name of the world
-     * @param name
+     * Sets the name of the world
+     * 
+     * @param name Name of the world to be set
      */
     public void setName(String name) {
         this.name = name;
@@ -679,6 +699,7 @@ public class World {
 
     /**
      * Add enemy into the world.
+     * 
      * @param name Name of the player.
      */
     public void addEnemy(String name) {
@@ -690,6 +711,7 @@ public class World {
 
     /**
      * Add being into the world.
+     * 
      * @param name Name of the enemy
      */
     public void addPlayer(String name, String opt) {
@@ -721,6 +743,7 @@ public class World {
     
     /**
      * Returns an array list of the entities
+     * 
      * @return array list of the entities
      */
     public ArrayList<Entity> getEntities() {
@@ -729,6 +752,7 @@ public class World {
 
     /**
      * Returns an array list of all the items
+     * 
      * @return array list of items
      */
     public ArrayList<Item> getItems() {
@@ -741,6 +765,7 @@ public class World {
     
     /**
      * Get's the name of the world
+     * 
      * @return world name
      */
     public String getName() {
@@ -749,6 +774,7 @@ public class World {
     
     /**
      * Gets the start node.
+     * 
      * @return start node
      */
     public Node getStartNode() {
@@ -757,6 +783,7 @@ public class World {
     
     /**
      * Gets the finish node
+     * 
      * @return finish node
      */
     public Node getFinishNode() {
@@ -765,6 +792,7 @@ public class World {
     
     /**
      * Gets the width of the maze
+     * 
      * @return maze width
      */
     public int getWidth() {
@@ -773,6 +801,7 @@ public class World {
     
     /**
      * Gets the height of the maze
+     * 
      * @return maze height
      */
     public int getHeight() {
@@ -780,7 +809,8 @@ public class World {
     }
     
     /**
-     * gets the node the key is at
+     * Gets the node the key is at
+     * 
      * @return the node of the key
      */
     public Node getKeyNode() {
@@ -789,6 +819,7 @@ public class World {
 
     /**
      * Gets the node an entity is at
+     * 
      * @param name the entity name
      * @return the node of the entity
      */
@@ -798,6 +829,7 @@ public class World {
 
     /**
      * Gets the direction of an entity
+     * 
      * @param name the entity name
      * @return the direction of the entity
      */
@@ -807,6 +839,7 @@ public class World {
     
     /**
      * Get the node at the x and y coordinates given.
+     * 
      * @param x The x coordinate.
      * @param y The y coordinate.
      * @return Node at x and y.
@@ -821,6 +854,7 @@ public class World {
 
     /**
      * Gets the visibility of the node at x and y.
+     * 
      * @param x the x coordinate of the node.
      * @param y the y coordinate of the node.
      * @return the visibility of the node.
@@ -831,6 +865,7 @@ public class World {
 
     /**
      * Gets what is between two nodes at the given coordinates
+     * 
      * @param x1 x coordinate of node A
      * @param y1 y coordinate of node A
      * @param x2 x coordinate of node B
@@ -895,8 +930,10 @@ public class World {
             return visA > visB ? visB : visA;
         }   
     }
+    
     /**
      * Checks what the visibility is of the corner between nodes A, B, C, D
+     * 
      * @param x1 x coordinate of node A
      * @param y1 y coordinate of node A
      * @param x2 x coordinate of node B
@@ -923,10 +960,22 @@ public class World {
         return vis;
     }
     
+    /**
+     * Gets the item mutex to allow other classes to have synchronised access
+     * to items
+     * 
+     * @return The item mutex
+     */
     public Semaphore getItemSemaphore() {
     	return this.itemSemaphore;
     }
     
+    /**
+     * Gets the entity mutex to allow other classes to have synchronised access 
+     * to entities
+     * 
+     * @return The entity mutex
+     */
     public Semaphore getEntitySemaphore() {
     	return this.entitySemaphore;
     }
@@ -1031,6 +1080,7 @@ public class World {
     /**
      * Returns a list of unvisit neighbors from the given node, 
      * if there is no unvisit neighbors, an empty list will be returned
+     * 
      * @param node the node for visiting its neighbors
      * @param visited a list that contains the nodes that have been visited
      * @return a list of unvisit neighbors from the given node
@@ -1073,6 +1123,7 @@ public class World {
     
     /**
      * Connects the two given nodes by comparing their coordinates
+     * 
      * @param nodeA the first node to be connected
      * @param nodeB the second node to be connected
      */
@@ -1110,6 +1161,7 @@ public class World {
     
     /**
      * Fills in the shortest path with the given start and destination
+     * 
      * @param shortestPath the List that will be storing the shortest path
      * @param path the path created by bfs
      * @param start the starting point
@@ -1216,6 +1268,7 @@ public class World {
     
     /**
      * Disconnects the given two nodes, ie make a wall between them
+     * 
      * @param nodeA the first node to be disconnected
      * @param nodeB the second node to be disconnected
      */
@@ -1254,6 +1307,7 @@ public class World {
     
     /**
      * Sets the cost of the nodes from the given node by doing a bfs
+     * 
      * @param node the starting node
      */
     private void setNodeCost(Node node, HashMap<Node, Integer> nodeCostMap) {
