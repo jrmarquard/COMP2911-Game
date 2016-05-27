@@ -23,6 +23,7 @@ public class Game {
     
     /**
      * The constructor for game. 
+     * 
      * @param manager Manager is where to send messages to.
      */
     public Game (App manager) {
@@ -97,7 +98,8 @@ public class Game {
     
     /**
      * Returns the coins of each player in each world
-     * @return
+     * 
+     * @return The coins of each player
      */
     public ArrayList<Integer> getPlayerCoins() {
         ArrayList<Integer> coins = new ArrayList<Integer>();
@@ -108,10 +110,21 @@ public class Game {
         return coins;
     }
     
+    /**
+     * Returns the world associated with the input name
+     * 
+     * @param worldName Name of the world being returned
+     * @return The world of input name
+     */
     public World getWorld(String worldName) {
         return worlds.get(worldName);
     }
 
+    /**
+     * Returns an arrayList of the worlds associated with this game
+     * 
+     * @return The worlds associated with this game
+     */
     public ArrayList<World> getWorlds() {
         ArrayList<World> worlds = new ArrayList<World>();
         for (String s : this.worlds.keySet()) {
@@ -120,6 +133,11 @@ public class Game {
         return worlds;
     }
 
+    /**
+     * Where messages are passed to make changes to the game
+     * 
+     * @param message The message delivered 
+     */
     synchronized public void inbox(String[] message) {
         switch(message[0]) {
             case "newGame":
@@ -167,6 +185,11 @@ public class Game {
         
     }
     
+    /**
+     * Gets the About File which is used for the "About" page
+     * 
+     * @return The "About" File
+     */
     public File getAboutFile() {
     	return this.aboutFile;
     }
