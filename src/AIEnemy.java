@@ -1,6 +1,9 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * An enemy AI that will explore the maze and try and reach the player
@@ -185,6 +188,14 @@ public class AIEnemy implements AI {
     			}
     		}
     	}
+    	
+    	LinkedList<Node> sameCostNodes = this.getSameCostNodes(reachable);
+    	
+    	if(sameCostNodes.size() > 1) {
+    		Random rand = new Random();
+    		int randNum = rand.nextInt(sameCostNodes.size());
+    		next = sameCostNodes.get(randNum);
+    	}
         
         return next;
     }
@@ -211,5 +222,60 @@ public class AIEnemy implements AI {
     	} else if(nextX == currX && nextY == currY + 1) {
     		message[3] = "down";
     	}
+	}
+	
+	/**
+	 * Returns a list of nodes with the same visited cost
+	 * @param reachable the list of nodes to scan through
+	 * @return a list of nodes with the same visited cost
+	 */
+	private LinkedList<Node> getSameCostNodes(ArrayList<Node> reachable) {
+		LinkedList<Node> sameCostNodes = new LinkedList<Node>();
+		ArrayList<Integer> costList = new ArrayList<Integer>();
+		Set<Integer> duplicateCost = new HashSet<Integer>();
+		Set<Integer> tempSet = new HashSet<Integer>();
+		
+		// Extracts a list of costs
+		for(Node node: reachable) {
+			if(this.visited.containsKey(node)) {
+				costList.add(this.visited.get(node));
+			} else {
+				costList.add(0);
+			}
+		}
+ 
+		// Finds a set of duplicate costs
+		for (Integer yourInt : costList) {
+			if (!tempSet.add(yourInt)) {
+				duplicateCost.add(yourInt);
+			}
+		}
+		
+		if(duplicateCost.size() > 0) {
+			int cost = 0;
+			
+			// Retrieves the duplicate cost
+			for(int tempInt: duplicateCost) {
+				cost = tempInt;
+				break;
+			}
+			
+			// Adds the nodes that are associated with the duplicate cost to the list
+			for(Node node: reachable) {
+				int nodeCost;
+				
+				if(this.visited.containsKey(node)) {
+					nodeCost = this.visited.get(node);
+				} else {
+					nodeCost = 0;
+				}
+				
+				if(nodeCost == cost) {
+					sameCostNodes.add(node);
+				}
+			}
+		}
+		
+		return sameCostNodes;
 	}
 }
