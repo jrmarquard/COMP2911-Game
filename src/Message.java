@@ -23,10 +23,6 @@ public class Message {
         return id;
     }
 
-    public void setCommandID(int Com) {
-        this.id = Com;
-    }
-
     public String[] getMessage() {
         return message;
     }

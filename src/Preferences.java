@@ -39,13 +39,6 @@ public class Preferences {
             bools.put(s, true);
         }
     }
-    public void setBool (String s) {
-        if (bools.get(s) == true) {
-            bools.put(s, false);
-        } else {
-            bools.put(s, true);
-        }
-    }
     
     public void setPreference (String s) {
         // Of the format mapName.setting=value
@@ -94,8 +87,4 @@ public class Preferences {
                 return null;
         }
     }
-    
-    
-    
-    
 }

@@ -2,7 +2,6 @@
 public class Entity {
 
     private String name;
-    private boolean AIControl;
     private int coins;
     private boolean key;
     private boolean dead;
@@ -10,8 +9,7 @@ public class Entity {
     private String direction;
     
     public Entity(Node node, String name) {
-        this.node = node;        
-        this.AIControl = false;
+        this.node = node;      
         this.name = name;
         this.coins = 0;
         this.key = false;
@@ -29,6 +27,7 @@ public class Entity {
     public Node getNode() {
         return node;
     }
+    
     public void setNode(Node n) {
         this.node = n;
     }
@@ -43,21 +42,6 @@ public class Entity {
 
     public void setName(String name) {
         this.name = name;
-    }
-    
-    public boolean isAIControl() {
-        return AIControl;
-    }
-
-    public void setAIControl(boolean aiControl) {
-        this.AIControl = aiControl;
-    }
-    public void toggleAIControl() {
-        if (AIControl==false) {
-            AIControl = true;
-        } else {
-            AIControl = false;
-        }
     }
 
     public int getCoins() {
