@@ -135,22 +135,22 @@ public class GUI extends JFrame  {
         battleControls.put(KeyEvent.VK_LEFT, new String[]{"world1", "move", "Moneymaker", "left"});
         battleControls.put(KeyEvent.VK_DOWN, new String[]{"world1", "move", "Moneymaker", "down"});
         battleControls.put(KeyEvent.VK_RIGHT, new String[]{"world1", "move", "Moneymaker", "right"});
-        battleControls.put(KeyEvent.VK_CONTROL, new String[]{"world1", "melee", "Moneymaker"});
-        battleControls.put(KeyEvent.VK_I, new String[]{"world1", "range", "Moneymaker", "up"});
+        battleControls.put(KeyEvent.VK_SPACE, new String[]{"world1", "melee", "Moneymaker"});
+        /*battleControls.put(KeyEvent.VK_I, new String[]{"world1", "range", "Moneymaker", "up"});
         battleControls.put(KeyEvent.VK_J, new String[]{"world1", "range", "Moneymaker", "down"});
         battleControls.put(KeyEvent.VK_K, new String[]{"world1", "range", "Moneymaker", "left"});
-        battleControls.put(KeyEvent.VK_L, new String[]{"world1", "range", "Moneymaker", "right"});
+        battleControls.put(KeyEvent.VK_L, new String[]{"world1", "range", "Moneymaker", "right"});*/
         // Player 2
         battleControls.put(KeyEvent.VK_W, new String[]{"world1", "move", "Teadrinker", "up"});
         battleControls.put(KeyEvent.VK_A, new String[]{"world1", "move", "Teadrinker", "left"});
         battleControls.put(KeyEvent.VK_S, new String[]{"world1", "move", "Teadrinker", "down"});
         battleControls.put(KeyEvent.VK_D, new String[]{"world1", "move", "Teadrinker", "right"});
-        battleControls.put(KeyEvent.VK_SPACE, new String[]{"world1", "melee", "Teadrinker"});
-        battleControls.put(KeyEvent.VK_T, new String[]{"world1", "range", "Teadrinker", "up"});
+        battleControls.put(KeyEvent.VK_SHIFT, new String[]{"world1", "melee", "Teadrinker"});
+        /*battleControls.put(KeyEvent.VK_T, new String[]{"world1", "range", "Teadrinker", "up"});
         battleControls.put(KeyEvent.VK_F, new String[]{"world1", "range", "Teadrinker", "down"});
         battleControls.put(KeyEvent.VK_G, new String[]{"world1", "range", "Teadrinker", "left"});
         battleControls.put(KeyEvent.VK_H, new String[]{"world1", "range", "Teadrinker", "right"});
-        
+        */
         // Register a keystroke
         this.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
