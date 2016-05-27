@@ -270,33 +270,27 @@ public class GameMap extends JPanel {
         
         // Draw on finish
         n = world.getFinishNode();
-        if(n != null) {
-        	if(n.getUp() != null) g2d.setPaint(finishUTexture);
-            else if(n.getDown() != null) g2d.setPaint(finishDTexture);
-            else if(n.getLeft() != null) g2d.setPaint(finishLTexture);
-            else if(n.getRight() != null) g2d.setPaint(finishRTexture);
-            g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
-        }
-        
-        try {
-        	// Draw on items
-            for (Item i : world.getItems()) {
-                n = i.getNode();
-                if (i.getType() == Item.COIN) {
-                    // Draw on coins
-                    g2d.setPaint(coinTexture); 
-                } else if (i.getType() == Item.ENERGY) {
-                    // Draw on 'energy'
-                } else if (i.getType() == Item.PLAYER_CORPSE) {
-                    g2d.setPaint(playerDeadTexture);                
-                } else if (i.getType() == Item.ENEMY_CORPSE) {
-                    g2d.setPaint(enemyDeadTexture);                
-                }
-                g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize); 
-            }	
-        } catch(Exception e) {
-        	
-        }
+    	if(n.getUp() != null) g2d.setPaint(finishUTexture);
+        else if(n.getDown() != null) g2d.setPaint(finishDTexture);
+        else if(n.getLeft() != null) g2d.setPaint(finishLTexture);
+        else if(n.getRight() != null) g2d.setPaint(finishRTexture);
+        g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
+    
+    	// Draw on items
+        for (Item i : world.getItems()) {
+            n = i.getNode();
+            if (i.getType() == Item.COIN) {
+                // Draw on coins
+                g2d.setPaint(coinTexture); 
+            } else if (i.getType() == Item.ENERGY) {
+                // Draw on 'energy'
+            } else if (i.getType() == Item.PLAYER_CORPSE) {
+                g2d.setPaint(playerDeadTexture);                
+            } else if (i.getType() == Item.ENEMY_CORPSE) {
+                g2d.setPaint(enemyDeadTexture);                
+            }
+            g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize); 
+        }	
         
         // Draw on entities
         for (Entity e : world.getEntities()) {
