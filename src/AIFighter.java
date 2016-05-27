@@ -1,11 +1,13 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 public class AIFighter implements AI {
 
 	private World world;
 	private String worldName;
 	private String id;
+	private LinkedList<Node> explore;
     private HashMap<Node, Integer> visited;
     private boolean attacked;
 	
@@ -18,6 +20,7 @@ public class AIFighter implements AI {
     	this.world = world;
         this.worldName = world.getName();;
         this.id = id;
+        this.explore = new LinkedList<Node>();
         this.visited = new HashMap<Node, Integer>();
         this.attacked = false;
     }
@@ -27,75 +30,176 @@ public class AIFighter implements AI {
 		String[] message = new String[4];
         message[0] = worldName;
         message[2] = id;
-    	
-    	boolean attack = this.attack(message);
-    	
-        if(!attack) {
-        	Node current = this.world.getEntityNode(this.id);
-        	ArrayList<Node> reachable = current.getConnectedNodes();
-    		if(this.visited.containsKey(current)) {
-    			int currentCost = this.visited.get(current);
-    			this.visited.put(current, currentCost += 1);
-    		} else {
-    			this.visited.put(current, 1);
-    		}
-            
-            Node next = null;
-            boolean allVisited = isReachableInVisited(reachable);
-            
-            for(Node node: reachable) {
-            	if(allVisited) {
-            		if(next == null) {
-            			next = node;
-            		} else {
-            			int nodeCost, nextCost;
-            			
-            			if(this.visited.containsKey(node)) {
-            				nodeCost = this.visited.get(node);
-            			} else {
-            				nodeCost = 0;
-            			}
-            			
-            			if(this.visited.containsKey(next)) {
-            				nextCost = this.visited.get(next);
-            			} else {
-            				nextCost = 0;
-            			}
-            			
-            			if(nodeCost < nextCost) {
-            				next = node;
-            			}
-            		}
-            	} else if(!visited.containsKey(node)) {
-            		next = node;
-            	}
-            }
-            
-            putDirectionInMessage(current, next, message);
-        }
-
-        return new Message(Message.GAME_MSG, message);
-	}
-
-	/**
-     * Returns if the AI is going to attack or not
-     * and stores either attack or move inside message
-     * @param message to store either attack or move
-     * @return if the AI is going to attack or not
-     */
-    private boolean attack(String[] message) {
-    	Node current = this.world.getEntityNode(this.id);
-    	Node enemy = null;
+        
+        Node enemy = null;
     	String enemyName = null;
-    	boolean attack = false;
-    	
-    	if(this.id.equals("Moneymaker")) {
+        
+        if(this.id.equals("Moneymaker")) {
     		enemyName = "Teadrinker";
 			enemy = this.world.getEntityNode(enemyName);
 		} else {
 			enemyName = "Moneymaker";
 			enemy = this.world.getEntityNode(enemyName);
 		}
+    	
+    	boolean attack = this.attack(enemy, enemyName, message);
+    	
+        if(!attack) {
+        	Node current = this.world.getEntityNode(this.id);
+            int currX = current.getX();
+            int currY = current.getY();
+            int enemyX = enemy.getX();
+            int enemyY = enemy.getY();
+            
+        	if(!this.explore.isEmpty()) {
+            	Node next = this.explore.remove();
+            	putDirectionInMessage(current, next, message);
+            } else {
+            	/*
+            	 * A boolean to tell when the AI is in the same row/column
+            	 * with the enemy, the AI will try to get to where the enemy is
+            	 * with that row/column. If the AI doesn't reach the enemy,
+            	 * this boolean will be false, ie there is a wall between
+            	 * the AI and the enemy
+            	 */
+            	boolean enemyReached = false;
+            	boolean goRandom = false;
+            	
+            	if(currX == enemyX) {
+            		// enemy is below
+            		if(currY < enemyY) {
+            			// Tries to get to where enemy is
+            			while(this.world.getNode(currX, currY).getDown() != null) {
+            				if(this.world.getNode(currX, currY).getDown().equals(enemy)) {
+            					enemyReached = true;
+            				}
+            				
+                			this.explore.add(this.world.getNode(currX, currY).getDown());
+                			currY++;
+                		}
+            			
+            			if(!enemyReached) {
+            				this.explore.clear();
+            				goRandom = true;
+            			}
+            		}
+            		
+            		// enemy is above
+            		else {
+            			// Tries to get to where enemy is
+            			while(this.world.getNode(currX, currY).getUp() != null) {
+            				if(this.world.getNode(currX, currY).getUp().equals(enemy)) {
+            					enemyReached = true;
+            				}
+            				
+                			this.explore.add(this.world.getNode(currX, currY).getUp());
+                			currY--;
+                		}
+            			
+            			if(!enemyReached) {
+            				this.explore.clear();
+            				goRandom = true;
+            			}
+            		}
+            	} else if(currY == enemyY) {
+            		// enemy is on the right
+            		if(currX < enemyX) {
+            			// Tries to get to where enemy is
+            			while(this.world.getNode(currX, currY).getRight() != null) {
+            				if(this.world.getNode(currX, currY).getRight().equals(enemy)) {
+            					enemyReached = true;
+            				}
+            				
+                			this.explore.add(this.world.getNode(currX, currY).getRight());
+                			currX++;
+                		}
+            			
+            			if(!enemyReached) {
+            				this.explore.clear();
+            				goRandom = true;
+            			}
+            		}
+            		
+            		// enemy is on the left
+            		else {
+            			// Tries to get to where enemy is
+            			while(this.world.getNode(currX, currY).getLeft() != null) {
+            				if(this.world.getNode(currX, currY).getLeft().equals(enemy)) {
+            					enemyReached = true;
+            				}
+            				
+                			this.explore.add(this.world.getNode(currX, currY).getLeft());
+                			currX--;
+                		}
+            			
+            			if(!enemyReached) {
+            				this.explore.clear();
+            				goRandom = true;
+            			}
+            		}
+            	} else {
+            		goRandom = true;
+            	}
+            	
+            	if(goRandom) {
+		        	ArrayList<Node> reachable = current.getConnectedNodes();
+		    		if(this.visited.containsKey(current)) {
+		    			int currentCost = this.visited.get(current);
+		    			this.visited.put(current, currentCost += 1);
+		    		} else {
+		    			this.visited.put(current, 1);
+		    		}
+		            
+		            Node next = null;
+		            boolean allVisited = isReachableInVisited(reachable);
+		            
+		            for(Node node: reachable) {
+		            	if(allVisited) {
+		            		if(next == null) {
+		            			next = node;
+		            		} else {
+		            			int nodeCost, nextCost;
+		            			
+		            			if(this.visited.containsKey(node)) {
+		            				nodeCost = this.visited.get(node);
+		            			} else {
+		            				nodeCost = 0;
+		            			}
+		            			
+		            			if(this.visited.containsKey(next)) {
+		            				nextCost = this.visited.get(next);
+		            			} else {
+		            				nextCost = 0;
+		            			}
+		            			
+		            			if(nodeCost < nextCost) {
+		            				next = node;
+		            			}
+		            		}
+		            	} else if(!visited.containsKey(node)) {
+		            		next = node;
+		            	}
+		            }
+		            
+		            putDirectionInMessage(current, next, message);
+		        }
+            }
+        }
+
+        return new Message(Message.GAME_MSG, message);
+	}
+
+	/**
+	 * Returns if the AI is going to attack or not
+     * and stores either attack or move inside message
+	 * @param enemy the enemy node
+	 * @param enemyName the name of the enemy 
+	 * @param message to store either attack or move
+	 * @return if the AI is going to attack or not
+	 */
+    private boolean attack(Node enemy, String enemyName, String[] message) {
+    	Node current = this.world.getEntityNode(this.id);
+    	boolean attack = false;
     	
     	for (Entity entity : world.getEntities()) {
     	    if (entity.getName().equals(enemyName) && 
@@ -127,7 +231,7 @@ public class AIFighter implements AI {
     	int enemyX = enemy.getX();
     	int enemyY = enemy.getY();
     	
-    	if((enemyX >= currX - 2 && enemyX <= currX + 2 && currY == enemyY) || 
+		if((enemyX >= currX - 2 && enemyX <= currX + 2 && currY == enemyY) || 
     			(enemyY >= currY - 2 && enemyY <= currY + 2 && currX == enemyX)) {
     		enemyClose = true;
     	}
