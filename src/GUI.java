@@ -382,6 +382,10 @@ public class GUI extends JFrame  {
 
         // Door and key generation option       
         JCheckBox doorAndKey = new JCheckBox("", App.pref.getBool("doorAndKey"));
+        if (gameMode.equals("Battle")){
+            doorAndKey.setSelected(false);
+            doorAndKey.setEnabled(false);
+        }
         doorAndKey.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -401,6 +405,7 @@ public class GUI extends JFrame  {
         // Enemy generation option
         JCheckBox enemyCheckBox = new JCheckBox("", App.pref.getBool("enemy"));
         if (!gameMode.equals("Adventure")){
+            enemyCheckBox.setSelected(false);
             enemyCheckBox.setEnabled(false);
         }
         enemyCheckBox.addActionListener(new ActionListener() {
@@ -517,7 +522,7 @@ public class GUI extends JFrame  {
         c.anchor = GridBagConstraints.CENTER;
         JClickButton startGameButton = new JClickButton("Start Game");
         if (gameMode.equals("Battle")) {
-            if (App.pref.getText("player1").equals("Off") || App.pref.getText("player2").equals("Off")) {
+            if (false) {
                 startGameButton.setEnabled(false);
             }
         } else {
