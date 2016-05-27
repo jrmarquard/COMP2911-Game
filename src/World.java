@@ -499,6 +499,10 @@ public class World {
         return coords;
     }
 
+    public boolean isBeingInWorld(String string) {
+    	return this.entities.containsKey(string);
+    }
+    
     public boolean isBeingDead(String string) {
         return entities.get(string).isDead();
     }
@@ -524,10 +528,6 @@ public class World {
         entities.put(name, enemy);
         aiRunnable AIRunEnemy = new aiRunnable(new AIEnemy(this, "Enemy"));
         aiPool.scheduleAtFixedRate(AIRunEnemy, AI_POOL_DELAY, AI_POOL_RATE, SCHEDULE_TIME_UNIT);
-    }
-    
-    public boolean isEnemyInMaze() {
-    	return this.entities.containsKey("Enemy");
     }
 
     /**
@@ -659,15 +659,8 @@ public class World {
         return getNode(x, y).getVisibility();
     }
     
-    public boolean isDoor(int xA, int yA, int xB, int yB) {
-        if((this.getNode(xA, yA).equals(this.doorStart) &&
-                this.getNode(xB, yB).equals(this.doorFinish)) ||
-                (this.getNode(xA, yA).equals(this.doorFinish) &&
-                this.getNode(xB, yB).equals(this.doorStart))) {
-            return true;
-        } else {
-            return false;
-        }
+    public boolean isDoor(Node node) {
+        return node.equals(this.doorStart);
     }
     
     /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *

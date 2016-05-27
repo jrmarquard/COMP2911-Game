@@ -137,6 +137,7 @@ public class AIEnemy implements AI {
             	// Cannot reach player/player has not been seen
             	if(goRandom) {
             		ArrayList<Node> reachable = current.getConnectedNodes();
+            		
             		if(this.visited.containsKey(current)) {
         				int currentCost = this.visited.get(current);
         				this.visited.put(current, currentCost += 1);

@@ -17,8 +17,6 @@ public class AIPlayer implements AI {
 	private String diff;
     private LinkedList<Node> explore;
     private HashMap<Node, Integer> visited;
-    private boolean enemyInMaze;
-    private boolean attacked;
     
     public AIPlayer(World world, String id, String diff) {
         this.world = world;
@@ -27,8 +25,6 @@ public class AIPlayer implements AI {
         this.diff = diff;
         this.explore = new LinkedList<Node>();
         this.visited = new HashMap<Node, Integer>();
-        this.enemyInMaze = this.world.isEnemyInMaze();
-        this.attacked = false;
     }
     
     @Override
@@ -52,27 +48,25 @@ public class AIPlayer implements AI {
      * @return a message which contains the move that the AI would like to make
      */
     private Message easyMove() {
-    	Node current = this.world.getEntityNode(this.id);
-    	Node enemy = null;
-    	boolean attack = false;
-    	
-    	if(this.enemyInMaze) {
-    		enemy = this.world.getEntityNode("Enemy");
-    	} else {
-    		this.attacked = true;
-    	}
-    	
     	String[] message = new String[4];
         message[0] = worldName;
         message[2] = id;
         
-        if(current.isConnected(enemy) && !this.attacked) {
-        	message[1] = "melee";
-        	attack = true;
-        	this.attacked = true;
-        } else {
-        	message[1] = "move";
-        }
+    	Node current = this.world.getEntityNode(this.id);
+    	boolean attack = false;
+    	
+    	if(this.world.isBeingInWorld("Enemy") && !this.world.isBeingDead("Enemy")) {
+    		Node enemy = this.world.getEntityNode("Enemy");
+    		
+    		if(isEnemyClose(current, enemy)) {
+            	message[1] = "melee";
+            	attack = true;
+            } else {
+            	message[1] = "move";
+            }
+    	} else {
+    		message[1] = "move";
+    	}
         
         if(!attack) {
         	int randValue = (new Random()).nextInt(4);
@@ -94,27 +88,25 @@ public class AIPlayer implements AI {
      * @return a message which contains the move that the AI would like to make
      */
     private Message medMove() {
-    	Node current = this.world.getEntityNode(this.id);
-    	Node enemy = null;
-    	boolean attack = false;
-    	
-    	if(this.enemyInMaze) {
-    		enemy = this.world.getEntityNode("Enemy");
-    	} else {
-    		this.attacked = true;
-    	}
-    	
     	String[] message = new String[4];
         message[0] = worldName;
         message[2] = id;
         
-        if(current.isConnected(enemy) && !this.attacked) {
-        	message[1] = "melee";
-        	attack = true;
-        	this.attacked = true;
-        } else {
-        	message[1] = "move";
-        }
+    	Node current = this.world.getEntityNode(this.id);
+    	boolean attack = false;
+    	
+    	if(this.world.isBeingInWorld("Enemy") && !this.world.isBeingDead("Enemy")) {
+    		Node enemy = this.world.getEntityNode("Enemy");
+    		
+    		if(isEnemyClose(current, enemy)) {
+            	message[1] = "melee";
+            	attack = true;
+            } else {
+            	message[1] = "move";
+            }
+    	} else {
+    		message[1] = "move";
+    	}
 
         if(!attack) {
         	this.visited.put(current, 0);
@@ -209,27 +201,25 @@ public class AIPlayer implements AI {
      * @return a message which contains the move that the AI would like to make
      */
     private Message hardMove() {
-    	Node current = this.world.getEntityNode(this.id);
-    	Node enemy = null;
-    	boolean attack = false;
-    	
-    	if(this.enemyInMaze) {
-    		enemy = this.world.getEntityNode("Enemy");
-    	} else {
-    		this.attacked = true;
-    	}
-    	
     	String[] message = new String[4];
         message[0] = worldName;
         message[2] = id;
         
-        if(current.isConnected(enemy) && !this.attacked) {
-        	message[1] = "melee";
-        	attack = true;
-        	this.attacked = true;
-        } else {
-        	message[1] = "move";
-        }
+    	Node current = this.world.getEntityNode(this.id);
+    	boolean attack = false;
+    	
+    	if(this.world.isBeingInWorld("Enemy") && !this.world.isBeingDead("Enemy")) {
+    		Node enemy = this.world.getEntityNode("Enemy");
+    		
+    		if(isEnemyClose(current, enemy)) {
+            	message[1] = "melee";
+            	attack = true;
+            } else {
+            	message[1] = "move";
+            }
+    	} else {
+    		message[1] = "move";
+    	}
         
         if(!attack) {
         	ArrayList<Node> reachable = current.getConnectedNodes();
@@ -318,5 +308,20 @@ public class AIPlayer implements AI {
     	}
     	
     	return isAllIn;
+    }
+    
+    private boolean isEnemyClose(Node current, Node enemy) {
+    	boolean enemyClose = false;
+    	int currX = current.getX();
+    	int currY = current.getY();
+    	int enemyX = enemy.getX();
+    	int enemyY = enemy.getY();
+    	
+    	if((enemyX >= currX - 2 && enemyX <= currX + 2 && currY == enemyY) || 
+    			(enemyY >= currY - 2 && enemyY <= currY + 2 && currX == enemyX)) {
+    		enemyClose = true;
+    	}
+    	
+    	return enemyClose;
     }
 }
