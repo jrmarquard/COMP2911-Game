@@ -12,6 +12,10 @@ public class Preferences {
     private Map<String, Integer> values;
     private Map<String, Boolean> bools;
     
+    /**
+     * Constructor which sets up the field objects and then loads the fields
+     * with preferences from a text file
+     */
     public Preferences () {
         this.GUIcolours = new HashMap<String,Color>();
         this.appText = new HashMap<String,String>();

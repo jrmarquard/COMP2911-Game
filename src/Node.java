@@ -17,6 +17,12 @@ public class Node {
 	 */
 	private float visibility;
 	
+	/**
+	 * Constructor which creates a node with input coordinates
+	 * 
+	 * @param x Horizontal coordinate
+	 * @param y Vertical coordinate
+	 */
 	public Node(int x, int y) {
 		this.x = x;
 		this.y = y;
@@ -27,10 +33,20 @@ public class Node {
 		this.visibility = 100f;		
 	}
 	
+	/**
+	 * Gets this nodes visibility
+	 * 
+	 * @return Visibility of this node
+	 */
 	public float getVisibility() {
         return visibility;
     }
 
+	/**
+	 * Sets this nodes visibility to input value
+	 * 
+	 * @param visibility Visibility to be set
+	 */
     public void setVisibility(float visibility) {
         if (visibility > 100f) {
             this.visibility = 100f;
@@ -39,46 +55,101 @@ public class Node {
         }
     }
 
+    /**
+     * Returns the horizontal coordinate of this node
+     * 
+     * @return Horizontal coordinate of this node
+     */
     public int getX() {
 		return this.x;
 	}
 	
+    /**
+     * Returns the vertical coordinate of this node
+     * 
+     * @return Vertical coordinate of this node
+     */
 	public int getY() {
 		return this.y;
 	}
 	
+	/**
+	 * Gets the node above this node
+	 * 
+	 * @return The node positioned above this one
+	 */
 	public Node getUp() {
 		return this.up;
 	}
 	
+	/**
+	 * Gets the node to the right of this node
+	 * 
+	 * @return The node positioned to the right of this one
+	 */
 	public Node getRight() {
 		return this.right;
 	}
 	
+	/**
+	 * Gets the node below this node
+	 * 
+	 * @return The node positioned below this one
+	 */
 	public Node getDown() {
 		return this.down;
 	}
 	
+	/**
+	 * Gets the node to the left of this one
+	 * 
+	 * @return The node positioned to the left of this one
+	 */
 	public Node getLeft() {
 		return this.left;
 	}
 	
+	/**
+	 * Sets the node above to be connected to this one
+	 * 
+	 * @param up The node to be connected
+	 */
 	public void setUp(Node up) {
 		this.up = up;
 	}
 	
+	/**
+	 * Sets the node to the right to be connected to this one
+	 * 
+	 * @param right The node to be connected
+	 */
 	public void setRight(Node right) {
 		this.right = right;
 	}
 
+	/**
+	 * Sets the node below to be connected to this one
+	 * 
+	 * @param down The node to be connected
+	 */
 	public void setDown(Node down) {
 		this.down = down;
 	}
 
+	/**
+	 * Sets the node to the left to be connected to this one
+	 * 
+	 * @param left The node to be connected
+	 */
 	public void setLeft(Node left) {
 		this.left = left;
 	}
 	
+	/**
+	 * Gets an arrayList of the nodes which are connected to this one
+	 * 
+	 * @return The nodes connected to this one
+	 */
 	public ArrayList<Node> getConnectedNodes() {
 	    ArrayList<Node> nodes = new ArrayList<Node>();
 	    if (this.up != null) nodes.add(this.up);
@@ -88,6 +159,11 @@ public class Node {
 	    return nodes;
 	}
 	
+	/**
+	 * Finds whether this node is a dead end (ie is walled in on 3 sides)
+	 * 
+	 * @return Whether this node is a dead end
+	 */
 	public boolean isDeadEnd() {
 	    boolean deadEnd = false;
 	    int count = 0;
@@ -101,6 +177,12 @@ public class Node {
 	    return deadEnd;
 	}
 	
+	/**
+	 * Finds whether this node is connected to the input node
+	 * 
+	 * @param n The node to be checked for adjacency
+	 * @return Whether this node is connected to the input node
+	 */
 	public boolean isConnected(Node n) {
 	    if (this.up == n || this.right == n || this.down == n || this.left == n) {
 	        return true;
@@ -109,6 +191,9 @@ public class Node {
 	    }
 	}
 	
+	/**
+	 * Finds whether this node is equal to an input object
+	 */
 	@Override
 	public boolean equals(Object o) {
 		if(o == null || !(o instanceof Node)) {

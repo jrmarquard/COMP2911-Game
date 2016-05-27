@@ -243,9 +243,16 @@ public class World {
         // Copy special nodes in the maze
         this.start = this.nodes.get(start.getX()).get(start.getY());
         this.finish = this.nodes.get(finish.getX()).get(finish.getY());
-        this.doorStart = this.nodes.get(doorStart.getX()).get(doorStart.getY());
-        this.doorFinish = this.nodes.get(doorFinish.getX()).get(doorFinish.getY());
-        this.key = this.nodes.get(key.getX()).get(key.getY());
+        
+        if (doorStart != null && doorFinish != null && key != null) {
+	        this.doorStart = this.nodes.get(doorStart.getX()).get(doorStart.getY());
+	        this.doorFinish = this.nodes.get(doorFinish.getX()).get(doorFinish.getY());
+	        this.key = this.nodes.get(key.getX()).get(key.getY());
+        } else {
+        	this.doorStart = null;
+        	this.doorFinish = null;
+        	this.key = null;
+        }
                 
         // If visibility is turned off make all the tiles bright.
         if (maxVisDistance == -1) {

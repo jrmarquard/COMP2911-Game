@@ -31,8 +31,9 @@ public class AIEnemy implements AI {
     
     @Override
 	/**
-	 * Returns a message which contains the move that
-	 * the AI would like to make
+	 * Returns a message which contains the name of the world, 
+	 * a String to tell if it wants to move or attack, its ID, and 
+	 * the move that the AI would like to make
 	 */
 	public Message makeMove() {
 		String[] message = new String[4];

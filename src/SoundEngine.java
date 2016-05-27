@@ -26,6 +26,9 @@ public class SoundEngine {
 	// Thread pool to run sounds in
 	ExecutorService soundPool;
 	
+	/**
+	 * Constructor to load sounds into the program and store them for later use
+	 */
 	public SoundEngine() {
 		this.soundEnabled = true;
 		this.musicVolume = 0f;
@@ -73,6 +76,13 @@ public class SoundEngine {
         
 	}
 
+	/**
+	 * The inbox for messages being sent to the SoundEngine where it 
+	 * then passes appropriate messages to internal private methods
+	 * if sound is enabled
+	 * 
+	 * @param message String representation of what the SoundEngine needs to do
+	 */
     public void inbox(String[] message) {
         if (this.soundEnabled) {
         	try {
@@ -86,9 +96,6 @@ public class SoundEngine {
     
     /**
      * Sets the master volume up between max and min values.
-     * 
-     * 
-     * @param volume A number between 0 and 100. Where 0 is mute and 100 max volume.
      */
     private void setMusicVolume() {
 	        int volume = App.pref.getValue("musicVolume");
@@ -105,6 +112,9 @@ public class SoundEngine {
 	        }
     }
     
+    /**
+     * Sets the sound effect volume
+     */
     private void setSoundEffectVolume() {
     	int volume = App.pref.getValue("effectsVolume");
         
@@ -116,8 +126,12 @@ public class SoundEngine {
         if (volume == 0) soundEffectsVolume = -64f;
     }
 	        
-	 
-	
+	/**
+	 * Plays a sound of input name if there are less than 5 sounds already being
+	 * loaded
+	 * 
+	 * @param soundName Name of the sound to be played
+	 */
 	private void playSound(String soundName) {
 			try {
 				this.soundsPlayingSemaphore.acquire();
@@ -180,6 +194,9 @@ public class SoundEngine {
 			} 
 	}
 	
+	/**
+	 * Starts looping the menu music 
+	 */
 	private void startMenuMusic() {
 		if (this.soundEnabled) {
 			this.menuMusic.setFramePosition(0);
@@ -187,12 +204,18 @@ public class SoundEngine {
 		}
 	}
 	
+	/**
+	 * Ends the menu music looping
+	 */
 	private void endMenuMusic() {
 		if (this.soundEnabled) {
 			this.menuMusic.stop();
 		}
 	}
 	
+	/**
+	 * Starts looping the background music
+	 */
 	private void startBackgroundMusic() {
 		if (this.soundEnabled) {
 			this.backgroundMusic.setFramePosition(0);
@@ -200,12 +223,18 @@ public class SoundEngine {
 		}
 	}
 	
+	/**
+	 * Ends the background music looping
+	 */
 	private void endBackgroundMusic() {
 		if (this.soundEnabled) {
 			this.backgroundMusic.stop();
 		}
 	}
 	
+	/**
+	 * Sets up a new thread for the sound to be run in
+	 */
 	private class SoundRunnable implements Runnable {
         String[] msg;
         
