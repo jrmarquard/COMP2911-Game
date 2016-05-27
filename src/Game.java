@@ -1,15 +1,7 @@
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-
 
 public class Game {
     /**
@@ -52,7 +44,6 @@ public class Game {
         String gameMode = App.pref.getText("gameMode");
         int height = App.pref.getValue("defaultMapHeight");
         int width = App.pref.getValue("defaultMapWidth");
-        boolean doorAndKey = App.pref.getBool("doorAndKey");
         
         // Create the game
         if (gameMode.equals("Race")) {

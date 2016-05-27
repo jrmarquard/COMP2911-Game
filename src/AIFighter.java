@@ -46,143 +46,26 @@ public class AIFighter implements AI {
     	
         if(!attack) {
         	Node current = this.world.getEntityNode(this.id);
-            int currX = current.getX();
-            int currY = current.getY();
-            int enemyX = enemy.getX();
-            int enemyY = enemy.getY();
             
         	if(!this.explore.isEmpty()) {
             	Node next = this.explore.remove();
             	putDirectionInMessage(current, next, message);
             } else {
-            	/*
-            	 * A boolean to tell when the AI is in the same row/column
-            	 * with the enemy, the AI will try to get to where the enemy is
-            	 * with that row/column. If the AI doesn't reach the enemy,
-            	 * this boolean will be false, ie there is a wall between
-            	 * the AI and the enemy
-            	 */
-            	boolean enemyReached = false;
-            	boolean goRandom = false;
+            	boolean playerReached = reachEnemy(current, enemy);
+            	boolean keepExploring = false;
             	
-            	if(currX == enemyX) {
-            		// enemy is below
-            		if(currY < enemyY) {
-            			// Tries to get to where enemy is
-            			while(this.world.getNode(currX, currY).getDown() != null) {
-            				if(this.world.getNode(currX, currY).getDown().equals(enemy)) {
-            					enemyReached = true;
-            				}
-            				
-                			this.explore.add(this.world.getNode(currX, currY).getDown());
-                			currY++;
-                		}
-            			
-            			if(!enemyReached) {
-            				this.explore.clear();
-            				goRandom = true;
-            			}
-            		}
-            		
-            		// enemy is above
-            		else {
-            			// Tries to get to where enemy is
-            			while(this.world.getNode(currX, currY).getUp() != null) {
-            				if(this.world.getNode(currX, currY).getUp().equals(enemy)) {
-            					enemyReached = true;
-            				}
-            				
-                			this.explore.add(this.world.getNode(currX, currY).getUp());
-                			currY--;
-                		}
-            			
-            			if(!enemyReached) {
-            				this.explore.clear();
-            				goRandom = true;
-            			}
-            		}
-            	} else if(currY == enemyY) {
-            		// enemy is on the right
-            		if(currX < enemyX) {
-            			// Tries to get to where enemy is
-            			while(this.world.getNode(currX, currY).getRight() != null) {
-            				if(this.world.getNode(currX, currY).getRight().equals(enemy)) {
-            					enemyReached = true;
-            				}
-            				
-                			this.explore.add(this.world.getNode(currX, currY).getRight());
-                			currX++;
-                		}
-            			
-            			if(!enemyReached) {
-            				this.explore.clear();
-            				goRandom = true;
-            			}
-            		}
-            		
-            		// enemy is on the left
-            		else {
-            			// Tries to get to where enemy is
-            			while(this.world.getNode(currX, currY).getLeft() != null) {
-            				if(this.world.getNode(currX, currY).getLeft().equals(enemy)) {
-            					enemyReached = true;
-            				}
-            				
-                			this.explore.add(this.world.getNode(currX, currY).getLeft());
-                			currX--;
-                		}
-            			
-            			if(!enemyReached) {
-            				this.explore.clear();
-            				goRandom = true;
-            			}
-            		}
-            	} else {
-            		goRandom = true;
+            	if(!playerReached) {
+            		keepExploring = true;
+            		this.explore.clear();
             	}
             	
-            	if(goRandom) {
-		        	ArrayList<Node> reachable = current.getConnectedNodes();
-		    		if(this.visited.containsKey(current)) {
-		    			int currentCost = this.visited.get(current);
-		    			this.visited.put(current, currentCost += 1);
-		    		} else {
-		    			this.visited.put(current, 1);
-		    		}
-		            
-		            Node next = null;
-		            boolean allVisited = isReachableInVisited(reachable);
-		            
-		            for(Node node: reachable) {
-		            	if(allVisited) {
-		            		if(next == null) {
-		            			next = node;
-		            		} else {
-		            			int nodeCost, nextCost;
-		            			
-		            			if(this.visited.containsKey(node)) {
-		            				nodeCost = this.visited.get(node);
-		            			} else {
-		            				nodeCost = 0;
-		            			}
-		            			
-		            			if(this.visited.containsKey(next)) {
-		            				nextCost = this.visited.get(next);
-		            			} else {
-		            				nextCost = 0;
-		            			}
-		            			
-		            			if(nodeCost < nextCost) {
-		            				next = node;
-		            			}
-		            		}
-		            	} else if(!visited.containsKey(node)) {
-		            		next = node;
-		            	}
-		            }
-		            
-		            putDirectionInMessage(current, next, message);
-		        }
+            	// Cannot reach player/player has not been seen
+            	if(keepExploring) {
+            		Node next = nextExploreNode(current);
+                    putDirectionInMessage(current, next, message);
+            	} else {
+            		message[3] = "";
+            	}
             }
         }
 
@@ -239,6 +122,134 @@ public class AIFighter implements AI {
     	return enemyClose;
     }
 
+
+    /**
+     * Returns if a player is reachable by going straight to one direction, and
+     * Adds the straight path to explore
+     * @param current the current Node
+     * @param player the player Node
+     * @return if a player is reachable by going straight to one direction
+     */
+    private boolean reachEnemy(Node current, Node player) {
+    	int currX = current.getX();
+        int currY = current.getY();
+        int playerX = player.getX();
+        int playerY = player.getY();
+    	/*
+    	 * A boolean to tell when the AI is in the same row/column
+    	 * with the player, the AI will try to get to where the player is
+    	 * with that row/column. If the AI doesn't reach the player,
+    	 * this boolean will be false, ie there is a wall between
+    	 * the AI and the player
+    	 */
+    	boolean playerReached = false;
+    	
+    	if(currX == playerX) {
+    		// Player is below
+    		if(currY < playerY) {
+    			// Tries to get to where player is
+    			while(this.world.getNode(currX, currY).getDown() != null) {
+    				if(this.world.getNode(currX, currY).getDown().equals(player)) {
+    					playerReached = true;
+    				}
+    				
+        			this.explore.add(this.world.getNode(currX, currY).getDown());
+        			currY++;
+        		}
+    		}
+    		
+    		// Player is above
+    		else {
+    			// Tries to get to where player is
+    			while(this.world.getNode(currX, currY).getUp() != null) {
+    				if(this.world.getNode(currX, currY).getUp().equals(player)) {
+    					playerReached = true;
+    				}
+    				
+        			this.explore.add(this.world.getNode(currX, currY).getUp());
+        			currY--;
+        		}
+    		}
+    	} else if(currY == playerY) {
+    		// Player is on the right
+    		if(currX < playerX) {
+    			// Tries to get to where player is
+    			while(this.world.getNode(currX, currY).getRight() != null) {
+    				if(this.world.getNode(currX, currY).getRight().equals(player)) {
+    					playerReached = true;
+    				}
+    				
+        			this.explore.add(this.world.getNode(currX, currY).getRight());
+        			currX++;
+        		}
+    		}
+    		
+    		// Player is on the left
+    		else {
+    			// Tries to get to where player is
+    			while(this.world.getNode(currX, currY).getLeft() != null) {
+    				if(this.world.getNode(currX, currY).getLeft().equals(player)) {
+    					playerReached = true;
+    				}
+    				
+        			this.explore.add(this.world.getNode(currX, currY).getLeft());
+        			currX--;
+        		}
+    		}
+    	}
+    	
+    	return playerReached;
+    }
+    
+    /**
+     * Returns the next node that will be visited
+     * @param current the current Node
+     * @return the next node that will be visited
+     */
+    private Node nextExploreNode(Node current) {
+    	ArrayList<Node> reachable = current.getConnectedNodes();
+		
+		if(this.visited.containsKey(current)) {
+			int currentCost = this.visited.get(current);
+			this.visited.put(current, currentCost += 1);
+		} else {
+			this.visited.put(current, 1);
+		}
+        
+        Node next = null;
+        boolean allVisited = isReachableInVisited(reachable);
+        
+        for(Node node: reachable) {
+        	if(allVisited) {
+        		if(next == null) {
+        			next = node;
+        		} else {
+        			int nodeCost, nextCost;
+        			
+        			if(this.visited.containsKey(node)) {
+        				nodeCost = this.visited.get(node);
+        			} else {
+        				nodeCost = 0;
+        			}
+        			
+        			if(this.visited.containsKey(next)) {
+        				nextCost = this.visited.get(next);
+        			} else {
+        				nextCost = 0;
+        			}
+        			
+        			if(nodeCost < nextCost) {
+        				next = node;
+        			}
+        		}
+        	} else if(!visited.containsKey(node)) {
+        		next = node;
+        	}
+        }
+        
+        return next;
+    }
+    
     /**
      * Stores the direction that the AI would like to go in message
      * base on its current location and the node that it is trying to get to

@@ -182,46 +182,7 @@ public class AIPlayer implements AI {
     	
         if(!attack) {
         	Node current = this.world.getEntityNode(this.id);
-        	ArrayList<Node> reachable = current.getConnectedNodes();
-            
-            if(this.visited.containsKey(current)) {
-    			int currentCost = this.visited.get(current);
-    			this.visited.put(current, currentCost += 1);
-    		} else {
-    			this.visited.put(current, 1);
-    		}
-            
-            Node next = null;
-            boolean allVisited = isReachableInVisited(reachable);
-            
-            for(Node node: reachable) {
-            	if(allVisited) {
-            		if(next == null) {
-            			next = node;
-            		} else {
-            			int nodeCost, nextCost;
-            			
-            			if(this.visited.containsKey(node)) {
-            				nodeCost = this.visited.get(node);
-            			} else {
-            				nodeCost = 0;
-            			}
-            			
-            			if(this.visited.containsKey(next)) {
-            				nextCost = this.visited.get(next);
-            			} else {
-            				nextCost = 0;
-            			}
-            			
-            			if(nodeCost < nextCost) {
-            				next = node;
-            			}
-            		}
-            	} else if(!visited.containsKey(node)) {
-            		next = node;
-            	}
-            }
-            
+        	Node next = nextExploreNode(current);
             putDirectionInMessage(current, next, message);
         }
         
@@ -272,6 +233,55 @@ public class AIPlayer implements AI {
     	}
     	
     	return enemyClose;
+    }
+    
+    /**
+     * Returns the next node that will be visited
+     * @param current the current Node
+     * @return the next node that will be visited
+     */
+    private Node nextExploreNode(Node current) {
+    	ArrayList<Node> reachable = current.getConnectedNodes();
+		
+		if(this.visited.containsKey(current)) {
+			int currentCost = this.visited.get(current);
+			this.visited.put(current, currentCost += 1);
+		} else {
+			this.visited.put(current, 1);
+		}
+        
+        Node next = null;
+        boolean allVisited = isReachableInVisited(reachable);
+        
+        for(Node node: reachable) {
+        	if(allVisited) {
+        		if(next == null) {
+        			next = node;
+        		} else {
+        			int nodeCost, nextCost;
+        			
+        			if(this.visited.containsKey(node)) {
+        				nodeCost = this.visited.get(node);
+        			} else {
+        				nodeCost = 0;
+        			}
+        			
+        			if(this.visited.containsKey(next)) {
+        				nextCost = this.visited.get(next);
+        			} else {
+        				nextCost = 0;
+        			}
+        			
+        			if(nodeCost < nextCost) {
+        				next = node;
+        			}
+        		}
+        	} else if(!visited.containsKey(node)) {
+        		next = node;
+        	}
+        }
+        
+        return next;
     }
     
     /**
