@@ -12,7 +12,6 @@ import javax.swing.text.BadLocationException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 @SuppressWarnings("serial")
@@ -771,8 +770,6 @@ public class GUI extends JFrame  {
         windowPanel.add(titlePanel);
         windowPanel.add(gamePanel);
         windowPanel.add(gameMenuPanel);
-        
-        String pack = App.pref.getText("texturePack");
 
         // Title Panel
         titlePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));

@@ -44,7 +44,6 @@ public class Game {
         String gameMode = App.pref.getText("gameMode");
         int height = App.pref.getValue("defaultMapHeight");
         int width = App.pref.getValue("defaultMapWidth");
-        boolean doorAndKey = App.pref.getBool("doorAndKey");
         
         // Create the game
         if (gameMode.equals("Race")) {
