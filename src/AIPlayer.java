@@ -51,23 +51,9 @@ public class AIPlayer implements AI {
     	String[] message = new String[4];
         message[0] = worldName;
         message[2] = id;
-        
-    	Node current = this.world.getEntityNode(this.id);
-    	boolean attack = false;
     	
-    	if(this.world.isBeingInWorld("Enemy") && !this.world.isBeingDead("Enemy")) {
-    		Node enemy = this.world.getEntityNode("Enemy");
-    		
-    		if(isEnemyClose(current, enemy)) {
-            	message[1] = "melee";
-            	attack = true;
-            } else {
-            	message[1] = "move";
-            }
-    	} else {
-    		message[1] = "move";
-    	}
-        
+    	boolean attack = this.attack(message);
+    	
         if(!attack) {
         	int randValue = (new Random()).nextInt(4);
             switch(randValue) {
@@ -91,24 +77,11 @@ public class AIPlayer implements AI {
     	String[] message = new String[4];
         message[0] = worldName;
         message[2] = id;
-        
-    	Node current = this.world.getEntityNode(this.id);
-    	boolean attack = false;
     	
-    	if(this.world.isBeingInWorld("Enemy") && !this.world.isBeingDead("Enemy")) {
-    		Node enemy = this.world.getEntityNode("Enemy");
-    		
-    		if(isEnemyClose(current, enemy)) {
-            	message[1] = "melee";
-            	attack = true;
-            } else {
-            	message[1] = "move";
-            }
-    	} else {
-    		message[1] = "move";
-    	}
-
+    	boolean attack = this.attack(message);
+    	
         if(!attack) {
+        	Node current = this.world.getEntityNode(this.id);
         	this.visited.put(current, 0);
             int currX = current.getX();
             int currY = current.getY();
@@ -204,24 +177,11 @@ public class AIPlayer implements AI {
     	String[] message = new String[4];
         message[0] = worldName;
         message[2] = id;
-        
-    	Node current = this.world.getEntityNode(this.id);
-    	boolean attack = false;
     	
-    	if(this.world.isBeingInWorld("Enemy") && !this.world.isBeingDead("Enemy")) {
-    		Node enemy = this.world.getEntityNode("Enemy");
-    		
-    		if(isEnemyClose(current, enemy)) {
-            	message[1] = "melee";
-            	attack = true;
-            } else {
-            	message[1] = "move";
-            }
-    	} else {
-    		message[1] = "move";
-    	}
-        
+    	boolean attack = this.attack(message);
+    	
         if(!attack) {
+        	Node current = this.world.getEntityNode(this.id);
         	ArrayList<Node> reachable = current.getConnectedNodes();
             
             if(this.visited.containsKey(current)) {
@@ -269,6 +229,53 @@ public class AIPlayer implements AI {
     }
     
     /**
+     * Returns if the AI is going to attack or not
+     * and stores either attack or move inside message
+     * @param message to store either attack or move
+     * @return if the AI is going to attack or not
+     */
+    private boolean attack(String[] message) {
+    	Node current = this.world.getEntityNode(this.id);
+    	boolean attack = false;
+    	
+    	if(this.world.isBeingInWorld("Enemy") && !this.world.isBeingDead("Enemy")) {
+    		Node enemy = this.world.getEntityNode("Enemy");
+    		
+    		if(isEnemyClose(current, enemy)) {
+            	message[1] = "melee";
+            	attack = true;
+            } else {
+            	message[1] = "move";
+            }
+    	} else {
+    		message[1] = "move";
+    	}
+    	
+    	return attack;
+    }
+    
+    /**
+     * Returns if the enemy is within 2 nodes away from current
+     * @param current the current node
+     * @param enemy the enemy node
+     * @return if the enemy is within 2 nodes away from current
+     */
+    private boolean isEnemyClose(Node current, Node enemy) {
+    	boolean enemyClose = false;
+    	int currX = current.getX();
+    	int currY = current.getY();
+    	int enemyX = enemy.getX();
+    	int enemyY = enemy.getY();
+    	
+    	if((enemyX >= currX - 2 && enemyX <= currX + 2 && currY == enemyY) || 
+    			(enemyY >= currY - 2 && enemyY <= currY + 2 && currX == enemyX)) {
+    		enemyClose = true;
+    	}
+    	
+    	return enemyClose;
+    }
+    
+    /**
      * Stores the direction that the AI would like to go in message
      * base on its current location and the node that it is trying to get to
      * @param current the node where the AI is
@@ -308,20 +315,5 @@ public class AIPlayer implements AI {
     	}
     	
     	return isAllIn;
-    }
-    
-    private boolean isEnemyClose(Node current, Node enemy) {
-    	boolean enemyClose = false;
-    	int currX = current.getX();
-    	int currY = current.getY();
-    	int enemyX = enemy.getX();
-    	int enemyY = enemy.getY();
-    	
-    	if((enemyX >= currX - 2 && enemyX <= currX + 2 && currY == enemyY) || 
-    			(enemyY >= currY - 2 && enemyY <= currY + 2 && currX == enemyX)) {
-    		enemyClose = true;
-    	}
-    	
-    	return enemyClose;
     }
 }
