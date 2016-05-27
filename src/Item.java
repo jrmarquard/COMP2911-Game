@@ -63,10 +63,7 @@ public class Item {
     public Node getNode() {
         return node;
     }
-
-    public void decayIncrement() {
-    }
-
+    
     public void decay() {
         decay--;
     }

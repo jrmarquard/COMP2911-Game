@@ -38,15 +38,21 @@ public class GameMap extends JPanel {
     private BufferedImage playerD = null;
     private BufferedImage playerL = null;
     private BufferedImage playerR = null;
+    private BufferedImage playerDead = null;
     private BufferedImage enemyU = null;
     private BufferedImage enemyD = null;
     private BufferedImage enemyL = null;
     private BufferedImage enemyR = null;
+    private BufferedImage enemyDead = null;
     private BufferedImage start = null;
     private BufferedImage finishU = null;
     private BufferedImage finishD = null;
     private BufferedImage finishL = null;
     private BufferedImage finishR = null;
+    private BufferedImage attackU = null;
+    private BufferedImage attackD = null;
+    private BufferedImage attackL = null;
+    private BufferedImage attackR = null;
     
     public GameMap (World world) {
         super();
@@ -69,15 +75,21 @@ public class GameMap extends JPanel {
 	        playerD = ImageIO.read(new File("Images/"+pack+"/charD.png"));
 	        playerL = ImageIO.read(new File("Images/"+pack+"/charL.png"));
 	        playerR = ImageIO.read(new File("Images/"+pack+"/charR.png"));
+	        playerDead = ImageIO.read(new File("Images/"+pack+"/charDead.png"));
 	        enemyU = ImageIO.read(new File("Images/"+pack+"/enemyUp.png"));
 	        enemyD = ImageIO.read(new File("Images/"+pack+"/enemyDown.png"));
 	        enemyL = ImageIO.read(new File("Images/"+pack+"/enemyLeft.png"));
 	        enemyR = ImageIO.read(new File("Images/"+pack+"/enemyRight.png"));
+	        enemyDead = ImageIO.read(new File("Images/"+pack+"/enemyDead.png"));
 	        start = ImageIO.read(new File("Images/"+pack+"/start.png"));
 	        finishU = ImageIO.read(new File("Images/"+pack+"/finishUp.png"));
 	        finishD = ImageIO.read(new File("Images/"+pack+"/finishDown.png"));
 	        finishL = ImageIO.read(new File("Images/"+pack+"/finishLeft.png"));
 	        finishR = ImageIO.read(new File("Images/"+pack+"/finishRight.png"));
+	        attackU = ImageIO.read(new File("Images/"+pack+"/attackUp.png"));
+	        attackD = ImageIO.read(new File("Images/"+pack+"/attackDown.png"));
+	        attackL = ImageIO.read(new File("Images/"+pack+"/attackLeft.png"));
+	        attackR = ImageIO.read(new File("Images/"+pack+"/attackRight.png"));
         } catch (IOException e) {
         }
     }
@@ -159,41 +171,38 @@ public class GameMap extends JPanel {
          */
         
         // The 
-        Rectangle2D wallVertRect2D = new Rectangle2D.Double(0, 0, wallWidth, tileSize+wallWidth);
-        Rectangle2D wallHoriRect2D = new Rectangle2D.Double(0, 0, tileSize+wallWidth, wallWidth);
-        Rectangle2D wallCornRect2D = new Rectangle2D.Double(0, 0, wallWidth, wallWidth);
-        Rectangle2D floorTileRect2D = new Rectangle2D.Double(0, 0, wallWidth+tileSize, wallWidth+tileSize);
-        
-        // Maze textures
-        TexturePaint floorTexture = new TexturePaint(floor, floorTileRect2D);
-        TexturePaint wallCTexture = new TexturePaint(wallC, wallCornRect2D);
-        TexturePaint finishUTexture = new TexturePaint(finishU, floorTileRect2D);
-        TexturePaint finishDTexture = new TexturePaint(finishD, floorTileRect2D);
-        TexturePaint finishLTexture = new TexturePaint(finishL, floorTileRect2D);
-        TexturePaint finishRTexture = new TexturePaint(finishR, floorTileRect2D);
-        TexturePaint startTexture = new TexturePaint(start, floorTileRect2D);
-        
-        // Walls
-        TexturePaint wallVTexture = new TexturePaint(wallV, wallVertRect2D);
-        TexturePaint wallHTexture = new TexturePaint(wallH, wallHoriRect2D);
-        
-        // Door
-        TexturePaint doorVTexture = new TexturePaint(doorV, wallVertRect2D);
-        TexturePaint doorHTexture = new TexturePaint(doorH, wallHoriRect2D);
-        
-        // Items
-        TexturePaint coinTexture = new TexturePaint(coin, floorTileRect2D);
-        TexturePaint keyTexture = new TexturePaint(key, floorTileRect2D);
-        
-        // Entities
-        TexturePaint playerUTexture = new TexturePaint(playerU, floorTileRect2D);
-        TexturePaint playerDTexture = new TexturePaint(playerD, floorTileRect2D);
-        TexturePaint playerLTexture = new TexturePaint(playerL, floorTileRect2D);
-        TexturePaint playerRTexture = new TexturePaint(playerR, floorTileRect2D);
-        TexturePaint enemyUTexture = new TexturePaint(enemyU, floorTileRect2D);
-        TexturePaint enemyDTexture = new TexturePaint(enemyD, floorTileRect2D);
-        TexturePaint enemyLTexture = new TexturePaint(enemyL, floorTileRect2D);
-        TexturePaint enemyRTexture = new TexturePaint(enemyR, floorTileRect2D);
+        Rectangle2D wallVSize = new Rectangle2D.Double(0, 0, wallWidth, tileSize+wallWidth);
+        Rectangle2D wallHSize = new Rectangle2D.Double(0, 0, tileSize+wallWidth, wallWidth);
+        Rectangle2D wallCSize = new Rectangle2D.Double(0, 0, wallWidth, wallWidth);
+        Rectangle2D floorSize = new Rectangle2D.Double(0, 0, wallWidth+tileSize, wallWidth+tileSize);
+
+        TexturePaint floorTexture = new TexturePaint(floor, floorSize);
+        TexturePaint wallVTexture = new TexturePaint(wallV, wallVSize);
+        TexturePaint wallHTexture = new TexturePaint(wallH, wallHSize);
+        TexturePaint wallCTexture = new TexturePaint(wallC, wallCSize);
+        TexturePaint doorVTexture = new TexturePaint(doorV, wallVSize);
+        TexturePaint doorHTexture = new TexturePaint(doorH, wallHSize);
+        TexturePaint coinTexture = new TexturePaint(coin, floorSize);
+        TexturePaint playerUTexture = new TexturePaint(playerU, floorSize);
+        TexturePaint playerDTexture = new TexturePaint(playerD, floorSize);
+        TexturePaint playerLTexture = new TexturePaint(playerL, floorSize);
+        TexturePaint playerRTexture = new TexturePaint(playerR, floorSize);
+        TexturePaint playerDeadTexture = new TexturePaint(playerDead, floorSize);
+        TexturePaint keyTexture = new TexturePaint(key, floorSize);
+        TexturePaint finishUTexture = new TexturePaint(finishU, floorSize);
+        TexturePaint finishDTexture = new TexturePaint(finishD, floorSize);
+        TexturePaint finishLTexture = new TexturePaint(finishL, floorSize);
+        TexturePaint finishRTexture = new TexturePaint(finishR, floorSize);
+        TexturePaint startTexture = new TexturePaint(start, floorSize);
+        TexturePaint enemyUTexture = new TexturePaint(enemyU, floorSize);
+        TexturePaint enemyDTexture = new TexturePaint(enemyD, floorSize);
+        TexturePaint enemyLTexture = new TexturePaint(enemyL, floorSize);
+        TexturePaint enemyRTexture = new TexturePaint(enemyR, floorSize);
+        TexturePaint enemyDeadTexture = new TexturePaint(enemyDead, floorSize);
+        TexturePaint attackUTexture = new TexturePaint(attackU, floorSize);
+        TexturePaint attackDTexture = new TexturePaint(attackD, floorSize);
+        TexturePaint attackLTexture = new TexturePaint(attackL, floorSize);
+        TexturePaint attackRTexture = new TexturePaint(attackR, floorSize);
 
         // Translate the maze to be centred in the given panel
         g2d.translate(offsetX + (mazeWidth - mazeUnitCols*wallWidth)/2, offsetY + (mazeHeight - mazeUnitRows*wallWidth)/2);
@@ -258,6 +267,8 @@ public class GameMap extends JPanel {
         else if(n.getRight() != null) g2d.setPaint(finishRTexture);
         g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
 
+        String dirP = world.getEntityDirection("Moneymaker");
+        
         // Draw on items
         for (Item i : world.getItems()) {
             n = i.getNode();
@@ -267,39 +278,60 @@ public class GameMap extends JPanel {
                 g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);  
             } else if (i.getType() == Item.ENERGY) {
                 // Draw on 'energy'
-                g2d.setColor(Color.pink);
-                g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);                
+
+            	if (dirP.equals("up") && world.getEntityNode("Moneymaker").getUp().equals(n)) {
+            		g2d.setPaint(attackUTexture);
+            		g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
+            	}
+            	else if (dirP.equals("down") && world.getEntityNode("Moneymaker").getDown().equals(n)) {
+            		g2d.setPaint(attackDTexture);
+            		g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize); 
+            	}
+            	else if (dirP.equals("left") && world.getEntityNode("Moneymaker").getLeft().equals(n)) {
+            		g2d.setPaint(attackLTexture);
+            		g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
+            	}
+            	else if (dirP.equals("right") && world.getEntityNode("Moneymaker").getRight().equals(n)) {
+            		g2d.setPaint(attackRTexture);
+            		g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize); 
+            	}  
             }
         }
+        
         // Draw on entities
         for (Entity e : world.getEntities()) {
             n = e.getNode();
             String dir = e.getDirection();
             String name = e.getName();
             if (name.equals("Moneymaker") || name.equals("Teadrinker")) {
-                if (e.isDead()) {
-                    g2d.setColor(Color.black);
-                    g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
-                } else {
+                int mode = e.getMode();
+                System.out.println(mode);
+                if (mode == Entity.MODE_DEAD) {
+                    g2d.setPaint(playerDeadTexture);
+                } else if (mode == Entity.MODE_ATTACK) {
+                    if (dir.equals("up")) g2d.setColor(Color.red);
+                    if (dir.equals("down")) g2d.setColor(Color.blue);
+                    if (dir.equals("left")) g2d.setColor(Color.green);
+                    if (dir.equals("right")) g2d.setColor(Color.pink);
+                }  else if (mode == Entity.MODE_IDLE) {
                     if (dir.equals("up")) g2d.setPaint(playerUTexture);
                     if (dir.equals("down")) g2d.setPaint(playerDTexture);
                     if (dir.equals("left")) g2d.setPaint(playerLTexture);
                     if (dir.equals("right")) g2d.setPaint(playerRTexture);
-                    g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
                 }                
+                g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
             } else if (name.equals("Enemy")) {
-                if (e.isDead()) {
-                    g2d.setColor(Color.black);
-                    g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
-                } else {
+                int mode = e.getMode();
+                if (mode == Entity.MODE_DEAD) {
+                    g2d.setPaint(enemyDeadTexture);
+                }else if (mode == Entity.MODE_IDLE) {
                     String dirE = world.getEntityDirection("Enemy");
                     if (dirE.equals("up")) g2d.setPaint(enemyUTexture);
                     if (dirE.equals("down")) g2d.setPaint(enemyDTexture);
                     if (dirE.equals("left")) g2d.setPaint(enemyLTexture);
                     if (dirE.equals("right")) g2d.setPaint(enemyRTexture);
-                    g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
                 }
-                
+                g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
             }
         }
         
@@ -379,15 +411,7 @@ public class GameMap extends JPanel {
                 @Override
                 public void actionPerformed(ActionEvent event)
                 {
-                    /*
-                     *  Checks to see if the world has actually changed
-                     *  before repainting.
-                     */
-                    if (world.isWorldChangeFlag()) {
-                        repaint();
-                        world.setWorldChangeFlag(false);
-                    }
-                    
+                    repaint();   
                 }
             });
         }

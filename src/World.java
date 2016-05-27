@@ -28,8 +28,6 @@ public class World {
     // World properies
     private String name;
     private App app;
-    private boolean updateFlag;
-    private boolean worldChangeFlag;
     private boolean enemiesEnabled;
     
     // Maze data
@@ -81,8 +79,6 @@ public class World {
         this.name = name;
         this.width = width;
         this.height = height;
-        this.updateFlag = false;
-        this.worldChangeFlag = false;
         this.enemiesEnabled = App.pref.getBool("enemy");
         this.worldTickCount = 0;
         this.maxVisDistance = App.pref.getValue("visibleRange");
@@ -143,8 +139,6 @@ public class World {
         this.name = name;
         this.width = width;
         this.height = height;
-        this.updateFlag = false;
-        this.worldChangeFlag = false;
         this.enemiesEnabled = App.pref.getBool("enemy");
         this.worldTickCount = 0;
         this.maxVisDistance = App.pref.getValue("visibleRange");
@@ -227,7 +221,7 @@ public class World {
     private void tickUpdate() {
         worldTickCount++;
         
-        // Go through items and decay energy
+        // Decay items
         Iterator<Item> itemItr = items.iterator();
         while (itemItr.hasNext()) {
             Item i = itemItr.next();
@@ -235,9 +229,16 @@ public class World {
                 i.decay();
                 if (i.getDecay() == 0) {
                     itemItr.remove();
-                    worldChangeFlag = true;
+         
                 }
             }
+        }
+        
+        // Decay entities
+        Iterator<String> iterEntity = entities.keySet().iterator();
+        while (iterEntity.hasNext()) {
+            Entity e = entities.get(iterEntity.next());
+            e.decay();
         }
     }
 
@@ -274,14 +275,13 @@ public class World {
             Entity e = entities.get(iterEntity.next());
             
             // If the player is dead they can't do anything
-            if (e.isDead()) continue;
+            if (e.getMode() == Entity.MODE_DEAD) continue;
             
             // Finish check
             if (e.getName().equals("Moneymaker") && e.getNode().equals(finish)) {
                 // winner winner chicken dinner
                 sendMessageToApp(new Message(Message.GAME_MSG, new String[]{"pause"}));
                 sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "finish"}));
-                worldChangeFlag = true;
             }
             
             // Key check
@@ -289,7 +289,6 @@ public class World {
                 e.setKey(true);
                 sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "key"}));
                 key = null;
-                worldChangeFlag = true;
             }
             
             // Opening door check
@@ -299,7 +298,6 @@ public class World {
                     sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "door"}));
                     doorStart = null;
                     doorFinish = null;
-                    worldChangeFlag = true;
                 }
             }
             
@@ -311,11 +309,10 @@ public class World {
                     continue;
                 }
                 Node enemyNode = enemyBeing.getNode();
-                if (enemyBeing.isDead()) continue;
+                if (enemyBeing.getMode() == Entity.MODE_DEAD) continue;
                 if (e.getNode().equals(enemyNode)) {
-                    e.setDead(true);
+                    e.setMode(Entity.MODE_DEAD);
                     sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "death"}));
-                    worldChangeFlag = true;
                 }
             }
         }
@@ -333,7 +330,6 @@ public class World {
                         e.addCoins((i).getValue());
                         itemItr.remove();
                         sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "coin"}));
-                        worldChangeFlag = true;
                     }
                 }
             }
@@ -421,11 +417,13 @@ public class World {
         }
         Entity entityAttacking = entities.get(entityName);
         
-        if (entityAttacking.isDead()) {
+        if (entityAttacking.getMode() == Entity.MODE_DEAD) {
         	this.entitySemaphore.release();
             return;
         } else {
-            sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "sword_swing"}));Node enemyAttackingNode = entityAttacking.getNode();        
+            sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "sword_swing"}));
+            entityAttacking.setMode(Entity.MODE_ATTACK);
+            Node entityAttackingNode = entityAttacking.getNode();        
             
             Iterator<String> iterEntity = entities.keySet().iterator();
             while (iterEntity.hasNext()) {
@@ -433,50 +431,52 @@ public class World {
                 Node entityNode = entity.getNode();
                 
                 // If the being is dead can't kill it twice
-                if (entity.isDead()) continue;
+                if (entity.getMode() == Entity.MODE_DEAD) continue;
                 
                 // Swing in every direction
-                for (Node m : enemyAttackingNode.getConnectedNodes()) {
-                    Item energy = new Item(m, Item.ENERGY, 3);
-                    items.add(energy);
+                for (Node m : entityAttackingNode.getConnectedNodes()) {
                     if (entityNode.equals(m)) {
                         sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "death"}));
-                        entity.setDead(true);
+                        entity.setMode(Entity.MODE_DEAD);
+                        if (entityNode.getX() + 1 == entityAttackingNode.getX()) {
+                            entityAttacking.setDirection("right");
+                        } else if (entityNode.getX() - 1 == entityAttackingNode.getX()) {
+                            entityAttacking.setDirection("left");                            
+                        } else if (entityNode.getY() + 1 == entityAttackingNode.getY()) {
+                            entityAttacking.setDirection("up");
+                        } else if (entityNode.getY() - 1 == entityAttackingNode.getY()) {
+                            entityAttacking.setDirection("down");
+                        } 
+                        
                     }
                 }
             }
-        worldChangeFlag = true;
         entitySemaphore.release();
         }
     }
     
     private void entityMove(String id, String dir) {
-        Entity b = entities.get(id);
-        if (b.isDead()) return;
+        Entity e = entities.get(id);
+        if (e.getMode() == Entity.MODE_DEAD) return;
         
-        Node n = b.getNode();
-        if (b != null) {
+        Node n = e.getNode();
+        if (e != null) {
             if (dir == "up" && n.getUp() != null) {
-                b.setNode(n.getUp()); 
-                b.setDirection("up");
-                updateFlag = true;
-            } else if (dir == "down" && n.getDown() != null) {
-                b.setNode(n.getDown()); 
-                b.setDirection("down");
-                updateFlag = true;
-            } else if (dir == "left" && n.getLeft() != null) {
-                b.setNode(n.getLeft());
-                b.setDirection("left");
-                updateFlag = true;
-            } else if (dir == "right" && n.getRight() != null) {
-                b.setNode(n.getRight());
-                b.setDirection("right");
-                updateFlag = true;
-            }
-            if (updateFlag) {
+                e.setNode(n.getUp()); 
+                e.setDirection("up");
                 sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "step"}));
-                updateFlag = false;
-                worldChangeFlag = true;
+            } else if (dir == "down" && n.getDown() != null) {
+                e.setNode(n.getDown()); 
+                e.setDirection("down"); 
+                sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "step"}));
+            } else if (dir == "left" && n.getLeft() != null) {
+                e.setNode(n.getLeft()); 
+                e.setDirection("left");
+                sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "step"}));
+            } else if (dir == "right" && n.getRight() != null) {
+                e.setNode(n.getRight());
+                e.setDirection("right");
+                sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "step"}));
             }
         }
         update();
@@ -494,21 +494,9 @@ public class World {
         return coords;
     }
 
-    public boolean isBeingDead(String string) {
-        return entities.get(string).isDead();
-    }
-
     public ArrayList<Item> getItems() {
         return items;
     }
-    
-    public boolean isWorldChangeFlag() {
-        return worldChangeFlag;
-    }
-
-    public void setWorldChangeFlag(boolean worldChangeFlag) {
-        this.worldChangeFlag = worldChangeFlag;
-    }    
 
     /**
      * Add being into the world.
