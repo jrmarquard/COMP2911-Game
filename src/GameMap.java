@@ -267,7 +267,6 @@ public class GameMap extends JPanel {
         else if(n.getRight() != null) g2d.setPaint(finishRTexture);
         g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
 
-        String dirP = world.getEntityDirection("Moneymaker");
         
         // Draw on items
         for (Item i : world.getItems()) {

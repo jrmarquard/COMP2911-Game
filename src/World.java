@@ -128,7 +128,9 @@ public class World {
         // Generate maze items
         mazeGenerator();
         if (doorAndKey) {
-            doorAndKeyGenerator();
+            if (!gameMode.equals("Battle")) {
+                doorAndKeyGenerator();                
+            }
         }
         if (!gameMode.equals("Battle")) {
         	generateCoins();
@@ -498,12 +500,11 @@ public class World {
         switch (message[1]) {
             case "move": entityMove(message[2], message[3]); break;
             case "melee": entityMeleeAttack(message[2]); break;
-            case "range": entityRangeAttack(message[2]); break;
+            case "range": entityRangeAttack(message[2], message[3]); break;
         }
     }
     
-    private void entityRangeAttack(String string) {
-        // TODO Auto-generated method stub
+    private void entityRangeAttack(String name, String dir) {
         
     }
 
@@ -541,8 +542,15 @@ public class World {
                     // iterEntity.remove();
                     
                     entity.setMode(Entity.MODE_DEAD);
-                    Item corpse = new Item(entity.getNode(), Item.ENEMY_CORPSE);
-                    items.add(corpse);
+                    if (entity.getType() == Entity.ENEMY) {
+                        items.add(new Item(entity.getNode(), Item.ENEMY_CORPSE));
+                    } else if (entity.getType() == Entity.ENEMY) {
+                        items.add(new Item(entity.getNode(), Item.PLAYER_CORPSE));
+                        if (gameMode.equals("Battle")) {
+                            sendMessageToApp(new Message(Message.GAME_MSG, new String[]{"pause"}));
+                            sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "finish"}));                            
+                        }
+                    }
                     if (entityNode.getX() + 1 == entityAttackingNode.getX()) {
                         entityAttacking.setDirection("right");
                     } else if (entityNode.getX() - 1 == entityAttackingNode.getX()) {
