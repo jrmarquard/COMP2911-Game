@@ -105,10 +105,11 @@ public class GUI extends JFrame  {
         adventureControls.put(KeyEvent.VK_DOWN, new String[]{"world1", "move", "Moneymaker", "down"});
         adventureControls.put(KeyEvent.VK_RIGHT, new String[]{"world1", "move", "Moneymaker", "right"});
         adventureControls.put(KeyEvent.VK_SPACE, new String[]{"world1", "melee", "Moneymaker"});
-        adventureControls.put(KeyEvent.VK_W, new String[]{"world1", "range", "Moneymaker", "up"});
-        adventureControls.put(KeyEvent.VK_A, new String[]{"world1", "range", "Moneymaker", "down"});
-        adventureControls.put(KeyEvent.VK_S, new String[]{"world1", "range", "Moneymaker", "left"});
-        adventureControls.put(KeyEvent.VK_D, new String[]{"world1", "range", "Moneymaker", "right"});
+        adventureControls.put(KeyEvent.VK_W, new String[]{"world2", "move", "Moneymaker", "up"});
+        adventureControls.put(KeyEvent.VK_A, new String[]{"world2", "move", "Moneymaker", "left"});
+        adventureControls.put(KeyEvent.VK_S, new String[]{"world2", "move", "Moneymaker", "down"});
+        adventureControls.put(KeyEvent.VK_D, new String[]{"world2", "move", "Moneymaker", "right"});
+        adventureControls.put(KeyEvent.VK_SHIFT, new String[]{"world2", "melee", "Moneymaker", "right"});
 
         // Race gamemode
         raceControls.put(KeyEvent.VK_UP, new String[]{"world1", "move", "Moneymaker", "up"});

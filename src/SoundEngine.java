@@ -74,13 +74,13 @@ public class SoundEngine {
 	}
 
     public void inbox(String[] message) {
-        try {
-        	if (this.soundEnabled) {
-	            SoundRunnable run = new SoundRunnable(message);
+        if (this.soundEnabled) {
+        	try {
+        		SoundRunnable run = new SoundRunnable(message);
 	            soundPool.execute(run);
+        	} catch (Exception e) {
+        		e.printStackTrace();
         	}
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
     
@@ -229,10 +229,8 @@ public class SoundEngine {
                     break;
                 case "changeVolume":
                 	if (msg[1].equals("effects")) {
-                	    System.out.println("changing effects");
                 	    setSoundEffectVolume();
                 	} else if (msg[1].equals("music")) {
-                	    System.out.println("changing music");
                 	    setMusicVolume();
                 	}
                     break;
