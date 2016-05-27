@@ -14,43 +14,70 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class GUI is responsible for rendering the game and allowing the user to 
+ * interact with the game, settings, and other information.
+ */
 @SuppressWarnings("serial")
 public class GUI extends JFrame  {
     
+    /**
+     * The Enum AppState is used to set appState and keep track of what state the app is in
+     */
     enum AppState {
-        /* Menu displays the main menu */
+
+        /** Menu displays the main menu */
         MENU, 
         
-        /* Screen that displays settings for creating a new game */
+        /** Screen that displays settings for creating a new game */
         GAME_INIT,
         
-        /* Game displays the game state, this can currently
+        /** Game displays the game state, this can currently
          * be several came states, will likely seperate this into
          * different game modes
          */
         GAME, 
         
-        /* Setting state allows user to change settings like
+        /** Setting state allows user to change settings like
          * controls and colours.
          */
         SETTINGS, 
         
-        /* About displays information about the game. */
+        /** About displays information about the game. */
         ABOUT, 
         
-        /* Unused at the moment, but left in just because it's another state */
+        /** Unused at the moment, but left in just because it's another state */
         EXIT
     }
     
+    /** Reference to the game object. */
     private Game game;
+    
+    /** The current app state. */
     private AppState appState;
+    
+    /** windowPanel is the child of JFrame. */
     private JPanel windowPanel;
+    
+    /** The reference to the manager (App.java). */
     private App manager;
     
+    /** The adventure controls. */
     private Map<Integer, String[]> adventureControls;
+    
+    /** The race controls. */
     private Map<Integer, String[]> raceControls;
+    
+    /** The battle controls. */
     private Map<Integer, String[]> battleControls;
     
+    /**
+     * Instantiates a new gui.
+     *
+     * @param manager the manager
+     * @param game the game
+     */
     public GUI (App manager, Game game) {
         this.manager = manager;
         this.game = game;
@@ -63,6 +90,9 @@ public class GUI extends JFrame  {
         });
     }
     
+    /**
+     * Refreshes the GUI, redrawing any changes.
+     */
     private void refresh() {
         EventQueue.invokeLater(new Runnable() {
             @Override
@@ -72,13 +102,13 @@ public class GUI extends JFrame  {
         });
     }
     
-    
-    private void initUI() {
-        /* Any layout information that should never be changed
-         * should be contained in here. Anything that can be redrawn
-         * must be added into the draw*() functions. 
-         */
-        
+    /**
+     * Initialises the GUI.
+     * Any layout information that should never be changed
+     * should be contained in here. Anything that can be redrawn
+     * must be added into the draw*() functions.
+     */
+    private void initUI() {        
         // Defaults to display the main menu first
         appState = AppState.MENU;
         sendMessage(new Message(Message.SOUND_MSG, new String[]{"loop", "menu"}));
@@ -136,21 +166,13 @@ public class GUI extends JFrame  {
         battleControls.put(KeyEvent.VK_DOWN, new String[]{"world1", "move", "Moneymaker", "down"});
         battleControls.put(KeyEvent.VK_RIGHT, new String[]{"world1", "move", "Moneymaker", "right"});
         battleControls.put(KeyEvent.VK_SPACE, new String[]{"world1", "melee", "Moneymaker"});
-        /*battleControls.put(KeyEvent.VK_I, new String[]{"world1", "range", "Moneymaker", "up"});
-        battleControls.put(KeyEvent.VK_J, new String[]{"world1", "range", "Moneymaker", "down"});
-        battleControls.put(KeyEvent.VK_K, new String[]{"world1", "range", "Moneymaker", "left"});
-        battleControls.put(KeyEvent.VK_L, new String[]{"world1", "range", "Moneymaker", "right"});*/
         // Player 2
         battleControls.put(KeyEvent.VK_W, new String[]{"world1", "move", "Teadrinker", "up"});
         battleControls.put(KeyEvent.VK_A, new String[]{"world1", "move", "Teadrinker", "left"});
         battleControls.put(KeyEvent.VK_S, new String[]{"world1", "move", "Teadrinker", "down"});
         battleControls.put(KeyEvent.VK_D, new String[]{"world1", "move", "Teadrinker", "right"});
         battleControls.put(KeyEvent.VK_SHIFT, new String[]{"world1", "melee", "Teadrinker"});
-        /*battleControls.put(KeyEvent.VK_T, new String[]{"world1", "range", "Teadrinker", "up"});
-        battleControls.put(KeyEvent.VK_F, new String[]{"world1", "range", "Teadrinker", "down"});
-        battleControls.put(KeyEvent.VK_G, new String[]{"world1", "range", "Teadrinker", "left"});
-        battleControls.put(KeyEvent.VK_H, new String[]{"world1", "range", "Teadrinker", "right"});
-        */
+
         // Register a keystroke
         this.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
@@ -178,6 +200,12 @@ public class GUI extends JFrame  {
         });
     }
     
+    /**
+     * Gets the keypressed and returns the message associated with it.
+     *
+     * @param keyPressed the key pressed
+     * @return the control message
+     */
     private String[] getControlMessage(int keyPressed ) {
         String gameMode = App.pref.getText("gameMode");
         try {
@@ -194,6 +222,9 @@ public class GUI extends JFrame  {
     }
     
     
+    /**
+     * Draws the entire GUI by checking the appState and calling the appropriate method.
+     */
     private void draw() {
         // Reset game panels, remove them (hopefully clears memory)
         windowPanel.removeAll();
@@ -327,11 +358,8 @@ public class GUI extends JFrame  {
      */
     private void drawGameInit() {
         windowPanel.setLayout(new BoxLayout(windowPanel, BoxLayout.Y_AXIS));
-
-        // Navigation panel across the top of the screen.
-        //JPanel navPanelTop = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        //navPanelTop.setBackground(windowPanel.getBackground().darker());
-        //windowPanel.add(navPanelTop);
+        
+        // Get the texture pack
         String pack = App.pref.getText("texturePack");
         
         // Settings Panel Layout Begin
@@ -353,10 +381,9 @@ public class GUI extends JFrame  {
         c.gridx = 3;
         gameSettingsPanel.add(blankColumnRight, c);
 
-        /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         * Start building the settings list
-         * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         */
+        /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
+         *    Start building the settings list    *
+         * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
         c.weightx = 1;
         int row = 0;
         
@@ -461,6 +488,7 @@ public class GUI extends JFrame  {
         });
         gameSettingsPanel.add(visSelection, c);
         
+        // Visibility options
         c.gridx = 1;
         c.gridy = row++;
         c.anchor = GridBagConstraints.WEST;
@@ -474,6 +502,7 @@ public class GUI extends JFrame  {
         widthSize.setColumns(2);
         widthSize.getDocument().addDocumentListener(new PrefUpdate("value", "defaultMapWidth"));
         
+        // Width option
         c.gridx = 1;
         c.gridy = row++;
         c.anchor = GridBagConstraints.WEST;
@@ -482,6 +511,7 @@ public class GUI extends JFrame  {
         c.anchor = GridBagConstraints.EAST;
         gameSettingsPanel.add(widthSize, c);
 
+        // Height option
         JFormattedTextField heightSize = new JFormattedTextField();
         heightSize.setValue(Integer.toString(App.pref.getValue("defaultMapHeight")));
         heightSize.setColumns(2);
@@ -495,7 +525,6 @@ public class GUI extends JFrame  {
         gameSettingsPanel.add(heightSize, c);
 
         String[] playerOptions = null;
-        
         if(gameMode.equals("Battle")) {
         	playerOptions = new String[]{"Human", "Battle AI"};
         } else {
@@ -520,8 +549,7 @@ public class GUI extends JFrame  {
             
         }
         
-        // Button should always be at the bottom, so it's y is 99. For some reason
-        // using row as with the rest of the buttons did not work
+        // Pushes these buttons to the bottom.
         c.gridy = 99;
         c.gridx = 1;
         c.gridwidth = 2;
@@ -650,38 +678,7 @@ public class GUI extends JFrame  {
         };
         windowPanel.add(settingsPanel);
         settingsPanel.add(Box.createRigidArea(new Dimension(0,20)));
-        
-        /*for (String s : App.pref.getKeys("colour")) {
-            Color c = App.pref.getColour(s);
-            String red = String.format("%02X",c.getRed());
-            String green = String.format("%02X",c.getGreen());
-            String blue = String.format("%02X",c.getBlue());
-            String value = red+green+blue;
-            
-            // Create row for setting
-            JPanel settingRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
-            JLabel settingName = new JLabel();
-            JTextField settingValue = new JTextField();
-            JPanel settingColour = new JPanel();
-            
-            settingRow.setBorder(BorderFactory.createLineBorder(Color.black));
-            settingValue.setColumns(6);
-            settingValue.getDocument().addDocumentListener(new PrefUpdate("colour", s));
-            settingColour.setBorder(BorderFactory.createLineBorder(Color.black));
-            
-            // Display
-            settingName.setText(s);
-            settingValue.setText(value);
-            settingValue.setColumns(value.length());
-            settingColour.setBackground(c);
-            
-            // Add to parent panels
-            settingRow.add(settingName);
-            settingRow.add(settingValue);
-            settingRow.add(settingColour);
-            settingsPanel.add(settingRow);
-        }
-        */
+
         JPanel textureSelectPanel = new JPanel();
         JLabel textureSelectLabel = new JLabel("Select texture: ");
         JRadioButton textureCastle = new JRadioButton("Castle");
@@ -871,21 +868,49 @@ public class GUI extends JFrame  {
         windowPanel.setPreferredSize(windowPanel.getSize());
     }
     
+    /**
+     * Send message to the game manager to pass on to the sound engine or game.
+     *
+     * @param c the message
+     */
     private void sendMessage(Message c) {
         manager.sendMessage(c);
     }
+    
+    /**
+     * Sets the app state.
+     *
+     * @param s the new app state
+     */
     private void setAppState(AppState s) {
         appState = s;
         refresh();
     }
+    
+    /**
+     * Close the gui safely
+     */
     public void close() {
         this.dispose();
     }
 
+    /**
+     * A document listener implementation which is used to change pref.
+     */
     private class PrefUpdate implements DocumentListener {
+        
+        /** The space name. */
         String spaceName;
+        
+        /** The pref name. */
         String prefName;
         
+        /**
+         * Instantiates a new pref update.
+         *
+         * @param s the s
+         * @param p the p
+         */
         public PrefUpdate(String s, String p) {
             this.spaceName = s;
             this.prefName = p;
@@ -895,6 +920,7 @@ public class GUI extends JFrame  {
         public void changedUpdate(DocumentEvent e) {
             update(e);
         }
+        
         @Override
         public void insertUpdate(DocumentEvent e) {
             update(e);    
@@ -903,6 +929,12 @@ public class GUI extends JFrame  {
         public void removeUpdate(DocumentEvent e) {
             update(e);
         }
+        
+        /**
+         * Update is called to parse the event and update the appropriate preference
+         *
+         * @param e the event
+         */
         private void update(DocumentEvent e) {
             try {
                 String value = "";
@@ -929,8 +961,20 @@ public class GUI extends JFrame  {
         }
     }
     
+    /**
+     * The Class PlayerOptions is used to select and change the player preferences
+     */
     private class PlayerOptions extends JComboBox<String> {
+        
+        /** The setting. */
         String setting;
+        
+        /**
+         * Instantiates a new player options.
+         *
+         * @param o the o
+         * @param s the s
+         */
         public PlayerOptions(String[] o, String s) {
             super(o);
             this.setting = s;
@@ -946,15 +990,19 @@ public class GUI extends JFrame  {
                 }
             });
         }
-        
     }
     
     /**
-     * Exactly the same as a normal button but it sends a click command
-     * to the sound engine.
-     * 
+     * JClickButton is exactly the same as a JButton but it sends a click command
+     * to the sound engine. 
      */
     private class JClickButton extends JButton {
+        
+        /**
+         * Instantiates a new JClickButton
+         *
+         * @param s the name of the button
+         */
         public JClickButton (String s) {
             super(s);
             this.addActionListener(new ActionListener() {
@@ -967,15 +1015,29 @@ public class GUI extends JFrame  {
     }
     
     /**
-     * Class used to add a background image to a JPanel
+     * Class used to add a background image to a JPanel.
+     *
      * @author Tyler
      */
     class ImagePanel extends JPanel {
+        
+        /** The img. */
         private Image img;
+        
+        /**
+         * Instantiates a new image panel.
+         *
+         * @param img the img
+         */
         public ImagePanel(String img) {
             this(new ImageIcon(img).getImage());
         }
         
+        /**
+         * Instantiates a new image panel.
+         *
+         * @param img the img
+         */
         public ImagePanel(Image img) {
             this.img = img;
             Dimension size = new Dimension(img.getWidth(null), img.getHeight(null));
@@ -986,6 +1048,9 @@ public class GUI extends JFrame  {
             setLayout(null);
         }
         
+        /* (non-Javadoc)
+         * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
+         */
         public void paintComponent(Graphics g) {
             g.drawImage(img, 0, 0, null);
         }
