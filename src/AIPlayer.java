@@ -182,6 +182,14 @@ public class AIPlayer implements AI {
     	
         if(!attack) {
         	Node current = this.world.getEntityNode(this.id);
+        	
+        	if(this.visited.containsKey(current)) {
+    			int currentCost = this.visited.get(current);
+    			this.visited.put(current, currentCost += 1);
+    		} else {
+    			this.visited.put(current, 1);
+    		}
+    		
         	Node next = nextExploreNode(current);
             putDirectionInMessage(current, next, message);
         }
@@ -242,44 +250,31 @@ public class AIPlayer implements AI {
      */
     private Node nextExploreNode(Node current) {
     	ArrayList<Node> reachable = current.getConnectedNodes();
-		
-		if(this.visited.containsKey(current)) {
-			int currentCost = this.visited.get(current);
-			this.visited.put(current, currentCost += 1);
-		} else {
-			this.visited.put(current, 1);
-		}
-        
-        Node next = null;
-        boolean allVisited = isReachableInVisited(reachable);
-        
-        for(Node node: reachable) {
-        	if(allVisited) {
-        		if(next == null) {
-        			next = node;
-        		} else {
-        			int nodeCost, nextCost;
-        			
-        			if(this.visited.containsKey(node)) {
-        				nodeCost = this.visited.get(node);
-        			} else {
-        				nodeCost = 0;
-        			}
-        			
-        			if(this.visited.containsKey(next)) {
-        				nextCost = this.visited.get(next);
-        			} else {
-        				nextCost = 0;
-        			}
-        			
-        			if(nodeCost < nextCost) {
-        				next = node;
-        			}
-        		}
-        	} else if(!visited.containsKey(node)) {
-        		next = node;
-        	}
-        }
+    	Node next = null;
+
+    	for(Node node: reachable) {
+    		if(next == null) {
+    			next = node;
+    		} else {
+    			int nodeCost, nextCost;
+    			
+    			if(this.visited.containsKey(node)) {
+    				nodeCost = this.visited.get(node);
+    			} else {
+    				nodeCost = 0;
+    			}
+    			
+    			if(this.visited.containsKey(next)) {
+    				nextCost = this.visited.get(next);
+    			} else {
+    				nextCost = 0;
+    			}
+    			
+    			if(nodeCost < nextCost) {
+    				next = node;
+    			}
+    		}
+    	}
         
         return next;
     }
@@ -307,22 +302,4 @@ public class AIPlayer implements AI {
     		message[3] = "down";
     	}
 	}
-    
-	/**
-	 * Returns if all the nodes in reachable are in the visited list
-	 * @param reachable the list that contains the reachable nodes
-	 * @return if all the nodes in reachable are in the visited list
-	 */
-    private boolean isReachableInVisited(ArrayList<Node> reachable) {
-    	boolean isAllIn = true;
-    	
-    	for(Node node: reachable) {
-    		if(!this.visited.containsKey(node)) {
-    			isAllIn = false;
-    			break;
-    		}
-    	}
-    	
-    	return isAllIn;
-    }
 }
