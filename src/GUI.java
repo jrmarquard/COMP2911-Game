@@ -512,7 +512,7 @@ public class GUI extends JFrame  {
                 }
             };
         aboutTextPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-        JTextArea aboutText = new JTextArea(35, 25);
+        JTextArea aboutText = new JTextArea(30, 25);
         aboutText.setMargin(new Insets(10,10,10,10));
         try {
 	        FileReader aboutReader = new FileReader(this.game.getAboutFile());
