@@ -778,11 +778,7 @@ public class GUI extends JFrame  {
         titlePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
         titlePanel.setBackground(windowPanel.getBackground());
 
-        ArrayList<Integer> coins = game.getPlayerCoins();
-        JLabel coins1 = new JLabel();
-        JLabel coins2 = new JLabel();
-        JLabel coins3 = new JLabel();
-        JLabel coins4 = new JLabel();
+        ArrayList<Integer> coins = game.getPlayerCoins();  
         
         // Game Panel        
         gamePanel.setLayout(new BoxLayout(gamePanel, BoxLayout.Y_AXIS));
@@ -796,35 +792,50 @@ public class GUI extends JFrame  {
         
         if (numWorlds >= 1) {
             JPanel innerPanelA = new JPanel(new GridBagLayout());
+            JLabel coins1 = new JLabel();
+            JLabel level1 = new JLabel();
             Integer playerOneCoins = coins.get(0);
             coins1.setText("Coins: "+playerOneCoins);
             titlePanel.add(coins1);
-            innerPanelA.add(new GameMap(worlds.get(0), coins1));
+            titlePanel.add(level1);
+            innerPanelA.add(new GameMap(worlds.get(0), coins1, level1));
             gamePanelTop.add(innerPanelA);
             if (numWorlds >= 2) {            
                 JPanel innerPanelB = new JPanel(new GridBagLayout());
+                JLabel coins2 = new JLabel();
+                JLabel level2 = new JLabel();
                 Integer playerTwoCoins = coins.get(1);
                 coins2.setText("Coins: "+playerTwoCoins);
+                titlePanel.add(Box.createRigidArea(new Dimension(10,0)));
                 titlePanel.add(coins2);
-                innerPanelB.add(new GameMap(worlds.get(1), coins2));
+                titlePanel.add(level2);
+                innerPanelB.add(new GameMap(worlds.get(1), coins2, level2));
                 gamePanelTop.add(innerPanelB);
                 if (numWorlds >= 3) {    
                     JPanel gamePanelBot = new JPanel();
+                    JLabel coins3 = new JLabel();
+                    JLabel level3 = new JLabel();
                     Integer playerThreeCoins = coins.get(2);
                     coins3.setText("Coins: "+playerThreeCoins);
+                    titlePanel.add(Box.createRigidArea(new Dimension(10,0)));
                     titlePanel.add(coins3);
+                    titlePanel.add(level3);
                     gamePanelBot.setLayout(new BoxLayout(gamePanelBot, BoxLayout.X_AXIS));
                     gamePanel.add(gamePanelBot);
                     
                     JPanel innerPanelC = new JPanel(new GridBagLayout());
-                    innerPanelC.add(new GameMap(worlds.get(2), coins3));
+                    innerPanelC.add(new GameMap(worlds.get(2), coins3,level3));
                     gamePanelBot.add(innerPanelC);
                     if (numWorlds == 4) {            
                         JPanel innerPanelD = new JPanel(new GridBagLayout());
+                        JLabel coins4 = new JLabel();
+                        JLabel level4 = new JLabel();
                         Integer playerFourCoins = coins.get(3);
                         coins4.setText("Coins: "+playerFourCoins);
+                        titlePanel.add(Box.createRigidArea(new Dimension(10,0)));
                         titlePanel.add(coins4);
-                        innerPanelD.add(new GameMap(worlds.get(3), coins4));
+                        titlePanel.add(level4);
+                        innerPanelD.add(new GameMap(worlds.get(3), coins4, level4));
                         gamePanelBot.add(innerPanelD);
                     }
                 }
@@ -834,6 +845,19 @@ public class GUI extends JFrame  {
         // Menu Panel
         gameMenuPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
         gameMenuPanel.setBackground(windowPanel.getBackground().darker());
+        
+        JClickButton restartButton = new JClickButton("Restart");
+        restartButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sendMessage(new Message(Message.GAME_MSG, new String[]{"endGame"}));
+                sendMessage(new Message(Message.SOUND_MSG, new String[]{"stop", "background"}));
+                sendMessage(new Message(Message.SOUND_MSG, new String[]{"loop", "menu"}));
+                sendMessage(new Message(Message.GAME_MSG, new String[]{"newGame"}));
+                setAppState(AppState.GAME);
+            }
+        });
+        gameMenuPanel.add(restartButton);
         
         JClickButton closeButton = new JClickButton("Exit to menu");
         closeButton.addActionListener(new ActionListener() {

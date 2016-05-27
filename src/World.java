@@ -239,13 +239,13 @@ public class World {
                 
         // If visibility is turned off make all the tiles bright.
         if (maxVisDistance == -1) {
-            for (ArrayList<Node> an : this.nodes) {
+        	for (ArrayList<Node> an : this.nodes) {
                 for (Node n : an) {
                     n.setVisibility(0f);
                 }
             }
         } else {
-            calculateVisibility(this.start);            
+        	calculateVisibility(this.start);             
         }
         
         // If enemies are enabled, create 1
@@ -414,6 +414,7 @@ public class World {
                     sendMessageToApp(new Message(Message.GAME_MSG, new String[]{"pause"}));
                     sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "finish"}));                    
                 } else if (gameMode.equals("Adventure")) {
+                	entity.setLevel(entity.getLevel()+1);
                     resetMaze();
                 } else if (gameMode.equals("Battle")) {
                     // do nothing

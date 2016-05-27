@@ -26,6 +26,7 @@ public class GameMap extends JPanel {
     private Graphics2D g2d;
     private PaintRefresh timer;
     private JLabel coins;
+    private JLabel level;
     
     // Textures
     private BufferedImage floor = null;
@@ -59,10 +60,11 @@ public class GameMap extends JPanel {
     private BufferedImage attackL = null;
     private BufferedImage attackR = null;
     
-    public GameMap (World world, JLabel coins) {
+    public GameMap (World world, JLabel coins, JLabel level) {
         super();
         this.world = world;
         this.coins = coins;
+        this.level = level;
         
         String pack = App.pref.getText("texturePack");
         timer = new PaintRefresh(this);
@@ -127,10 +129,11 @@ public class GameMap extends JPanel {
 	        g2d = (Graphics2D) g;
 	        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	        
-	        //Updates the coin counter at the top of the game screen
+	        //Updates the coin counter and level counter at the top of the game screen
 	        for (Entity i : world.getEntities()) {
 	        	if (i.getType() == Entity.PLAYER) {
 	        		coins.setText("coins: "+ i.getCoins());
+	        		level.setText("level: "+ i.getLevel());
 	        	}
 	        }
 	        
@@ -290,11 +293,6 @@ public class GameMap extends JPanel {
 	
 	        
 	        // Draw on items
-	        try {
-				world.getItemSemaphore().acquire();
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
-			}
 	        for (Item i : world.getItems()) {
 	            n = i.getNode();
 	            if (i.getType() == Item.COIN) {
@@ -309,14 +307,8 @@ public class GameMap extends JPanel {
 	            }
 	            g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize); 
 	        }
-	        world.getItemSemaphore().release();
 	        
 	        // Draw on entities
-	        try {
-				world.getEntitySemaphore().acquire();
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
-			}
 	        for (Entity e : world.getEntities()) {
 	            n = e.getNode(); 
 	            String dir = e.getDirection();
@@ -346,7 +338,6 @@ public class GameMap extends JPanel {
 	                }
 	            }
 	        }
-	        world.getEntitySemaphore().release();
 	        
 	        // Draw key
 	        n = world.getKeyNode();
@@ -395,6 +386,7 @@ public class GameMap extends JPanel {
     	catch (Exception e2) {
     		//Occurs when map hasnt finished being created before being drawn
     	}
+        
     }
     
     /*      Code to calculate visibility

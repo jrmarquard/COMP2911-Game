@@ -10,6 +10,7 @@ public class Entity {
     
     private String name;
     private int coins;
+    private int level;
     private boolean key;
     private Node node;
     private String direction;
@@ -22,6 +23,7 @@ public class Entity {
         this.type = type;
         this.name = name;
         this.coins = 0;
+        this.level = 1;
         this.key = false;
         this.mode = MODE_IDLE;
         this.decay = -1;
@@ -31,7 +33,15 @@ public class Entity {
         else if (node.getRight() != null) this.direction = "right";
     }
     
-    public int getType() {
+    public int getLevel() {
+		return level;
+	}
+
+	public void setLevel(int level) {
+		this.level = level;
+	}
+
+	public int getType() {
         return type;
     }
 
