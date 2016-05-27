@@ -503,7 +503,7 @@ public class World {
     /**
      * Calculate the visibility of each node from a given node.
      * 
-     * @param node The node to start from.
+     * @param startNode The node to start from.
      */
     private void calculateVisibility(Node startNode) {
         
@@ -554,7 +554,7 @@ public class World {
     /**
      * Method allowing external objects to update the game state.
      * 
-     * @param string The message send to the world.
+     * @param message The message send to the world.
      */
     public void sendMessage(String[] message) {
         switch (message[1]) {
@@ -720,6 +720,7 @@ public class World {
      * Add being into the world.
      * 
      * @param name Name of the enemy
+     * @param opt Modifier for the player
      */
     public void addPlayer(String name, String opt) {
         Node n = null;
@@ -1316,6 +1317,7 @@ public class World {
      * Sets the cost of the nodes from the given node by doing a bfs
      * 
      * @param node the starting node
+     * @param nodeCostMap Map of the cost of each node
      */
     private void setNodeCost(Node node, HashMap<Node, Integer> nodeCostMap) {
         Queue<Node> explore = new LinkedList<Node>();
