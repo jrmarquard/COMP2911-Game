@@ -18,6 +18,12 @@ public class AIPlayer implements AI {
     private LinkedList<Node> explore;
     private HashMap<Node, Integer> visited;
     
+    /**
+     * Constructs an AIPlayer with the given world, id and difficulty
+     * @param world the world
+     * @param id the id of the AI
+     * @param diff the difficulty of the AI
+     */
     public AIPlayer(World world, String id, String diff) {
         this.world = world;
         this.worldName = world.getName();;
@@ -29,8 +35,9 @@ public class AIPlayer implements AI {
     
     @Override
     /**
-	 * Returns a message which contains the move that
-	 * the AI would like to make
+	 * Returns a message which contains the name of the world, 
+	 * a String to tell if it wants to move or attack, its ID, and 
+	 * the move that the AI would like to make
 	 */
     public Message makeMove() {
         switch (diff) {
@@ -45,7 +52,9 @@ public class AIPlayer implements AI {
     /**
      * Easiest setting on the AI.
      * Makes a completely random move, sometimes stays still
-     * @return a message which contains the move that the AI would like to make
+     * @return a message which contains the name of the world, 
+	 * a String to tell if it wants to move or attack, its ID, and 
+	 * the move that the AI would like to make
      */
     private Message easyMove() {
     	String[] message = new String[4];
@@ -71,7 +80,9 @@ public class AIPlayer implements AI {
     /**
      * Medium Difficulty
      * Picks a random corridor and goes through it until it reaches the end of it
-     * @return a message which contains the move that the AI would like to make
+     * @return a message which contains the name of the world, 
+	 * a String to tell if it wants to move or attack, its ID, and 
+	 * the move that the AI would like to make
      */
     private Message medMove() {
     	String[] message = new String[4];
@@ -168,10 +179,12 @@ public class AIPlayer implements AI {
 
     /**
      * Hard difficulty
-     * Looks for the neighbour nodes each time and pick one depending on their
+     * Looks for the neighbour nodes each time and picks one depending on their
      * visited cost which will be increased by one each time that node is 
      * being visited
-     * @return a message which contains the move that the AI would like to make
+     * @return a message which contains the name of the world, 
+	 * a String to tell if it wants to move or attack, its ID, and 
+	 * the move that the AI would like to make
      */
     private Message hardMove() {
     	String[] message = new String[4];
