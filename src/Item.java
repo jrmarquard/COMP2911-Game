@@ -3,6 +3,8 @@ public class Item {
     public final static int COIN = 1;
     public final static int KEY = 2;
     public final static int ENERGY = 3;
+    public final static int PLAYER_CORPSE = 4;
+    public final static int ENEMY_CORPSE = 5;
     
     // The node of an item. An item cannot be moved, and as such it's node cannot be changed
     private final Node node;

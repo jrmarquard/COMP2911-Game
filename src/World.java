@@ -29,6 +29,8 @@ public class World {
     private String name;
     private App app;
     private boolean enemiesEnabled;
+    private boolean doorAndKey;
+    private String gameMode;
     
     // Maze data
     private ArrayList<ArrayList<Node>> nodes;
@@ -73,73 +75,15 @@ public class World {
     private static final int AI_POOL_DELAY = 600; 
     private static final int AI_POOL_RATE = 150; 
     
-    public World (App app, String name, int height, int width, Node start, Node finish, Node doorStart, Node doorFinish, Node key, ArrayList<ArrayList<Node>> nodes, ArrayList<Item> items) {
+    public World (App app, String name, int width, int height) {        
         // Global settings
         this.app = app;
         this.name = name;
         this.width = width;
         this.height = height;
         this.enemiesEnabled = App.pref.getBool("enemy");
-        this.worldTickCount = 0;
-        this.maxVisDistance = App.pref.getValue("visibleRange");
-        this.visibleNodes = new ArrayList<Node>();
-        
-        // Semaphores
-        this.visibilitySemaphore = new Semaphore(1, true);
-        this.itemSemaphore = new Semaphore(1, true);
-        this.entitySemaphore = new Semaphore(1, true);
-        
-        // Schedulers
-        this.worldTickTock = Executors.newSingleThreadScheduledExecutor();
-        this.aiPool = Executors.newScheduledThreadPool(4);
-        
-        worldTickTock.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                tickUpdate();
-            }
-        }, WORLD_TICK_DELAY, WORLD_TICK_RATE, SCHEDULE_TIME_UNIT);
-        
-        // Copy maze and item collections
-        this.nodes = new ArrayList<ArrayList<Node>>(nodes);
-        this.items = new ArrayList<Item>(items);
-        
-        // Create entity collection
-        this.entities = new ConcurrentHashMap<String, Entity>();
-        
-        // Copy special nodes in the maze
-        this.start = start;
-        this.finish = finish;
-        this.doorStart = doorStart;
-        this.doorFinish = doorFinish;
-        this.key = key;
-                
-        // If visibility is turned off make all the tiles bright.
-        if (maxVisDistance == -1) {
-            for (ArrayList<Node> an : nodes) {
-                for (Node n : an) {
-                    n.setVisibility(0f);
-                }
-            }
-        } else {
-            calculateVisibility(start);            
-        }
-        
-        // If enemies are enabled, create 1
-        if (enemiesEnabled) {
-            this.addEnemy("Enemy");
-            aiRunnable AIRunEnemy = new aiRunnable(new AIEnemy(this, "Enemy"));
-            aiPool.scheduleAtFixedRate(AIRunEnemy, AI_POOL_DELAY, AI_POOL_RATE, SCHEDULE_TIME_UNIT);
-        }        
-    }
-    
-    public World (App app, String name, int width, int height, boolean doorAndKey) {        
-        // Global settings
-        this.app = app;
-        this.name = name;
-        this.width = width;
-        this.height = height;
-        this.enemiesEnabled = App.pref.getBool("enemy");
+        this.gameMode = App.pref.getText("gameMode");
+        this.doorAndKey = App.pref.getBool("doorAndKey");
         this.worldTickCount = 0;
         this.maxVisDistance = App.pref.getValue("visibleRange");
         this.visibleNodes = new ArrayList<Node>();
@@ -206,6 +150,82 @@ public class World {
     }
     
     /**
+     * Constructor creates a copy of the maze without the entities.
+     * @param app App references
+     * @param name Name of the maze
+     * @param height Height of the maze
+     * @param width Width of the maze
+     * @param start Start node of the maze
+     * @param finish Finish Node of the maze
+     * @param doorStart Door start node of the maze
+     * @param doorFinish Door finish node of the maze
+     * @param key Key node of the maze
+     * @param nodes Nodes of the maze
+     * @param items Items of the maze
+     */
+    public World (App app, String name, int height, int width, Node start, Node finish, Node doorStart, Node doorFinish, Node key, ArrayList<ArrayList<Node>> nodes, ArrayList<Item> items) {
+        // Global settings
+        this.app = app;
+        this.name = name;
+        this.width = width;
+        this.height = height;
+        this.enemiesEnabled = App.pref.getBool("enemy");
+        this.gameMode = App.pref.getText("gameMode");
+        this.doorAndKey = App.pref.getBool("doorAndKey");
+        this.worldTickCount = 0;
+        this.maxVisDistance = App.pref.getValue("visibleRange");
+        this.visibleNodes = new ArrayList<Node>();
+        
+        // Semaphores
+        this.visibilitySemaphore = new Semaphore(1, true);
+        this.itemSemaphore = new Semaphore(1, true);
+        this.entitySemaphore = new Semaphore(1, true);
+        
+        // Schedulers
+        this.worldTickTock = Executors.newSingleThreadScheduledExecutor();
+        this.aiPool = Executors.newScheduledThreadPool(4);
+        
+        worldTickTock.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                tickUpdate();
+            }
+        }, WORLD_TICK_DELAY, WORLD_TICK_RATE, SCHEDULE_TIME_UNIT);
+        
+        // Copy maze and item collections
+        this.nodes = new ArrayList<ArrayList<Node>>(nodes);
+        this.items = new ArrayList<Item>(items);
+        
+        // Create entity collection
+        this.entities = new ConcurrentHashMap<String, Entity>();
+        
+        // Copy special nodes in the maze
+        this.start = start;
+        this.finish = finish;
+        this.doorStart = doorStart;
+        this.doorFinish = doorFinish;
+        this.key = key;
+                
+        // If visibility is turned off make all the tiles bright.
+        if (maxVisDistance == -1) {
+            for (ArrayList<Node> an : nodes) {
+                for (Node n : an) {
+                    n.setVisibility(0f);
+                }
+            }
+        } else {
+            calculateVisibility(start);            
+        }
+        
+        // If enemies are enabled, create 1
+        if (enemiesEnabled) {
+            this.addEnemy("Enemy");
+            aiRunnable AIRunEnemy = new aiRunnable(new AIEnemy(this, "Enemy"));
+            aiPool.scheduleAtFixedRate(AIRunEnemy, AI_POOL_DELAY, AI_POOL_RATE, SCHEDULE_TIME_UNIT);
+        }        
+    }
+    
+    /**
      * A wrapper to send a message to the App
      * @param c
      */
@@ -259,6 +279,73 @@ public class World {
     }
 
     /**
+     * Resets the maze keeping the entities
+     */
+    private void resetMaze() {
+        System.out.println("reseting");
+        
+        // Save the old nodes
+        // ArrayList<ArrayList<Node>> oldNodes = nodes;
+        
+        // Reset nodes
+        this.nodes = new ArrayList<ArrayList<Node>>();
+        for (int w = 0; w < width; w++) {
+            this.nodes.add(new ArrayList<Node>());
+            for (int h = 0; h < height; h++) {
+                this.nodes.get(w).add(new Node(w, h));
+            }
+        }
+        // get the coordinates of finish, and get the new node at those coordinates
+        int finishX = finish.getX();
+        int finishY = finish.getY();
+        start = this.nodes.get(finishX).get(finishY);
+        
+        // Iterate over the entities and swap their nodes over to the new nodes
+        Iterator<String> iterEntity = entities.keySet().iterator();
+        while (iterEntity.hasNext()) {
+            Entity e = entities.get(iterEntity.next());
+            e.setKey(false);
+            Node oldNode = e.getNode();
+            e.setNode(nodes.get(oldNode.getX()).get(oldNode.getY()));
+        }        
+        
+        // Set items and points defaults
+        this.finish = null;
+        this.doorStart = null;
+        this.doorFinish = null;
+        this.key = null;                    
+        this.items.clear();
+        
+        // Generate a new maze, this will find a new finish
+        mazeGenerator();
+        
+        // Generate door and key if it's turned on.
+        if (doorAndKey) {
+            doorAndKeyGenerator();
+        }
+        
+        // generate coins
+        generateCoins();
+        
+        // If visibility is turned off make all the tiles bright.
+        if (maxVisDistance == -1) {
+            for (ArrayList<Node> an : nodes) {
+                for (Node n : an) {
+                    n.setVisibility(0f);
+                }
+            }
+        } else {
+            calculateVisibility(start);            
+        }
+        
+        // If enemies are enabled, create another one.
+        // Uniquely identified by worldTickCount
+        if (enemiesEnabled) {
+            this.addEnemy("Enemy"+worldTickCount);
+        }
+    }
+    
+    /**
      * collision runs checks for all the entities and items in the game
      */
     private void collision() {
@@ -272,28 +359,33 @@ public class World {
         // Entity collision
         Iterator<String> iterEntity = entities.keySet().iterator();
         while (iterEntity.hasNext()) {
-            Entity e = entities.get(iterEntity.next());
+            Entity entity = entities.get(iterEntity.next());
             
             // If the player is dead they can't do anything
-            if (e.getMode() == Entity.MODE_DEAD) continue;
+            if (entity.getMode() == Entity.MODE_DEAD) continue;
             
-            // Finish check
-            if (e.getName().equals("Moneymaker") && e.getNode().equals(finish)) {
-                // winner winner chicken dinner
-                sendMessageToApp(new Message(Message.GAME_MSG, new String[]{"pause"}));
-                sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "finish"}));
+            // Finish check for race/adventure
+            if (entity.getName().equals("Moneymaker") && entity.getNode().equals(finish)) {
+                if (gameMode.equals("Race")) {
+                    sendMessageToApp(new Message(Message.GAME_MSG, new String[]{"pause"}));
+                    sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "finish"}));                    
+                } else if (gameMode.equals("Adventure")) {
+                    resetMaze();
+                } else if (gameMode.equals("Battle")) {
+                    // do nothing
+                }
             }
             
             // Key check
-            if (e.getNode().equals(key)) {
-                e.setKey(true);
+            if (entity.getNode().equals(key)) {
+                entity.setKey(true);
                 sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "key"}));
                 key = null;
             }
             
             // Opening door check
-            if (e.getNode().equals(doorStart)) {
-                if (e.getKey()) {
+            if (entity.getNode().equals(doorStart)) {
+                if (entity.getKey()) {
                     connectNodes(doorStart, doorFinish);
                     sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "door"}));
                     doorStart = null;
@@ -302,17 +394,21 @@ public class World {
             }
             
             // Being attack check
-            if (e.getName().equals("Moneymaker")) {
-                Entity enemyBeing = entities.get("Enemy");
-                // if there are no enemies
-                if (enemyBeing == null) {
-                    continue;
-                }
-                Node enemyNode = enemyBeing.getNode();
-                if (enemyBeing.getMode() == Entity.MODE_DEAD) continue;
-                if (e.getNode().equals(enemyNode)) {
-                    e.setMode(Entity.MODE_DEAD);
-                    sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "death"}));
+            if (entity.getType() == Entity.PLAYER) {
+                for (Entity f : entities.values()) {
+                    if (f.getType() == Entity.ENEMY) {
+                        if (f.getMode() == Entity.MODE_DEAD) {
+                            continue;
+                        }
+                        if (entity.getNode().equals(f.getNode())) {
+                            // kill e
+                            
+                            Item deadEntity = new Item(entity.getNode(), Item.PLAYER_CORPSE);
+                            items.add(deadEntity);
+                            entity.setMode(Entity.MODE_DEAD);
+                            sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "death"}));
+                        }
+                    }
                 }
             }
         }
@@ -400,7 +496,6 @@ public class World {
             case "move": entityMove(message[2], message[3]); break;
             case "melee": entityMeleeAttack(message[2]); break;
             case "range": entityRangeAttack(message[2]); break;
-        
         }
     }
     
@@ -418,94 +513,126 @@ public class World {
         Entity entityAttacking = entities.get(entityName);
         
         if (entityAttacking.getMode() == Entity.MODE_DEAD) {
-        	this.entitySemaphore.release();
+            entitySemaphore.release();
             return;
-        } else {
-            sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "sword_swing"}));
-            entityAttacking.setMode(Entity.MODE_ATTACK);
-            Node entityAttackingNode = entityAttacking.getNode();        
+        }
+        
+        sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "sword_swing"}));
+        entityAttacking.setMode(Entity.MODE_ATTACK);
+        
+        Node entityAttackingNode = entityAttacking.getNode();        
+        
+        Iterator<String> iterEntity = entities.keySet().iterator();
+        while (iterEntity.hasNext()) {
+            Entity entity = entities.get(iterEntity.next());
+            Node entityNode = entity.getNode();
             
-            Iterator<String> iterEntity = entities.keySet().iterator();
-            while (iterEntity.hasNext()) {
-                Entity entity = entities.get(iterEntity.next());
-                Node entityNode = entity.getNode();
-                
-                // If the being is dead can't kill it twice
-                if (entity.getMode() == Entity.MODE_DEAD) continue;
-                
-                // Swing in every direction
-                for (Node m : entityAttackingNode.getConnectedNodes()) {
-                    if (entityNode.equals(m)) {
-                        sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "death"}));
-                        entity.setMode(Entity.MODE_DEAD);
-                        if (entityNode.getX() + 1 == entityAttackingNode.getX()) {
-                            entityAttacking.setDirection("right");
-                        } else if (entityNode.getX() - 1 == entityAttackingNode.getX()) {
-                            entityAttacking.setDirection("left");                            
-                        } else if (entityNode.getY() + 1 == entityAttackingNode.getY()) {
-                            entityAttacking.setDirection("up");
-                        } else if (entityNode.getY() - 1 == entityAttackingNode.getY()) {
-                            entityAttacking.setDirection("down");
-                        } 
-                        
-                    }
+            if (entity.getMode() == Entity.MODE_DEAD) {
+                continue;
+            }
+            
+            // Swing in every direction
+            for (Node m : entityAttackingNode.getConnectedNodes()) {
+                if (entityNode.equals(m)) {
+                    sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "death"}));
+                    // iterEntity.remove();
+                    
+                    entity.setMode(Entity.MODE_DEAD);
+                    Item corpse = new Item(entity.getNode(), Item.ENEMY_CORPSE);
+                    items.add(corpse);
+                    if (entityNode.getX() + 1 == entityAttackingNode.getX()) {
+                        entityAttacking.setDirection("right");
+                    } else if (entityNode.getX() - 1 == entityAttackingNode.getX()) {
+                        entityAttacking.setDirection("left");                            
+                    } else if (entityNode.getY() + 1 == entityAttackingNode.getY()) {
+                        entityAttacking.setDirection("up");
+                    } else if (entityNode.getY() - 1 == entityAttackingNode.getY()) {
+                        entityAttacking.setDirection("down");
+                    } 
+                    
                 }
             }
+            
         entitySemaphore.release();
         }
     }
     
-    private void entityMove(String id, String dir) {
-        Entity e = entities.get(id);
-        if (e.getMode() == Entity.MODE_DEAD) return;
+    private void entityMove(String name, String dir) {
+        Entity entity = entities.get(name);
         
-        Node n = e.getNode();
-        if (e != null) {
-            if (dir == "up" && n.getUp() != null) {
-                e.setNode(n.getUp()); 
-                e.setDirection("up");
+        if (entity.getMode() == Entity.MODE_DEAD) {
+            return;
+        }
+        
+        Node entityNode = entity.getNode();
+        if (entity != null) {
+            if (dir == "up" && entityNode.getUp() != null) {
+                entity.setNode(entityNode.getUp()); 
+                entity.setDirection("up");
                 sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "step"}));
-            } else if (dir == "down" && n.getDown() != null) {
-                e.setNode(n.getDown()); 
-                e.setDirection("down"); 
+            } else if (dir == "down" && entityNode.getDown() != null) {
+                entity.setNode(entityNode.getDown()); 
+                entity.setDirection("down"); 
                 sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "step"}));
-            } else if (dir == "left" && n.getLeft() != null) {
-                e.setNode(n.getLeft()); 
-                e.setDirection("left");
+            } else if (dir == "left" && entityNode.getLeft() != null) {
+                entity.setNode(entityNode.getLeft()); 
+                entity.setDirection("left");
                 sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "step"}));
-            } else if (dir == "right" && n.getRight() != null) {
-                e.setNode(n.getRight());
-                e.setDirection("right");
+            } else if (dir == "right" && entityNode.getRight() != null) {
+                entity.setNode(entityNode.getRight());
+                entity.setDirection("right");
                 sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "step"}));
             }
         }
         update();
     }
-
-    public int getPlayerCoins(String id) {
-        return entities.get(id).getCoins();
+    
+    /**
+     * Makes a deep copy of the world except for parts of the world that
+     * need to remain independent from other worlds (e.g. ai pool).
+     * @return copy of world
+     */
+    public World copy() {
+        return new World(
+            this.app,
+            this.name,
+            this.height,
+            this.width,
+            this.start,
+            this.finish,
+            this.doorStart,
+            this.doorFinish,
+            this.key,
+            this.nodes,
+            this.items
+        );
     }
     
-    public ArrayList<Node> getEntityNodes() {
-        ArrayList<Node> coords = new ArrayList<Node>();
-        for (Item i : items) {
-            coords.add(i.getNode());
-        }
-        return coords;
+    /**
+     * Turns off the scheduled threads.
+     */
+    public void endWorld () {
+        aiPool.shutdownNow();
+        worldTickTock.shutdownNow();
     }
-
-    public ArrayList<Item> getItems() {
-        return items;
+    
+    /**
+     * Set the name of the world
+     * @param name
+     */
+    public void setName(String name) {
+        this.name = name;
     }
+    
 
     /**
      * Add being into the world.
      * @param name Name of the player.
      */
     public void addEnemy(String name) {
-        Entity enemy = new Entity(this.finish, name);
+        Entity enemy = new Entity(this.finish, name, Entity.ENEMY);
         entities.put(name, enemy);
-        aiRunnable AIRunEnemy = new aiRunnable(new AIEnemy(this, "Enemy"));
+        aiRunnable AIRunEnemy = new aiRunnable(new AIEnemy(this, name));
         aiPool.scheduleAtFixedRate(AIRunEnemy, AI_POOL_DELAY, AI_POOL_RATE, SCHEDULE_TIME_UNIT);
     }
 
@@ -519,8 +646,9 @@ public class World {
             n = this.start;
         } else if (name.equals("Teadrinker")) {
             n = this.finish;
-        } 
-        Entity player = new Entity(n, name);
+        }
+        
+        Entity player = new Entity(n, name, Entity.PLAYER);
         entities.put(name, player);
         if (opt.equals("Easy AI")) {
             aiRunnable AIRun = new aiRunnable(new AIPlayer(this, name, "easy"));
@@ -533,6 +661,29 @@ public class World {
             aiPool.scheduleAtFixedRate(air, AI_POOL_DELAY, AI_POOL_RATE, SCHEDULE_TIME_UNIT);
         }
     }
+    
+    
+    
+    /**
+     * Returns an array list of the entities
+     * @return array list of the entities
+     */
+    public ArrayList<Entity> getEntities() {
+        return new ArrayList<Entity>(entities.values());
+    }
+
+    /**
+     * Returns an array list of all the items
+     * @return array list of items
+     */
+    public ArrayList<Item> getItems() {
+        return items;
+    }
+
+    public int getPlayerCoins(String id) {
+        return entities.get(id).getCoins();
+    }
+    
     /**
      * Get's the name of the world
      * @return world name
@@ -612,18 +763,6 @@ public class World {
             return null;
         }
     }
-    
-    /**
-     * Checks if the x and y coordinates given are corrected to each other.
-     * @param x1 x coordinate of node A
-     * @param y1 y coordinate of node A
-     * @param x2 x coordinate of node B
-     * @param y2 y coordinate of node B
-     * @return the visibility of the space
-     */
-    public boolean isConnected(int x1, int y1, int x2, int y2) {
-        return getNode(x1,y1).isConnected(getNode(x2,y2));
-    }
 
     /**
      * Gets the visibility of the node at x and y.
@@ -635,15 +774,99 @@ public class World {
         return getNode(x, y).getVisibility();
     }
     
-    public boolean isDoor(int xA, int yA, int xB, int yB) {
-        if((this.getNode(xA, yA).equals(this.doorStart) &&
-                this.getNode(xB, yB).equals(this.doorFinish)) ||
-                (this.getNode(xA, yA).equals(this.doorFinish) &&
-                this.getNode(xB, yB).equals(this.doorStart))) {
-            return true;
-        } else {
-            return false;
+
+    /**
+     * Gets what is between two nodes at the given coordinates
+     * @param x1 x coordinate of node A
+     * @param y1 y coordinate of node A
+     * @param x2 x coordinate of node B
+     * @param y2 y coordinate of node B
+     * @return string equal to either wall, door, or space
+     */
+    public String getWallType(int x1, int y1, int x2, int y2) {
+        Node nodeA = getNode(x1, y1);
+        Node nodeB = getNode(x2, y2);
+        
+        // If one of the nodes is not a real node.
+        if (nodeA == null || nodeB == null) return "wall";
+        
+        // Check for door.
+        if (nodeA.equals(doorStart) && nodeB.equals(doorFinish)) return "door";
+        if (nodeA.equals(doorFinish) && nodeB.equals(doorStart)) return "door";
+        
+        // Check if they are connected.
+        if (nodeA.getConnectedNodes().contains(nodeB)) return "space";
+        
+        // Default to wall.
+        return "wall";
+    }
+    
+    /** 
+     * Gets the visibility of the space between two nodes
+     * @param x1 x coordinate of node A
+     * @param y1 y coordinate of node A
+     * @param x2 x coordinate of node B
+     * @param y2 y coordinate of node B
+     * @return the visibility of the space
+     */
+    public float getWallVisibility(int x1, int y1, int x2, int y2) {
+        try {
+            this.visibilitySemaphore.acquire();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+        Node nodeA = getNode(x1, y1);
+        Node nodeB = getNode(x2, y2);
+        
+        // If one of the nodes is not a real node.
+        if (nodeA == null && nodeB == null) {
+            visibilitySemaphore.release();
+            return 100f;
+        } else if (nodeA == null) {
+            visibilitySemaphore.release();
+            return nodeB.getVisibility();
+        } else if (nodeB == null) {
+            visibilitySemaphore.release();
+            return nodeA.getVisibility();
+        }
+        
+        float visA = nodeA.getVisibility();
+        float visB = nodeB.getVisibility();
+        visibilitySemaphore.release();
+        
+        String wallType = getWallType(x1, y1, x2, y2);
+        if (wallType.equals("space")) {
+            return (visA+visB)/2f;    
+        } else {
+            return visA > visB ? visB : visA;
+        }   
+    }
+    /**
+     * Checks what the visibility is of the corner between nodes A, B, C, D
+     * @param x1 x coordinate of node A
+     * @param y1 y coordinate of node A
+     * @param x2 x coordinate of node B
+     * @param y2 y coordinate of node B
+     * @param x3 x coordinate of node C
+     * @param y3 y coordinate of node C
+     * @param x4 x coordinate of node D
+     * @param y4 y coordinate of node D
+     * @return the visibility of the corner
+     */
+    public float getCornerVisibility (int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4) {
+        ArrayList<Float> wallVis = new ArrayList<Float>();
+        
+        wallVis.add(getWallVisibility(x1,y1,x2,y2));
+        wallVis.add(getWallVisibility(x2,y2,x3,y3));
+        wallVis.add(getWallVisibility(x3,y3,x4,y4));
+        wallVis.add(getWallVisibility(x4,y4,x1,y1));
+       
+        float vis = wallVis.remove(0);
+        while(!wallVis.isEmpty()) {
+            float temp = wallVis.remove(0);
+            vis = temp > vis ? vis : temp;
+        }
+        return vis;   
     }
     
     /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
@@ -660,7 +883,10 @@ public class World {
         ArrayList<Node> visited = new ArrayList<Node>();
         Random rand = new Random();
         
-        this.start = this.getNode(rand.nextInt(this.width), rand.nextInt(this.height));
+        // If the start is null, generate a start node
+        if (this.start == null) {
+            this.start = this.getNode(rand.nextInt(this.width), rand.nextInt(this.height));            
+        }
         Node currNode = this.getStartNode();
         explore.add(currNode);
         visited.add(currNode);
@@ -999,127 +1225,7 @@ public class World {
             i++;
         }
     }
-
-    /**
-     * Gets what is between two nodes at the given coordinates
-     * @param x1 x coordinate of node A
-     * @param y1 y coordinate of node A
-     * @param x2 x coordinate of node B
-     * @param y2 y coordinate of node B
-     * @return string equal to either wall, door, or space
-     */
-    public String getWallType(int x1, int y1, int x2, int y2) {
-        Node nodeA = getNode(x1, y1);
-        Node nodeB = getNode(x2, y2);
-        
-        // If one of the nodes is not a real node.
-        if (nodeA == null || nodeB == null) return "wall";
-        
-        // Check for door.
-        if (nodeA.equals(doorStart) && nodeB.equals(doorFinish)) return "door";
-        if (nodeA.equals(doorFinish) && nodeB.equals(doorStart)) return "door";
-        
-        // Check if they are connected.
-        if (nodeA.getConnectedNodes().contains(nodeB)) return "space";
-        
-        // Default to wall.
-        return "wall";
-    }
     
-    /** 
-     * Gets the visibility of the space between two nodes
-     * @param x1 x coordinate of node A
-     * @param y1 y coordinate of node A
-     * @param x2 x coordinate of node B
-     * @param y2 y coordinate of node B
-     * @return the visibility of the space
-     */
-    public float getWallVisibility(int x1, int y1, int x2, int y2) {
-        try {
-            this.visibilitySemaphore.acquire();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        Node nodeA = getNode(x1, y1);
-        Node nodeB = getNode(x2, y2);
-        
-        // If one of the nodes is not a real node.
-        if (nodeA == null && nodeB == null) {
-            visibilitySemaphore.release();
-            return 100f;
-        } else if (nodeA == null) {
-            visibilitySemaphore.release();
-            return nodeB.getVisibility();
-        } else if (nodeB == null) {
-            visibilitySemaphore.release();
-            return nodeA.getVisibility();
-        }
-        
-        float visA = nodeA.getVisibility();
-        float visB = nodeB.getVisibility();
-        visibilitySemaphore.release();
-        
-        String wallType = getWallType(x1, y1, x2, y2);
-        if (wallType.equals("space")) {
-            return (visA+visB)/2f;    
-        } else {
-            return visA > visB ? visB : visA;
-        }   
-    }
-    
-    public float getCornerVisibility (int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4) {
-        ArrayList<Float> wallVis = new ArrayList<Float>();
-        
-        wallVis.add(getWallVisibility(x1,y1,x2,y2));
-        wallVis.add(getWallVisibility(x2,y2,x3,y3));
-        wallVis.add(getWallVisibility(x3,y3,x4,y4));
-        wallVis.add(getWallVisibility(x4,y4,x1,y1));
-       
-        float vis = wallVis.remove(0);
-        while(!wallVis.isEmpty()) {
-            float temp = wallVis.remove(0);
-            vis = temp > vis ? vis : temp;
-        }
-        return vis;
-        
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * Makes a deep copy of the world except for parts of the world that
-     * need to remain independent from other worlds (e.g. ai pool).
-     * @return copy of world
-     */
-    public World copy() {
-        //
-        return new World(
-                this.app,
-                this.name,
-                this.height,
-                this.width,
-                this.start,
-                this.finish,
-                this.doorStart,
-                this.doorFinish,
-                this.key,
-                this.nodes,
-                this.items
-                );
-    }
-
-    /**
-     * Returns an array list of the entities
-     * @return array list of the entities
-     */
-    public ArrayList<Entity> getEntities() {
-        return new ArrayList<Entity>(entities.values());
-    }
-    
-
-
     /**
      * aiRunnable executes an ai's makeMove method and sends it to the app.
      */
@@ -1139,11 +1245,6 @@ public class World {
             }
         }
     };
-    
-    public void endWorld () {
-        aiPool.shutdownNow();
-        worldTickTock.shutdownNow();
-    }
 }
 
 

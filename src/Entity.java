@@ -1,9 +1,12 @@
 
 public class Entity {
     
-    public static final int MODE_IDLE = 0;
-    public static final int MODE_ATTACK = 1;
-    public static final int MODE_DEAD = 2;
+    public static final int ENEMY = 0;
+    public static final int PLAYER = 1;
+    
+    public static final int MODE_IDLE = 10;
+    public static final int MODE_ATTACK = 11;
+    public static final int MODE_DEAD = 12;
     
     private String name;
     private boolean AIControl;
@@ -13,9 +16,11 @@ public class Entity {
     private String direction;
     private int mode;
     private int decay;
+    private int type;
     
-    public Entity(Node node, String name) {
-        this.node = node;        
+    public Entity(Node node, String name, int type) {
+        this.node = node;
+        this.type = type;
         this.AIControl = false;
         this.name = name;
         this.coins = 0;
@@ -28,6 +33,14 @@ public class Entity {
         else if (node.getRight() != null) this.direction = "right";
     }
     
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
     public Node getNode() {
         return node;
     }

@@ -400,7 +400,7 @@ public class GUI extends JFrame  {
         
         // Enemy generation option
         JCheckBox enemyCheckBox = new JCheckBox("", App.pref.getBool("enemy"));
-        if (gameMode.equals("Race")){
+        if (!gameMode.equals("Adventure")){
             enemyCheckBox.setEnabled(false);
         }
         enemyCheckBox.addActionListener(new ActionListener() {

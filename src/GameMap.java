@@ -274,64 +274,45 @@ public class GameMap extends JPanel {
             n = i.getNode();
             if (i.getType() == Item.COIN) {
                 // Draw on coins
-                g2d.setPaint(coinTexture);
-                g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);  
+                g2d.setPaint(coinTexture); 
             } else if (i.getType() == Item.ENERGY) {
                 // Draw on 'energy'
-
-            	if (dirP.equals("up") && world.getEntityNode("Moneymaker").getUp().equals(n)) {
-            		g2d.setPaint(attackUTexture);
-            		g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
-            	}
-            	else if (dirP.equals("down") && world.getEntityNode("Moneymaker").getDown().equals(n)) {
-            		g2d.setPaint(attackDTexture);
-            		g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize); 
-            	}
-            	else if (dirP.equals("left") && world.getEntityNode("Moneymaker").getLeft().equals(n)) {
-            		g2d.setPaint(attackLTexture);
-            		g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
-            	}
-            	else if (dirP.equals("right") && world.getEntityNode("Moneymaker").getRight().equals(n)) {
-            		g2d.setPaint(attackRTexture);
-            		g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize); 
-            	}  
+            } else if (i.getType() == Item.PLAYER_CORPSE) {
+                g2d.setPaint(playerDeadTexture);                
+            } else if (i.getType() == Item.ENEMY_CORPSE) {
+                g2d.setPaint(enemyDeadTexture);                
             }
+            g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize); 
         }
         
         // Draw on entities
         for (Entity e : world.getEntities()) {
-            n = e.getNode();
+            n = e.getNode(); 
             String dir = e.getDirection();
-            String name = e.getName();
-            if (name.equals("Moneymaker") || name.equals("Teadrinker")) {
-                int mode = e.getMode();
-                System.out.println(mode);
-                if (mode == Entity.MODE_DEAD) {
-                    g2d.setPaint(playerDeadTexture);
-                } else if (mode == Entity.MODE_ATTACK) {
+            int mode = e.getMode();
+            if (e.getType() == Entity.PLAYER) {
+                if (mode == Entity.MODE_ATTACK) {
                     if (dir.equals("up")) g2d.setColor(Color.red);
                     if (dir.equals("down")) g2d.setColor(Color.blue);
                     if (dir.equals("left")) g2d.setColor(Color.green);
                     if (dir.equals("right")) g2d.setColor(Color.pink);
+                    g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
                 }  else if (mode == Entity.MODE_IDLE) {
                     if (dir.equals("up")) g2d.setPaint(playerUTexture);
                     if (dir.equals("down")) g2d.setPaint(playerDTexture);
                     if (dir.equals("left")) g2d.setPaint(playerLTexture);
                     if (dir.equals("right")) g2d.setPaint(playerRTexture);
-                }                
-                g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
-            } else if (name.equals("Enemy")) {
-                int mode = e.getMode();
-                if (mode == Entity.MODE_DEAD) {
-                    g2d.setPaint(enemyDeadTexture);
-                }else if (mode == Entity.MODE_IDLE) {
-                    String dirE = world.getEntityDirection("Enemy");
-                    if (dirE.equals("up")) g2d.setPaint(enemyUTexture);
-                    if (dirE.equals("down")) g2d.setPaint(enemyDTexture);
-                    if (dirE.equals("left")) g2d.setPaint(enemyLTexture);
-                    if (dirE.equals("right")) g2d.setPaint(enemyRTexture);
+                    g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
                 }
-                g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
+                
+            } else if (e.getType() == Entity.ENEMY) {
+                if (mode == Entity.MODE_IDLE) {
+                    if (dir.equals("up")) g2d.setPaint(enemyUTexture);
+                    if (dir.equals("down")) g2d.setPaint(enemyDTexture);
+                    if (dir.equals("left")) g2d.setPaint(enemyLTexture);
+                    if (dir.equals("right")) g2d.setPaint(enemyRTexture);
+                    g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
+                }
             }
         }
         
