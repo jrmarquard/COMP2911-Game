@@ -650,7 +650,7 @@ public class GUI extends JFrame  {
         };
         windowPanel.add(settingsPanel);
         
-        for (String s : App.pref.getKeys("colour")) {
+        /*for (String s : App.pref.getKeys("colour")) {
             Color c = App.pref.getColour(s);
             String red = String.format("%02X",c.getRed());
             String green = String.format("%02X",c.getGreen());
@@ -680,7 +680,7 @@ public class GUI extends JFrame  {
             settingRow.add(settingColour);
             settingsPanel.add(settingRow);
         }
-        
+        */
         JPanel textureSelectPanel = new JPanel();
         JLabel textureSelectLabel = new JLabel("Select texture: ");
         JRadioButton textureCastle = new JRadioButton("Castle");

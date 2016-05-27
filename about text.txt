@@ -42,8 +42,7 @@ ESC to return to menu
 - 2 players
 - 1 maze
 - Last person standing is the winner
-- guess we could spawn enemies for fun
-- maze is completely visible in this
+- Maze is completely visible
 
 
                             MODIFIERS
