@@ -5,12 +5,15 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
+import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.Semaphore;
+
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.Collections;
 
 /**
  * World contains:
@@ -27,6 +30,7 @@ public class World {
     private App app;
     private boolean updateFlag;
     private boolean worldChangeFlag;
+    private boolean enemiesEnabled;
     
     // Maze data
     private ArrayList<ArrayList<Node>> nodes;
@@ -41,7 +45,7 @@ public class World {
     private Node key;
     
     // Lighting
-    private ArrayList<Node> visibileNodes;
+    private ArrayList<Node> visibleNodes;
     private int maxVisDistance;
     
     // Multiple beings in a world
@@ -57,37 +61,113 @@ public class World {
     private Semaphore itemSemaphore;
     private Semaphore entitySemaphore;
     
-    // Settings for the tick service
+    // Schedule for the tick service
     private ScheduledExecutorService worldTickTock;
+    private static final TimeUnit SCHEDULE_TIME_UNIT = TimeUnit.MILLISECONDS;
     private static final int WORLD_TICK_DELAY = 200; 
     private static final int WORLD_TICK_RATE = 50; 
-    private static final TimeUnit WORLD_TICK_TIME_UNIT = TimeUnit.MILLISECONDS;
     private int worldTickCount;
+
+    /**
+     * Executor to run the AIs in
+     */
+    private ScheduledExecutorService aiPool;
+    private static final int AI_POOL_DELAY = 600; 
+    private static final int AI_POOL_RATE = 150; 
     
-    public World (App manager, String name, int width, int height, boolean doorAndKey) {
-        this.app = manager;
+    public World (App app, String name, int height, int width, Node start, Node finish, Node doorStart, Node doorFinish, Node key, ArrayList<ArrayList<Node>> nodes, ArrayList<Item> items) {
+        // Global settings
+        this.app = app;
         this.name = name;
+        this.width = width;
+        this.height = height;
         this.updateFlag = false;
         this.worldChangeFlag = false;
-        this.worldTickTock = Executors.newSingleThreadScheduledExecutor();
+        this.enemiesEnabled = App.pref.getBool("enemy");
         this.worldTickCount = 0;
+        this.maxVisDistance = App.pref.getValue("visibleRange");
+        this.visibleNodes = new ArrayList<Node>();
+        
+        // Semaphores
+        this.visibilitySemaphore = new Semaphore(1, true);
+        this.itemSemaphore = new Semaphore(1, true);
+        this.entitySemaphore = new Semaphore(1, true);
+        
+        // Schedulers
+        this.worldTickTock = Executors.newSingleThreadScheduledExecutor();
+        this.aiPool = Executors.newScheduledThreadPool(4);
         
         worldTickTock.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
                 tickUpdate();
             }
-        }, WORLD_TICK_DELAY, WORLD_TICK_RATE, WORLD_TICK_TIME_UNIT);
+        }, WORLD_TICK_DELAY, WORLD_TICK_RATE, SCHEDULE_TIME_UNIT);
         
+        // Copy maze and item collections
+        this.nodes = new ArrayList<ArrayList<Node>>(nodes);
+        this.items = new ArrayList<Item>(items);
         
-        this.nodes = new ArrayList<ArrayList<Node>>();
+        // Create entity collection
         this.entities = new ConcurrentHashMap<String, Entity>();
-        this.items = new ArrayList<Item>();
-        this.visibileNodes = new ArrayList<Node>();
-        maxVisDistance = App.pref.getValue("visibleRange");
         
+        // Copy special nodes in the maze
+        this.start = start;
+        this.finish = finish;
+        this.doorStart = doorStart;
+        this.doorFinish = doorFinish;
+        this.key = key;
+                
+        // If visibility is turned off make all the tiles bright.
+        if (maxVisDistance == -1) {
+            for (ArrayList<Node> an : nodes) {
+                for (Node n : an) {
+                    n.setVisibility(0f);
+                }
+            }
+        } else {
+            calculateVisibility(start);            
+        }
+        
+        // If enemies are enabled, create 1
+        if (enemiesEnabled) {
+            this.addEnemy("Enemy");
+            aiRunnable AIRunEnemy = new aiRunnable(new AIEnemy(this, "Enemy"));
+            aiPool.scheduleAtFixedRate(AIRunEnemy, AI_POOL_DELAY, AI_POOL_RATE, SCHEDULE_TIME_UNIT);
+        }        
+    }
+    
+    public World (App app, String name, int width, int height, boolean doorAndKey) {        
+        // Global settings
+        this.app = app;
+        this.name = name;
         this.width = width;
         this.height = height;
+        this.updateFlag = false;
+        this.worldChangeFlag = false;
+        this.enemiesEnabled = App.pref.getBool("enemy");
+        this.worldTickCount = 0;
+        this.maxVisDistance = App.pref.getValue("visibleRange");
+        this.visibleNodes = new ArrayList<Node>();
+        
+        // Semaphore initialisation
+        this.visibilitySemaphore = new Semaphore(1, true);
+        this.itemSemaphore = new Semaphore(1, true);
+        this.entitySemaphore = new Semaphore(1, true);
+        
+        // Schedulers
+        this.worldTickTock = Executors.newSingleThreadScheduledExecutor();
+        this.aiPool = Executors.newScheduledThreadPool(4);
+        
+        this.worldTickTock.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                tickUpdate();
+            }
+        }, WORLD_TICK_DELAY, WORLD_TICK_RATE, SCHEDULE_TIME_UNIT);
+        
+        // Create the maze nodes
+        this.nodes = new ArrayList<ArrayList<Node>>();
         
         for (int w = 0; w < width; w++) {
             this.nodes.add(new ArrayList<Node>());
@@ -96,18 +176,23 @@ public class World {
             }
         }
         
+        // Create entity and item collections
+        this.entities = new ConcurrentHashMap<String, Entity>();
+        this.items = new ArrayList<Item>();
+        
+        // Special nodes within the maze
+        this.start = null;
+        this.finish = null;
         this.doorStart = null;
         this.doorFinish = null;
         this.key = null;
         
-        // Maze generator connects nodes together and sets start/finish.
+        // Generate maze items
         mazeGenerator();
+        if (doorAndKey) {
+            doorAndKeyGenerator();
+        }
         generateCoins();
-        
-        //Synchronization (providing mutual exclusion to appropriate resources)
-        this.visibilitySemaphore = new Semaphore(1, true);
-        this.itemSemaphore = new Semaphore(1, true);
-        this.entitySemaphore = new Semaphore(1, true);
         
         // If visibility is turned off make all the tiles bright.
         if (maxVisDistance == -1) {
@@ -119,7 +204,11 @@ public class World {
         } else {
             calculateVisibility(start);            
         }
-        if (doorAndKey) doorAndKeyGenerator();
+        
+        // If enemies are enabled, create 1
+        if (enemiesEnabled) {
+            this.addEnemy("Enemy");
+        }  
     }
     
     /**
@@ -217,6 +306,10 @@ public class World {
             // Being attack check
             if (e.getName().equals("Moneymaker")) {
                 Entity enemyBeing = entities.get("Enemy");
+                // if there are no enemies
+                if (enemyBeing == null) {
+                    continue;
+                }
                 Node enemyNode = enemyBeing.getNode();
                 if (enemyBeing.isDead()) continue;
                 if (e.getNode().equals(enemyNode)) {
@@ -268,10 +361,10 @@ public class World {
 			e.printStackTrace();
 		}
         // Resets the nodes that were visible to be dark
-        for (Node n : visibileNodes) {
+        for (Node n : visibleNodes) {
             n.setVisibility(0);
         }
-        visibileNodes.clear();
+        visibleNodes.clear();
         
         // Calculate the visibility 'resolution'
         float visRes = 100.0f/(float)maxVisDistance;
@@ -288,12 +381,12 @@ public class World {
             // If the node has visibility lower than the darkest possible visibiliity
             if (n.getVisibility() <= 100-visRes) {
                 // Add it to the list of all visibile nodes
-                visibileNodes.add(n);
+                visibleNodes.add(n);
                 
                 // Add all it's children to the list of nodes to check if they haven't been checked already
                 // and then set their visibility based on the current node.
                 for (Node m : n.getConnectedNodes()) {
-                    if (!nodesToCheck.contains(m) && !visibileNodes.contains(m)) {
+                    if (!nodesToCheck.contains(m) && !visibleNodes.contains(m)) {
                         nodesToCheck.add(m);
                         m.setVisibility(n.getVisibility()+visRes);
                     }
@@ -301,15 +394,34 @@ public class World {
             }
             
         }
+        this.visibilitySemaphore.release();
+    }
+
+    /**
+     * Method allowing external objects to update the game state.
+     * @param string The message send to the world.
+     */
+    public void sendMessage(String[] message) {
+        switch (message[1]) {
+            case "move": entityMove(message[2], message[3]); break;
+            case "melee": entityMeleeAttack(message[2]); break;
+            case "range": entityRangeAttack(message[2]); break;
+        
+        }
     }
     
-    private void beingAttack(String beingName) {
+    private void entityRangeAttack(String string) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    private void entityMeleeAttack(String entityName) {
         try {
             this.entitySemaphore.acquire();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Entity entityAttacking = entities.get(beingName);
+        Entity entityAttacking = entities.get(entityName);
         
         if (entityAttacking.isDead()) {
         	this.entitySemaphore.release();
@@ -340,7 +452,7 @@ public class World {
         }
     }
     
-    private void beingMove(String id, String dir) {
+    private void entityMove(String id, String dir) {
         Entity b = entities.get(id);
         if (b.isDead()) return;
         
@@ -391,18 +503,6 @@ public class World {
     public ArrayList<Item> getItems() {
         return items;
     }
-
-    /**
-     * Method allowing external objects to update the game state.
-     * @param string The message send to the world.
-     */
-    public void sendMessage(String[] message) {
-        switch (message[1]) {
-            case "move": beingMove(message[2], message[3]); break;
-            case "attack": beingAttack(message[2]); break;
-        
-        }
-    }
     
     public boolean isWorldChangeFlag() {
         return worldChangeFlag;
@@ -419,15 +519,33 @@ public class World {
     public void addEnemy(String name) {
         Entity enemy = new Entity(this.finish, name);
         entities.put(name, enemy);
+        aiRunnable AIRunEnemy = new aiRunnable(new AIEnemy(this, "Enemy"));
+        aiPool.scheduleAtFixedRate(AIRunEnemy, AI_POOL_DELAY, AI_POOL_RATE, SCHEDULE_TIME_UNIT);
     }
 
     /**
      * Add enemy into the world.
      * @param name Name of the enemy
      */
-    public void addPlayer(String name) {
-        Entity player = new Entity(this.start, name);
+    public void addPlayer(String name, String opt) {
+        Node n = null;
+        if (name.equals("Moneymaker")) {
+            n = this.start;
+        } else if (name.equals("Teadrinker")) {
+            n = this.finish;
+        } 
+        Entity player = new Entity(n, name);
         entities.put(name, player);
+        if (opt.equals("Easy AI")) {
+            aiRunnable AIRun = new aiRunnable(new AIPlayer(this, name, "easy"));
+            aiPool.scheduleAtFixedRate(AIRun, AI_POOL_DELAY, AI_POOL_RATE, SCHEDULE_TIME_UNIT);
+        } else if (opt.equals("Med AI")) {
+            aiRunnable air = new aiRunnable(new AIPlayer(this, name, "med"));
+            aiPool.scheduleAtFixedRate(air, AI_POOL_DELAY, AI_POOL_RATE, SCHEDULE_TIME_UNIT);
+        } else if (opt.equals("Hard AI")) {
+            aiRunnable air = new aiRunnable(new AIPlayer(this, name, "hard"));
+            aiPool.scheduleAtFixedRate(air, AI_POOL_DELAY, AI_POOL_RATE, SCHEDULE_TIME_UNIT);
+        }
     }
     /**
      * Get's the name of the world
@@ -502,7 +620,11 @@ public class World {
      * @return Node at x and y.
      */
     public Node getNode(int x, int y) {
-        return this.nodes.get(x).get(y);
+        try {
+            return this.nodes.get(x).get(y);
+        } catch (Exception e) {
+            return null;
+        }
     }
     
     /**
@@ -525,26 +647,6 @@ public class World {
      */
     public float getNodeVisibility(int x, int y) {
         return getNode(x, y).getVisibility();
-    }
-    
-    /** 
-     * Gets the visibility of the space between two nodes
-     * @param x1 x coordinate of node A
-     * @param y1 y coordinate of node A
-     * @param x2 x coordinate of node B
-     * @param y2 y coordinate of node B
-     * @return the visibility of the space
-     */
-    public float getWallVisibility(int x1, int y1, int x2, int y2) {
-    	try {
-			this.visibilitySemaphore.acquire();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-        float visA = getNode(x1,y1).getVisibility();
-        float visB = getNode(x2,y2).getVisibility();
-        this.visibilitySemaphore.release();
-        return (visA+visB)/2f;
     }
     
     public boolean isDoor(int xA, int yA, int xB, int yB) {
@@ -911,4 +1013,162 @@ public class World {
             i++;
         }
     }
+
+    /**
+     * Gets what is between two nodes at the given coordinates
+     * @param x1 x coordinate of node A
+     * @param y1 y coordinate of node A
+     * @param x2 x coordinate of node B
+     * @param y2 y coordinate of node B
+     * @return string equal to either wall, door, or space
+     */
+    public String getWallType(int x1, int y1, int x2, int y2) {
+        Node nodeA = getNode(x1, y1);
+        Node nodeB = getNode(x2, y2);
+        
+        // If one of the nodes is not a real node.
+        if (nodeA == null || nodeB == null) return "wall";
+        
+        // Check for door.
+        if (nodeA.equals(doorStart) && nodeB.equals(doorFinish)) return "door";
+        if (nodeA.equals(doorFinish) && nodeB.equals(doorStart)) return "door";
+        
+        // Check if they are connected.
+        if (nodeA.getConnectedNodes().contains(nodeB)) return "space";
+        
+        // Default to wall.
+        return "wall";
+    }
+    
+    /** 
+     * Gets the visibility of the space between two nodes
+     * @param x1 x coordinate of node A
+     * @param y1 y coordinate of node A
+     * @param x2 x coordinate of node B
+     * @param y2 y coordinate of node B
+     * @return the visibility of the space
+     */
+    public float getWallVisibility(int x1, int y1, int x2, int y2) {
+        try {
+            this.visibilitySemaphore.acquire();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Node nodeA = getNode(x1, y1);
+        Node nodeB = getNode(x2, y2);
+        
+        // If one of the nodes is not a real node.
+        if (nodeA == null && nodeB == null) {
+            visibilitySemaphore.release();
+            return 100f;
+        } else if (nodeA == null) {
+            visibilitySemaphore.release();
+            return nodeB.getVisibility();
+        } else if (nodeB == null) {
+            visibilitySemaphore.release();
+            return nodeA.getVisibility();
+        }
+        
+        float visA = nodeA.getVisibility();
+        float visB = nodeB.getVisibility();
+        visibilitySemaphore.release();
+        
+        String wallType = getWallType(x1, y1, x2, y2);
+        if (wallType.equals("space")) {
+            return (visA+visB)/2f;    
+        } else {
+            return visA > visB ? visB : visA;
+        }   
+    }
+    
+    public float getCornerVisibility (int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4) {
+        ArrayList<Float> wallVis = new ArrayList<Float>();
+        
+        wallVis.add(getWallVisibility(x1,y1,x2,y2));
+        wallVis.add(getWallVisibility(x2,y2,x3,y3));
+        wallVis.add(getWallVisibility(x3,y3,x4,y4));
+        wallVis.add(getWallVisibility(x4,y4,x1,y1));
+       
+        float vis = wallVis.remove(0);
+        while(!wallVis.isEmpty()) {
+            float temp = wallVis.remove(0);
+            vis = temp > vis ? vis : temp;
+        }
+        return vis;
+        
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Makes a deep copy of the world except for parts of the world that
+     * need to remain independent from other worlds (e.g. ai pool).
+     * @return copy of world
+     */
+    public World copy() {
+        //
+        return new World(
+                this.app,
+                this.name,
+                this.height,
+                this.width,
+                this.start,
+                this.finish,
+                this.doorStart,
+                this.doorFinish,
+                this.key,
+                this.nodes,
+                this.items
+                );
+    }
+
+    /**
+     * Returns an array list of the entities
+     * @return array list of the entities
+     */
+    public ArrayList<Entity> getEntities() {
+        return new ArrayList<Entity>(entities.values());
+    }
+    
+
+
+    /**
+     * aiRunnable executes an ai's makeMove method and sends it to the app.
+     */
+    private class aiRunnable implements Runnable {
+        AI ai;
+        
+        public aiRunnable(AI ai) {
+            this.ai = ai;
+        }
+        
+        public void run() {
+            try {
+                sendMessageToApp(ai.makeMove());
+            } catch (Exception e){
+                System.out.println("AI runnable error.");
+                e.printStackTrace();
+            }
+        }
+    };
+    
+    public void endWorld () {
+        aiPool.shutdownNow();
+        worldTickTock.shutdownNow();
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+

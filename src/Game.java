@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.Executors;
@@ -16,11 +17,6 @@ public class Game {
      * Collection of the worlds which are identified by a unique string
      */
     private ConcurrentMap<String, World> worlds;
-    
-    /**
-     * Executor to run the AIs in
-     */
-    private ScheduledExecutorService aiPool;
     
     /**
      * Pause is used to halt all game state changes if true.
@@ -43,24 +39,24 @@ public class Game {
     public void newGame() {
         // Pause the game while making it.
         pause = true;
-
-        // Create executor service.
-        aiPool = Executors.newScheduledThreadPool(4);
         
         // Get various game settings
         String gameMode = App.pref.getText("gameMode");
         int height = App.pref.getValue("defaultMapHeight");
         int width = App.pref.getValue("defaultMapWidth");
         boolean doorAndKey = App.pref.getBool("doorAndKey");
-        boolean enemy = App.pref.getBool("enemy");
-        
-        // AI run settings
-        TimeUnit timeUnit = TimeUnit.MILLISECONDS;
-        int aiRefreshRate = 150;
         
         // Create the game
         if (gameMode.equals("Race")) {
-            for (int x = 1; x <= 4; x++) {
+            App.pref.setPreference("bool.enemy=false");
+            
+            // Create first world, add player, add it to worlds
+            World worldMaster = new World(manager, "world1", height, width, doorAndKey);
+            worldMaster.addPlayer("Moneymaker", App.pref.getText("player1"));
+            worlds.put("world1", worldMaster);
+            
+            // Check if the other 3 worlds should be made
+            for (int x = 2; x <= 4; x++) {
                 String opt = App.pref.getText("player"+x);
                 
                 // If this player is turned off, skip this world
@@ -68,39 +64,34 @@ public class Game {
                     continue;
                 }
                 
-                // Create the world and add it to worlds
-                World world = new World(manager, "world"+x, height, width, doorAndKey);
+                // Create a copy of world master, app next player, change name, add it to worlds
+                World world = worldMaster.copy();
+                world.setName("world"+x);
+                world.addPlayer("Moneymaker", opt);
                 worlds.put("world"+x, world);
-                
-                // Create the default player
-                world.addPlayer("Moneymaker");
-                
-                // If enemy is selected, add it to the world and attach an AI
-                if (enemy) {
-                    world.addEnemy("Enemy");
-                    aiRunnable AIRunEnemy = new aiRunnable(new AIEnemy(world,"Enemy"));
-                    aiPool.scheduleAtFixedRate(AIRunEnemy, 650, aiRefreshRate, timeUnit);
-                }
-                
-                // If AI is specified add it
-                if (opt.equals("Easy AI")) {
-                    aiRunnable AIRun = new aiRunnable(new AIPlayer(world,"Moneymaker", "easy"));
-                    aiPool.scheduleAtFixedRate(AIRun, 650, aiRefreshRate, timeUnit);
-                } else if (opt.equals("Med AI")) {
-                    aiRunnable air = new aiRunnable(new AIPlayer(world,"Moneymaker", "med"));
-                    aiPool.scheduleAtFixedRate(air, aiRefreshRate*(5/10), aiRefreshRate, timeUnit);
-                } else if (opt.equals("Hard AI")) {
-                    aiRunnable air = new aiRunnable(new AIPlayer(world,"Moneymaker", "hard"));
-                    aiPool.scheduleAtFixedRate(air, aiRefreshRate*(8/10), aiRefreshRate, timeUnit);
-                }
             }
-        } else if (gameMode.equals("Infinite Mazes")) {
-            // not implemented yet
+        } else if (gameMode.equals("Adventure")) {
+            // Create world 1
+            World world1 = new World(manager, "world1", height, width, doorAndKey);
+            world1.addPlayer("Moneymaker", App.pref.getText("player1"));
+            worlds.put("world1", world1);
+            
+            // If player2 is enabled, create a second world
+            String opt = App.pref.getText("player2");
+            if (!opt.equals("Off")) {
+                World world2 = new World(manager, "world2", height, width, doorAndKey);
+                world2.addPlayer("Moneymaker", opt);
+                worlds.put("world2", world2);
+                
+            }
         } else if (gameMode.equals("Battle")) {
-            // Create a world with 2 players
-            // Start them at start/finish
-            // No key door
-            // No enemy
+            App.pref.setPreference("value.visibleRange=-1");
+            App.pref.setPreference("bool.enemy=false");
+            
+            World world = new World(manager, "world1", height, width, false);
+            worlds.put("world1", world);
+            world.addPlayer("Moneymaker", App.pref.getText("player1"));
+            world.addPlayer("Teadrinker", App.pref.getText("player2"));
         }
         pause = false;
     }
@@ -143,6 +134,7 @@ public class Game {
                 break;
             default:
                 if (pause) return;
+                if (worlds.isEmpty()) return;
                 try {
                     worlds.get(message[0]).sendMessage(message);
                 } catch (Exception e) {
@@ -168,32 +160,12 @@ public class Game {
      * endGame() clears the game data and stops processing the ai threads.
      */
     private void endGame() {
-        // Stop new submissions and end all currently running tasks immediately
-        aiPool.shutdownNow();
-        
+        for (World w : worlds.values()) {
+            w.endWorld();
+        }
         // Remove old worlds
         worlds.clear();
         
     }
-
-    /**
-     * aiRunnable executes an ai's makeMove method and sends it to the app.
-     */
-    private class aiRunnable implements Runnable {
-        AI ai;
-        
-        public aiRunnable(AI ai) {
-            this.ai = ai;
-        }
-        
-        public void run() {
-            try {
-                manager.sendMessage(ai.makeMove());
-            } catch (Exception e){
-                System.out.println("AI runnable error.");
-                e.printStackTrace();
-            }
-        }
-    };
     
 }
