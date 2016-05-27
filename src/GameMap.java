@@ -44,7 +44,10 @@ public class GameMap extends JPanel {
     private BufferedImage enemyL = null;
     private BufferedImage enemyR = null;
     private BufferedImage enemyDead = null;
-    private BufferedImage start = null;
+    private BufferedImage startU = null;
+    private BufferedImage startD = null;
+    private BufferedImage startL = null;
+    private BufferedImage startR = null;
     private BufferedImage finishU = null;
     private BufferedImage finishD = null;
     private BufferedImage finishL = null;
@@ -81,7 +84,10 @@ public class GameMap extends JPanel {
 	        enemyL = ImageIO.read(new File("Images/"+pack+"/enemyLeft.png"));
 	        enemyR = ImageIO.read(new File("Images/"+pack+"/enemyRight.png"));
 	        enemyDead = ImageIO.read(new File("Images/"+pack+"/enemyDead.png"));
-	        start = ImageIO.read(new File("Images/"+pack+"/start.png"));
+	        startU = ImageIO.read(new File("Images/"+pack+"/startUp.png"));
+	        startD = ImageIO.read(new File("Images/"+pack+"/startDown.png"));
+	        startL = ImageIO.read(new File("Images/"+pack+"/startLeft.png"));
+	        startR = ImageIO.read(new File("Images/"+pack+"/startRight.png"));
 	        finishU = ImageIO.read(new File("Images/"+pack+"/finishUp.png"));
 	        finishD = ImageIO.read(new File("Images/"+pack+"/finishDown.png"));
 	        finishL = ImageIO.read(new File("Images/"+pack+"/finishLeft.png"));
@@ -193,7 +199,10 @@ public class GameMap extends JPanel {
         TexturePaint finishDTexture = new TexturePaint(finishD, floorSize);
         TexturePaint finishLTexture = new TexturePaint(finishL, floorSize);
         TexturePaint finishRTexture = new TexturePaint(finishR, floorSize);
-        TexturePaint startTexture = new TexturePaint(start, floorSize);
+        TexturePaint startUTexture = new TexturePaint(startU, floorSize);
+        TexturePaint startDTexture = new TexturePaint(startD, floorSize);
+        TexturePaint startLTexture = new TexturePaint(startL, floorSize);
+        TexturePaint startRTexture = new TexturePaint(startR, floorSize);
         TexturePaint enemyUTexture = new TexturePaint(enemyU, floorSize);
         TexturePaint enemyDTexture = new TexturePaint(enemyD, floorSize);
         TexturePaint enemyLTexture = new TexturePaint(enemyL, floorSize);
@@ -255,11 +264,13 @@ public class GameMap extends JPanel {
         
         // Draw on start
         Node n = world.getStartNode();
-        g2d.setPaint(startTexture);
+        if(n.getUp() != null) g2d.setPaint(startUTexture);
+        else if(n.getDown() != null) g2d.setPaint(startDTexture);
+        else if(n.getLeft() != null) g2d.setPaint(startLTexture);
+        else if(n.getRight() != null) g2d.setPaint(startRTexture);
         g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
         
         // Draw on finish
-        g2d.setPaint(finishUTexture);
         n = world.getFinishNode();
         if(n.getUp() != null) g2d.setPaint(finishUTexture);
         else if(n.getDown() != null) g2d.setPaint(finishDTexture);
@@ -291,10 +302,10 @@ public class GameMap extends JPanel {
             int mode = e.getMode();
             if (e.getType() == Entity.PLAYER) {
                 if (mode == Entity.MODE_ATTACK) {
-                    if (dir.equals("up")) g2d.setColor(Color.red);
-                    if (dir.equals("down")) g2d.setColor(Color.blue);
-                    if (dir.equals("left")) g2d.setColor(Color.green);
-                    if (dir.equals("right")) g2d.setColor(Color.pink);
+                    if (dir.equals("up")) g2d.setPaint(attackUTexture);
+                    if (dir.equals("down")) g2d.setPaint(attackDTexture);
+                    if (dir.equals("left")) g2d.setPaint(attackLTexture);
+                    if (dir.equals("right")) g2d.setPaint(attackRTexture);
                     g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
                 }  else if (mode == Entity.MODE_IDLE) {
                     if (dir.equals("up")) g2d.setPaint(playerUTexture);
