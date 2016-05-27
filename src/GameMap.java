@@ -128,11 +128,23 @@ public class GameMap extends JPanel {
 	        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	        
 	        //Updates the coin counter and level counter at the top of the game screen
-	        for (Entity i : world.getEntities()) {
-	        	if (i.getType() == Entity.PLAYER) {
-	        		coins.setText("coins: "+ i.getCoins());
-	        		level.setText("level: "+ i.getLevel());
-	        	}
+	        if (App.pref.getText("gameMode").equals("Adventure")){
+		        for (Entity i : world.getEntities()) {
+		        	if (i.getType() == Entity.PLAYER) {
+		        		coins.setText("coins: "+ i.getCoins());
+		        		level.setText("level: "+ i.getLevel());
+		        	}
+		        }
+	        } else if (App.pref.getText("gameMode").equals("Race")){
+	        	for (Entity i : world.getEntities()) {
+		        	if (i.getType() == Entity.PLAYER) {
+		        		coins.setText("coins: "+ i.getCoins());
+		        		level.setText("");
+		        	}
+		        }
+	        } else {
+	        	coins.setText("");
+        		level.setText("");
 	        }
 	        
 	        // Gets the size of the panel to draw into
