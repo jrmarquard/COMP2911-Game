@@ -521,9 +521,7 @@ public class GUI extends JFrame  {
         catch (Exception e) {
         	e.printStackTrace();
         }
-        //aboutText.setText("Game written by: John, Joshua, Patrick, Tim, Tyler\n\n");
          
-        
         aboutTextPanel.add(aboutText);
         windowPanel.add(aboutTextPanel);
     }
