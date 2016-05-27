@@ -39,6 +39,11 @@ public class App {
         new App();
 	}
 	
+	/**
+	 * Takes an input message and hands it off to the appropriate handler
+	 * 
+	 * @param c Message that has been delivered
+	 */
 	public void sendMessage(Message c) {
 	    switch (c.getCommandID()) {
             case Message.EXIT:         System.exit(0);;                 break;
