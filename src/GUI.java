@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.io.FileReader;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -511,11 +512,19 @@ public class GUI extends JFrame  {
                 }
             };
         aboutTextPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-        JTextField aboutText = new JTextField();
+        JTextArea aboutText = new JTextArea();
         aboutText.setMargin(new Insets(10,10,10,10));
-        aboutText.setText("Game written by: John, Joshua, Patrick, Tim, Tyler");
-        aboutTextPanel.add(aboutText);
+        try {
+	        FileReader aboutReader = new FileReader(this.game.getAboutFile());
+	        aboutText.read(aboutReader, null);
+        }
+        catch (Exception e) {
+        	e.printStackTrace();
+        }
+        //aboutText.setText("Game written by: John, Joshua, Patrick, Tim, Tyler\n\n");
+         
         
+        aboutTextPanel.add(aboutText);
         windowPanel.add(aboutTextPanel);
     }
     
