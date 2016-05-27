@@ -922,6 +922,14 @@ public class World {
         return vis;
     }
     
+    public Semaphore getItemSemaphore() {
+    	return this.itemSemaphore;
+    }
+    
+    public Semaphore getEntitySemaphore() {
+    	return this.entitySemaphore;
+    }
+    
     /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
      *                                                                        *
      *   All of the functions below are used in generating the initial maze   *

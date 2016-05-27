@@ -289,6 +289,11 @@ public class GameMap extends JPanel {
 
         
         // Draw on items
+        try {
+			world.getItemSemaphore().acquire();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
         for (Item i : world.getItems()) {
             n = i.getNode();
             if (i.getType() == Item.COIN) {
@@ -303,8 +308,14 @@ public class GameMap extends JPanel {
             }
             g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize); 
         }
+        world.getItemSemaphore().release();
         
         // Draw on entities
+        try {
+			world.getEntitySemaphore().acquire();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
         for (Entity e : world.getEntities()) {
             n = e.getNode(); 
             String dir = e.getDirection();
@@ -334,6 +345,7 @@ public class GameMap extends JPanel {
                 }
             }
         }
+        world.getEntitySemaphore().release();
         
         // Draw key
         n = world.getKeyNode();
