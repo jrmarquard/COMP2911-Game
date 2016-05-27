@@ -239,16 +239,12 @@ public class AIPlayer implements AI {
     	boolean attack = false;
     	
     	for (Entity entity : world.getEntities()) {
-    	    if (entity.getType() == Entity.ENEMY) {
-                if (entity.getMode() != Entity.MODE_DEAD) {
-                    if(isEnemyClose(current, entity.getNode())) {
-                        message[1] = "melee";
-                        attack = true;
-                        return attack;
-                    } else {
-                        message[1] = "move";
-                    }
-                }
+    	    if (entity.getType() == Entity.ENEMY && 
+    	    		entity.getMode() != Entity.MODE_DEAD &&
+    	    				isEnemyClose(current, entity.getNode())) {
+                message[1] = "melee";
+                attack = true;
+                break;
     	    } else {
                 message[1] = "move";
     	    }
