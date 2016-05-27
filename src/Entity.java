@@ -9,7 +9,6 @@ public class Entity {
     public static final int MODE_DEAD = 12;
     
     private String name;
-    private boolean AIControl;
     private int coins;
     private boolean key;
     private Node node;
@@ -17,11 +16,10 @@ public class Entity {
     private int mode;
     private int decay;
     private int type;
-    
+
     public Entity(Node node, String name, int type) {
         this.node = node;
         this.type = type;
-        this.AIControl = false;
         this.name = name;
         this.coins = 0;
         this.key = false;
@@ -44,6 +42,7 @@ public class Entity {
     public Node getNode() {
         return node;
     }
+    
     public void setNode(Node n) {
         this.node = n;
     }
@@ -64,21 +63,6 @@ public class Entity {
 
     public void setName(String name) {
         this.name = name;
-    }
-    
-    public boolean isAIControl() {
-        return AIControl;
-    }
-
-    public void setAIControl(boolean aiControl) {
-        this.AIControl = aiControl;
-    }
-    public void toggleAIControl() {
-        if (AIControl==false) {
-            AIControl = true;
-        } else {
-            AIControl = false;
-        }
     }
 
     public int getCoins() {

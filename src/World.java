@@ -130,7 +130,9 @@ public class World {
         if (doorAndKey) {
             doorAndKeyGenerator();
         }
-        generateCoins();
+        if (!gameMode.equals("Battle")) {
+        	generateCoins();
+        }
         
         // If visibility is turned off make all the tiles bright.
         if (maxVisDistance == -1) {
@@ -420,12 +422,14 @@ public class World {
             
             for(Map.Entry<String, Entity> entry : entities.entrySet()) {
                 Entity e = entry.getValue();
-                
+                // Only players can pick up coins
+                if (e.getType() != Entity.PLAYER) continue;
                 if (e.getNode().equals(i.getNode())) {
                     if (i.getType() == Item.COIN) {
                         e.addCoins((i).getValue());
                         itemItr.remove();
                         sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "coin"}));
+
                     }
                 }
             }
@@ -607,7 +611,7 @@ public class World {
             this.items
         );
     }
-    
+
     /**
      * Turns off the scheduled threads.
      */
@@ -626,7 +630,7 @@ public class World {
     
 
     /**
-     * Add being into the world.
+     * Add enemy into the world.
      * @param name Name of the player.
      */
     public void addEnemy(String name) {
@@ -637,7 +641,7 @@ public class World {
     }
 
     /**
-     * Add enemy into the world.
+     * Add being into the world.
      * @param name Name of the enemy
      */
     public void addPlayer(String name, String opt) {
@@ -658,6 +662,9 @@ public class World {
             aiPool.scheduleAtFixedRate(air, AI_POOL_DELAY, AI_POOL_RATE, SCHEDULE_TIME_UNIT);
         } else if (opt.equals("Hard AI")) {
             aiRunnable air = new aiRunnable(new AIPlayer(this, name, "hard"));
+            aiPool.scheduleAtFixedRate(air, AI_POOL_DELAY, AI_POOL_RATE, SCHEDULE_TIME_UNIT);
+        } else if (opt.equals("Battle AI")) {
+        	aiRunnable air = new aiRunnable(new AIFighter(this, name));
             aiPool.scheduleAtFixedRate(air, AI_POOL_DELAY, AI_POOL_RATE, SCHEDULE_TIME_UNIT);
         }
     }
@@ -773,7 +780,6 @@ public class World {
     public float getNodeVisibility(int x, int y) {
         return getNode(x, y).getVisibility();
     }
-    
 
     /**
      * Gets what is between two nodes at the given coordinates
@@ -866,7 +872,7 @@ public class World {
             float temp = wallVis.remove(0);
             vis = temp > vis ? vis : temp;
         }
-        return vis;   
+        return vis;
     }
     
     /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *

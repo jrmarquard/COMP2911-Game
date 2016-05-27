@@ -42,24 +42,12 @@ public class Item {
         return type;
     }
 
-    public void setType(int type) {
-        this.type = type;
-    }
-
     public int getDecay() {
         return decay;
     }
 
-    public void setDecay(int decay) {
-        this.decay = decay;
-    }
-
     public int getValue() {
         return value;
-    }
-
-    public void setValue(int value) {
-        this.value = value;
     }
 
     public Node getNode() {
@@ -68,12 +56,5 @@ public class Item {
     
     public void decay() {
         decay--;
-    }
-    
-    
-    
-    
-    
-    
-    
+    } 
 }

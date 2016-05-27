@@ -48,18 +48,21 @@ public class AIPlayer implements AI {
      * @return a message which contains the move that the AI would like to make
      */
     private Message easyMove() {
-        String[] message = new String[4];
+    	String[] message = new String[4];
         message[0] = worldName;
-        message[1] = "move";
         message[2] = id;
-        
-        int randValue = (new Random()).nextInt(4);
-        switch(randValue) {
-            case 0:     message[3] = "up";      break;
-            case 1:     message[3] = "down";    break;
-            case 2:     message[3] = "left";    break;
-            case 3:     message[3] = "right";   break;
-            default:    message[3] = "";        break;
+    	
+    	boolean attack = this.attack(message);
+    	
+        if(!attack) {
+        	int randValue = (new Random()).nextInt(4);
+            switch(randValue) {
+                case 0:     message[3] = "up";      break;
+                case 1:     message[3] = "down";    break;
+                case 2:     message[3] = "left";    break;
+                case 3:     message[3] = "right";   break;
+                default:    message[3] = "";        break;
+            }
         }
         
         return new Message(Message.GAME_MSG, message);
@@ -73,88 +76,91 @@ public class AIPlayer implements AI {
     private Message medMove() {
     	String[] message = new String[4];
         message[0] = worldName;
-        message[1] = "move";
         message[2] = id;
-        
-        Node current = this.world.getEntityNode(this.id);
-        this.visited.put(current, 0);
-        int currX = current.getX();
-        int currY = current.getY();
-        
-        if(!this.explore.isEmpty()) {
-        	Node next = this.explore.remove();
-        	putDirectionInMessage(current, next, message);
-        } else {
-        	boolean deadEnd = current.isDeadEnd();
+    	
+    	boolean attack = this.attack(message);
+    	
+        if(!attack) {
+        	Node current = this.world.getEntityNode(this.id);
+        	this.visited.put(current, 0);
+            int currX = current.getX();
+            int currY = current.getY();
+            
+            if(!this.explore.isEmpty()) {
+            	Node next = this.explore.remove();
+            	putDirectionInMessage(current, next, message);
+            } else {
+            	boolean deadEnd = current.isDeadEnd();
 
-        	if(deadEnd) {
-        		boolean addedToExplore = false;
-        		this.visited.clear();
+            	if(deadEnd) {
+            		boolean addedToExplore = false;
+            		this.visited.clear();
 
-        		while(this.world.getNode(currX, currY).getUp() != null) {
-        			this.explore.add(this.world.getNode(currX, currY).getUp());
-        			currY--;
-        			addedToExplore = true;
-        		}
-        		
-        		if(!addedToExplore) {
-        			while(this.world.getNode(currX, currY).getDown() != null) {
-            			this.explore.add(this.world.getNode(currX, currY).getDown());
-            			currY++;
+            		while(this.world.getNode(currX, currY).getUp() != null) {
+            			this.explore.add(this.world.getNode(currX, currY).getUp());
+            			currY--;
             			addedToExplore = true;
             		}
-        		}
-        		
-        		if(!addedToExplore) {
-        			while(this.world.getNode(currX, currY).getLeft() != null) {
-            			this.explore.add(this.world.getNode(currX, currY).getLeft());
-            			currX--;
-            			addedToExplore = true;
-            		}
-        		}
-        		
-        		if(!addedToExplore) {
-        			while(this.world.getNode(currX, currY).getRight() != null) {
-            			this.explore.add(this.world.getNode(currX, currY).getRight());
-            			currX++;
-            			addedToExplore = true;
-            		}
-        		}
-        	} else {
-        		int randValue = (new Random()).nextInt(4);
-        		
-        		if(randValue == 0) {
-        			if(!this.visited.containsKey(this.world.getNode(currX, currY).getUp())) {
-            			while(this.world.getNode(currX, currY).getUp() != null) {
-                			this.explore.add(this.world.getNode(currX, currY).getUp());
-                			currY--;
-                		}
-            		}
-        		} else if(randValue == 1) {
-        			if(!this.visited.containsKey(this.world.getNode(currX, currY).getDown())) {
+            		
+            		if(!addedToExplore) {
             			while(this.world.getNode(currX, currY).getDown() != null) {
                 			this.explore.add(this.world.getNode(currX, currY).getDown());
                 			currY++;
+                			addedToExplore = true;
                 		}
-        			}
-        		} else if(randValue == 2) {
-        			if(!this.visited.containsKey(this.world.getNode(currX, currY).getLeft())) {
+            		}
+            		
+            		if(!addedToExplore) {
             			while(this.world.getNode(currX, currY).getLeft() != null) {
                 			this.explore.add(this.world.getNode(currX, currY).getLeft());
                 			currX--;
+                			addedToExplore = true;
                 		}
-        			}
-        		} else if(randValue == 3) {
-        			if(!this.visited.containsKey(this.world.getNode(currX, currY).getRight())) {
+            		}
+            		
+            		if(!addedToExplore) {
             			while(this.world.getNode(currX, currY).getRight() != null) {
                 			this.explore.add(this.world.getNode(currX, currY).getRight());
                 			currX++;
+                			addedToExplore = true;
                 		}
             		}
-        		}
-        	}
-        	
-        	message[3] = "";
+            	} else {
+            		int randValue = (new Random()).nextInt(4);
+            		
+            		if(randValue == 0) {
+            			if(!this.visited.containsKey(this.world.getNode(currX, currY).getUp())) {
+                			while(this.world.getNode(currX, currY).getUp() != null) {
+                    			this.explore.add(this.world.getNode(currX, currY).getUp());
+                    			currY--;
+                    		}
+                		}
+            		} else if(randValue == 1) {
+            			if(!this.visited.containsKey(this.world.getNode(currX, currY).getDown())) {
+                			while(this.world.getNode(currX, currY).getDown() != null) {
+                    			this.explore.add(this.world.getNode(currX, currY).getDown());
+                    			currY++;
+                    		}
+            			}
+            		} else if(randValue == 2) {
+            			if(!this.visited.containsKey(this.world.getNode(currX, currY).getLeft())) {
+                			while(this.world.getNode(currX, currY).getLeft() != null) {
+                    			this.explore.add(this.world.getNode(currX, currY).getLeft());
+                    			currX--;
+                    		}
+            			}
+            		} else if(randValue == 3) {
+            			if(!this.visited.containsKey(this.world.getNode(currX, currY).getRight())) {
+                			while(this.world.getNode(currX, currY).getRight() != null) {
+                    			this.explore.add(this.world.getNode(currX, currY).getRight());
+                    			currX++;
+                    		}
+                		}
+            		}
+            	}
+            	
+            	message[3] = "";
+            }
         }
         
         return new Message(Message.GAME_MSG, message);
@@ -170,53 +176,106 @@ public class AIPlayer implements AI {
     private Message hardMove() {
     	String[] message = new String[4];
         message[0] = worldName;
-        message[1] = "move";
         message[2] = id;
-        
-        Node current = this.world.getEntityNode(this.id);
-        ArrayList<Node> reachable = current.getConnectedNodes();
-        
-        if(this.visited.containsKey(current)) {
-			int currentCost = this.visited.get(current);
-			this.visited.put(current, currentCost += 1);
-		} else {
-			this.visited.put(current, 1);
-		}
-        
-        Node next = null;
-        boolean allVisited = isReachableInVisited(reachable);
-        
-        for(Node node: reachable) {
-        	if(allVisited) {
-        		if(next == null) {
-        			next = node;
-        		} else {
-        			int nodeCost, nextCost;
-        			
-        			if(this.visited.containsKey(node)) {
-        				nodeCost = this.visited.get(node);
-        			} else {
-        				nodeCost = 0;
-        			}
-        			
-        			if(this.visited.containsKey(next)) {
-        				nextCost = this.visited.get(next);
-        			} else {
-        				nextCost = 0;
-        			}
-        			
-        			if(nodeCost < nextCost) {
-        				next = node;
-        			}
-        		}
-        	} else if(!visited.containsKey(node)) {
-        		next = node;
-        	}
+    	
+    	boolean attack = this.attack(message);
+    	
+        if(!attack) {
+        	Node current = this.world.getEntityNode(this.id);
+        	ArrayList<Node> reachable = current.getConnectedNodes();
+            
+            if(this.visited.containsKey(current)) {
+    			int currentCost = this.visited.get(current);
+    			this.visited.put(current, currentCost += 1);
+    		} else {
+    			this.visited.put(current, 1);
+    		}
+            
+            Node next = null;
+            boolean allVisited = isReachableInVisited(reachable);
+            
+            for(Node node: reachable) {
+            	if(allVisited) {
+            		if(next == null) {
+            			next = node;
+            		} else {
+            			int nodeCost, nextCost;
+            			
+            			if(this.visited.containsKey(node)) {
+            				nodeCost = this.visited.get(node);
+            			} else {
+            				nodeCost = 0;
+            			}
+            			
+            			if(this.visited.containsKey(next)) {
+            				nextCost = this.visited.get(next);
+            			} else {
+            				nextCost = 0;
+            			}
+            			
+            			if(nodeCost < nextCost) {
+            				next = node;
+            			}
+            		}
+            	} else if(!visited.containsKey(node)) {
+            		next = node;
+            	}
+            }
+            
+            putDirectionInMessage(current, next, message);
         }
         
-        putDirectionInMessage(current, next, message);
-        
         return new Message(Message.GAME_MSG, message);
+    }
+    
+    /**
+     * Returns if the AI is going to attack or not
+     * and stores either attack or move inside message
+     * @param message to store either attack or move
+     * @return if the AI is going to attack or not
+     */
+    private boolean attack(String[] message) {
+    	Node current = this.world.getEntityNode(this.id);
+    	boolean attack = false;
+    	
+    	for (Entity entity : world.getEntities()) {
+    	    if (entity.getType() == Entity.ENEMY) {
+                if (entity.getMode() != Entity.MODE_DEAD) {
+                    if(isEnemyClose(current, entity.getNode())) {
+                        message[1] = "melee";
+                        attack = true;
+                        return attack;
+                    } else {
+                        message[1] = "move";
+                    }
+                }
+    	    } else {
+                message[1] = "move";
+    	    }
+    	}
+    	
+    	return attack;
+    }
+    
+    /**
+     * Returns if the enemy is within 2 nodes away from current
+     * @param current the current node
+     * @param enemy the enemy node
+     * @return if the enemy is within 2 nodes away from current
+     */
+    private boolean isEnemyClose(Node current, Node enemy) {
+    	boolean enemyClose = false;
+    	int currX = current.getX();
+    	int currY = current.getY();
+    	int enemyX = enemy.getX();
+    	int enemyY = enemy.getY();
+    	
+    	if((enemyX >= currX - 2 && enemyX <= currX + 2 && currY == enemyY) || 
+    			(enemyY >= currY - 2 && enemyY <= currY + 2 && currX == enemyX)) {
+    		enemyClose = true;
+    	}
+    	
+    	return enemyClose;
     }
     
     /**
