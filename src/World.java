@@ -313,7 +313,8 @@ public class World {
         	this.entitySemaphore.release();
             return;
         } else {
-            sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "sword_swing"}));Node enemyAttackingNode = entityAttacking.getNode();        
+            sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "sword_swing"}));
+            Node enemyAttackingNode = entityAttacking.getNode();        
             
             Iterator<String> iterEntity = entities.keySet().iterator();
             while (iterEntity.hasNext()) {
@@ -330,6 +331,10 @@ public class World {
                     if (entityNode.equals(m)) {
                         sendMessageToApp(new Message(Message.SOUND_MSG, new String[]{"play", "death"}));
                         entity.setDead(true);
+                        if (enemyAttackingNode.getUp().equals(entityNode)) entityAttacking.setDirection("up");
+                        else if (enemyAttackingNode.getDown().equals(entityNode)) entityAttacking.setDirection("down");
+                        else if (enemyAttackingNode.getLeft().equals(entityNode)) entityAttacking.setDirection("left");
+                        else if (enemyAttackingNode.getRight().equals(entityNode)) entityAttacking.setDirection("right");
                     }
                 }
             }
