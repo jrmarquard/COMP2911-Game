@@ -2,6 +2,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+/**
+ * A Fighter AI for battle mode that will explore the maze and kill the opponent
+ */
 public class AIFighter implements AI {
 
 	private World world;
@@ -51,15 +54,15 @@ public class AIFighter implements AI {
             	Node next = this.explore.remove();
             	putDirectionInMessage(current, next, message);
             } else {
-            	boolean playerReached = reachEnemy(current, enemy);
+            	boolean enemyReached = reachEnemy(current, enemy);
             	boolean keepExploring = false;
             	
-            	if(!playerReached) {
+            	if(!enemyReached) {
             		keepExploring = true;
             		this.explore.clear();
             	}
             	
-            	// Cannot reach player/player has not been seen
+            	// Cannot reach enemy/enemy has not been seen
             	if(keepExploring) {
             		Node next = nextExploreNode(current);
                     putDirectionInMessage(current, next, message);
@@ -124,33 +127,33 @@ public class AIFighter implements AI {
 
 
     /**
-     * Returns if a player is reachable by going straight to one direction, and
+     * Returns if a enemy is reachable by going straight to one direction, and
      * Adds the straight path to explore
      * @param current the current Node
-     * @param player the player Node
-     * @return if a player is reachable by going straight to one direction
+     * @param enemy the enemy Node
+     * @return if a enemy is reachable by going straight to one direction
      */
-    private boolean reachEnemy(Node current, Node player) {
+    private boolean reachEnemy(Node current, Node enemy) {
     	int currX = current.getX();
         int currY = current.getY();
-        int playerX = player.getX();
-        int playerY = player.getY();
+        int enemyX = enemy.getX();
+        int enemyY = enemy.getY();
     	/*
     	 * A boolean to tell when the AI is in the same row/column
-    	 * with the player, the AI will try to get to where the player is
-    	 * with that row/column. If the AI doesn't reach the player,
+    	 * with the enemy, the AI will try to get to where the enemy is
+    	 * with that row/column. If the AI doesn't reach the enemy,
     	 * this boolean will be false, ie there is a wall between
-    	 * the AI and the player
+    	 * the AI and the enemy
     	 */
-    	boolean playerReached = false;
+    	boolean enemyReached = false;
     	
-    	if(currX == playerX) {
-    		// Player is below
-    		if(currY < playerY) {
-    			// Tries to get to where player is
+    	if(currX == enemyX) {
+    		// enemy is below
+    		if(currY < enemyY) {
+    			// Tries to get to where enemy is
     			while(this.world.getNode(currX, currY).getDown() != null) {
-    				if(this.world.getNode(currX, currY).getDown().equals(player)) {
-    					playerReached = true;
+    				if(this.world.getNode(currX, currY).getDown().equals(enemy)) {
+    					enemyReached = true;
     				}
     				
         			this.explore.add(this.world.getNode(currX, currY).getDown());
@@ -158,25 +161,25 @@ public class AIFighter implements AI {
         		}
     		}
     		
-    		// Player is above
+    		// enemy is above
     		else {
-    			// Tries to get to where player is
+    			// Tries to get to where enemy is
     			while(this.world.getNode(currX, currY).getUp() != null) {
-    				if(this.world.getNode(currX, currY).getUp().equals(player)) {
-    					playerReached = true;
+    				if(this.world.getNode(currX, currY).getUp().equals(enemy)) {
+    					enemyReached = true;
     				}
     				
         			this.explore.add(this.world.getNode(currX, currY).getUp());
         			currY--;
         		}
     		}
-    	} else if(currY == playerY) {
-    		// Player is on the right
-    		if(currX < playerX) {
-    			// Tries to get to where player is
+    	} else if(currY == enemyY) {
+    		// enemy is on the right
+    		if(currX < enemyX) {
+    			// Tries to get to where enemy is
     			while(this.world.getNode(currX, currY).getRight() != null) {
-    				if(this.world.getNode(currX, currY).getRight().equals(player)) {
-    					playerReached = true;
+    				if(this.world.getNode(currX, currY).getRight().equals(enemy)) {
+    					enemyReached = true;
     				}
     				
         			this.explore.add(this.world.getNode(currX, currY).getRight());
@@ -184,12 +187,12 @@ public class AIFighter implements AI {
         		}
     		}
     		
-    		// Player is on the left
+    		// enemy is on the left
     		else {
-    			// Tries to get to where player is
+    			// Tries to get to where enemy is
     			while(this.world.getNode(currX, currY).getLeft() != null) {
-    				if(this.world.getNode(currX, currY).getLeft().equals(player)) {
-    					playerReached = true;
+    				if(this.world.getNode(currX, currY).getLeft().equals(enemy)) {
+    					enemyReached = true;
     				}
     				
         			this.explore.add(this.world.getNode(currX, currY).getLeft());
@@ -198,7 +201,7 @@ public class AIFighter implements AI {
     		}
     	}
     	
-    	return playerReached;
+    	return enemyReached;
     }
     
     /**

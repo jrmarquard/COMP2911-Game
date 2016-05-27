@@ -2,6 +2,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+/**
+ * An enemy AI that will explore the maze and try and reach the player
+ */
 public class AIEnemy implements AI {
 
 	private World world;
