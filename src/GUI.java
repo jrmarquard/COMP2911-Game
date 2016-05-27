@@ -364,9 +364,10 @@ public class GUI extends JFrame  {
 
         c.gridx = 2;
         c.anchor = GridBagConstraints.EAST;
-        String[] gameModes = new String[]{"Race", "Infinite Mazes", "Adventure"};
+        String[] gameModes = new String[]{"Race", "Adventure", "Battle"};
+        String gameMode = App.pref.getText("gameMode");
         JComboBox<String> gameModeSelection = new JComboBox<String>(gameModes);
-        gameModeSelection.setSelectedItem(App.pref.getText("gameMode"));
+        gameModeSelection.setSelectedItem(gameMode);
         gameModeSelection.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -398,8 +399,11 @@ public class GUI extends JFrame  {
         gameSettingsPanel.add(doorAndKey, c);
         
         // Enemy generation option
-        JCheckBox enemy = new JCheckBox("", App.pref.getBool("enemy"));
-        enemy.addActionListener(new ActionListener() {
+        JCheckBox enemyCheckBox = new JCheckBox("", App.pref.getBool("enemy"));
+        if (gameMode.equals("Race")){
+            enemyCheckBox.setEnabled(false);
+        }
+        enemyCheckBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "click"}));
@@ -413,16 +417,19 @@ public class GUI extends JFrame  {
         gameSettingsPanel.add(new JLabel("Enemy in maze?"), c);
         c.gridx = 2;
         c.anchor = GridBagConstraints.EAST;
-        gameSettingsPanel.add(enemy, c);
+        gameSettingsPanel.add(enemyCheckBox, c);
         
         // Visibility selection
         String[] visModes = new String[]{"Off", "Low", "Med", "High"};
         JComboBox<String> visSelection = new JComboBox<String>(visModes);
+        if (gameMode.equals("Battle")){
+            visSelection.setEnabled(false);
+        }
         int vis = App.pref.getValue("visibleRange");
         switch (vis) {
             case 3: visSelection.setSelectedItem("Low");     break;
             case 6: visSelection.setSelectedItem("Med");     break;
-            case 10: visSelection.setSelectedItem("High");   break;
+            case 8: visSelection.setSelectedItem("High");   break;
             default:  visSelection.setSelectedItem("Off");    break;
         }
         
@@ -435,7 +442,7 @@ public class GUI extends JFrame  {
                         case "Off": App.pref.setPreference("value.visibleRange=-1");    break;
                         case "Low": App.pref.setPreference("value.visibleRange=3");     break;
                         case "Med": App.pref.setPreference("value.visibleRange=6");     break;
-                        case "High": App.pref.setPreference("value.visibleRange=10");   break;
+                        case "High": App.pref.setPreference("value.visibleRange=8");   break;
                     }
                     refresh();
                 }
@@ -486,21 +493,16 @@ public class GUI extends JFrame  {
             gameSettingsPanel.add(new JLabel("Player "+x+": "), c);
             c.gridx = 2;
             c.anchor = GridBagConstraints.EAST;
-            gameSettingsPanel.add(new PlayerOptions(playerOptions, "player"+x), c);      
+            PlayerOptions opt = new PlayerOptions(playerOptions, "player"+x);
+            if (!gameMode.equals("Race")){
+                if (x >= 3) {
+                    opt.setEnabled(false);
+                }
+            }
+            gameSettingsPanel.add(opt, c);  
+            
         }
-        // turned off gamemode selection changing the avaiable options for the moment
-        /*
-        if (gameMode.equals("Solve")) {
-            c.gridx = 1;
-            c.gridy = 5;
-            c.anchor = GridBagConstraints.WEST;
-            gameSettingsPanel.add(new JLabel("Player 1: "), c);
-            c.gridx = 2;
-            c.anchor = GridBagConstraints.EAST;
-            gameSettingsPanel.add(new PlayerOptions(playerOptions, "player1"), c);
-        } else if (gameMode.equals("Race")) {
-        }
-        */
+        
         // Button should always be at the bottom, so it's y is 99. For some reason
         // using row as with the rest of the buttons did not work
         c.gridy = 99;
@@ -508,6 +510,16 @@ public class GUI extends JFrame  {
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.CENTER;
         JClickButton startGameButton = new JClickButton("Start Game");
+        if (gameMode.equals("Battle")) {
+            if (App.pref.getText("player1").equals("Off") || App.pref.getText("player2").equals("Off")) {
+                startGameButton.setEnabled(false);
+            }
+        } else {
+            if (App.pref.getText("player1").equals("Off")) {
+                startGameButton.setEnabled(false);
+            }            
+        }
+        
         startGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -868,9 +880,11 @@ public class GUI extends JFrame  {
                         App.pref.setPreference("text."+setting+"="+(String)e.getItem());
                         sendMessage(new Message(Message.SOUND_MSG, new String[]{"play", "click"}));
                     }
+                    refresh();
                 }
             });
         }
+        
     }
     
     /**

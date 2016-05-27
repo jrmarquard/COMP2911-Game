@@ -271,33 +271,35 @@ public class GameMap extends JPanel {
                 g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);                
             }
         }
-        // Draw on character
-        n = world.getEntityNode("Moneymaker");
-        String dirP = world.getEntityDirection("Moneymaker");
-        if (world.isBeingDead("Moneymaker")) {
-            g2d.setColor(Color.black);
-            g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
-        } else {
-            if (dirP.equals("up")) g2d.setPaint(playerUTexture);
-            if (dirP.equals("down")) g2d.setPaint(playerDTexture);
-            if (dirP.equals("left")) g2d.setPaint(playerLTexture);
-            if (dirP.equals("right")) g2d.setPaint(playerRTexture);
-            g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
-        } 
-        
-        // Draw on Enemy
-        if(App.pref.getBool("enemy")) {
-            n = world.getEntityNode("Enemy");
-            if (world.isBeingDead("Enemy")) {
-                g2d.setColor(Color.black);
-                g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
-            } else {
-                String dirE = world.getEntityDirection("Enemy");
-                if (dirE.equals("up")) g2d.setPaint(enemyUTexture);
-                if (dirE.equals("down")) g2d.setPaint(enemyDTexture);
-                if (dirE.equals("left")) g2d.setPaint(enemyLTexture);
-                if (dirE.equals("right")) g2d.setPaint(enemyRTexture);
-                g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
+        // Draw on entities
+        for (Entity e : world.getEntities()) {
+            n = e.getNode();
+            String dir = e.getDirection();
+            String name = e.getName();
+            if (name.equals("Moneymaker") || name.equals("Teadrinker")) {
+                if (e.isDead()) {
+                    g2d.setColor(Color.black);
+                    g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
+                } else {
+                    if (dir.equals("up")) g2d.setPaint(playerUTexture);
+                    if (dir.equals("down")) g2d.setPaint(playerDTexture);
+                    if (dir.equals("left")) g2d.setPaint(playerLTexture);
+                    if (dir.equals("right")) g2d.setPaint(playerRTexture);
+                    g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
+                }                
+            } else if (name.equals("Enemy")) {
+                if (e.isDead()) {
+                    g2d.setColor(Color.black);
+                    g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
+                } else {
+                    String dirE = world.getEntityDirection("Enemy");
+                    if (dirE.equals("up")) g2d.setPaint(enemyUTexture);
+                    if (dirE.equals("down")) g2d.setPaint(enemyDTexture);
+                    if (dirE.equals("left")) g2d.setPaint(enemyLTexture);
+                    if (dirE.equals("right")) g2d.setPaint(enemyRTexture);
+                    g2d.fillRect(wallWidth+(n.getX()*(wallWidth+tileSize)), wallWidth+(n.getY()*(wallWidth+tileSize)), tileSize, tileSize);
+                }
+                
             }
         }
         

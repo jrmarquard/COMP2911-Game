@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
+import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -29,6 +30,7 @@ public class World {
     private App app;
     private boolean updateFlag;
     private boolean worldChangeFlag;
+    private boolean enemiesEnabled;
     
     // Maze data
     private ArrayList<ArrayList<Node>> nodes;
@@ -59,37 +61,113 @@ public class World {
     private Semaphore itemSemaphore;
     private Semaphore entitySemaphore;
     
-    // Settings for the tick service
+    // Schedule for the tick service
     private ScheduledExecutorService worldTickTock;
+    private static final TimeUnit SCHEDULE_TIME_UNIT = TimeUnit.MILLISECONDS;
     private static final int WORLD_TICK_DELAY = 200; 
     private static final int WORLD_TICK_RATE = 50; 
-    private static final TimeUnit WORLD_TICK_TIME_UNIT = TimeUnit.MILLISECONDS;
     private int worldTickCount;
+
+    /**
+     * Executor to run the AIs in
+     */
+    private ScheduledExecutorService aiPool;
+    private static final int AI_POOL_DELAY = 600; 
+    private static final int AI_POOL_RATE = 150; 
     
-    public World (App manager, String name, int width, int height, boolean doorAndKey) {
-        this.app = manager;
+    public World (App app, String name, int height, int width, Node start, Node finish, Node doorStart, Node doorFinish, Node key, ArrayList<ArrayList<Node>> nodes, ArrayList<Item> items) {
+        // Global settings
+        this.app = app;
         this.name = name;
+        this.width = width;
+        this.height = height;
         this.updateFlag = false;
         this.worldChangeFlag = false;
-        this.worldTickTock = Executors.newSingleThreadScheduledExecutor();
+        this.enemiesEnabled = App.pref.getBool("enemy");
         this.worldTickCount = 0;
+        this.maxVisDistance = App.pref.getValue("visibleRange");
+        this.visibleNodes = new ArrayList<Node>();
+        
+        // Semaphores
+        this.visibilitySemaphore = new Semaphore(1, true);
+        this.itemSemaphore = new Semaphore(1, true);
+        this.entitySemaphore = new Semaphore(1, true);
+        
+        // Schedulers
+        this.worldTickTock = Executors.newSingleThreadScheduledExecutor();
+        this.aiPool = Executors.newScheduledThreadPool(4);
         
         worldTickTock.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
                 tickUpdate();
             }
-        }, WORLD_TICK_DELAY, WORLD_TICK_RATE, WORLD_TICK_TIME_UNIT);
+        }, WORLD_TICK_DELAY, WORLD_TICK_RATE, SCHEDULE_TIME_UNIT);
         
+        // Copy maze and item collections
+        this.nodes = new ArrayList<ArrayList<Node>>(nodes);
+        this.items = new ArrayList<Item>(items);
         
-        this.nodes = new ArrayList<ArrayList<Node>>();
+        // Create entity collection
         this.entities = new ConcurrentHashMap<String, Entity>();
-        this.items = new ArrayList<Item>();
-        this.visibleNodes = new ArrayList<Node>();
-        maxVisDistance = App.pref.getValue("visibleRange");
         
+        // Copy special nodes in the maze
+        this.start = start;
+        this.finish = finish;
+        this.doorStart = doorStart;
+        this.doorFinish = doorFinish;
+        this.key = key;
+                
+        // If visibility is turned off make all the tiles bright.
+        if (maxVisDistance == -1) {
+            for (ArrayList<Node> an : nodes) {
+                for (Node n : an) {
+                    n.setVisibility(0f);
+                }
+            }
+        } else {
+            calculateVisibility(start);            
+        }
+        
+        // If enemies are enabled, create 1
+        if (enemiesEnabled) {
+            this.addEnemy("Enemy");
+            aiRunnable AIRunEnemy = new aiRunnable(new AIEnemy(this, "Enemy"));
+            aiPool.scheduleAtFixedRate(AIRunEnemy, AI_POOL_DELAY, AI_POOL_RATE, SCHEDULE_TIME_UNIT);
+        }        
+    }
+    
+    public World (App app, String name, int width, int height, boolean doorAndKey) {        
+        // Global settings
+        this.app = app;
+        this.name = name;
         this.width = width;
         this.height = height;
+        this.updateFlag = false;
+        this.worldChangeFlag = false;
+        this.enemiesEnabled = App.pref.getBool("enemy");
+        this.worldTickCount = 0;
+        this.maxVisDistance = App.pref.getValue("visibleRange");
+        this.visibleNodes = new ArrayList<Node>();
+        
+        // Semaphore initialisation
+        this.visibilitySemaphore = new Semaphore(1, true);
+        this.itemSemaphore = new Semaphore(1, true);
+        this.entitySemaphore = new Semaphore(1, true);
+        
+        // Schedulers
+        this.worldTickTock = Executors.newSingleThreadScheduledExecutor();
+        this.aiPool = Executors.newScheduledThreadPool(4);
+        
+        this.worldTickTock.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                tickUpdate();
+            }
+        }, WORLD_TICK_DELAY, WORLD_TICK_RATE, SCHEDULE_TIME_UNIT);
+        
+        // Create the maze nodes
+        this.nodes = new ArrayList<ArrayList<Node>>();
         
         for (int w = 0; w < width; w++) {
             this.nodes.add(new ArrayList<Node>());
@@ -98,18 +176,23 @@ public class World {
             }
         }
         
+        // Create entity and item collections
+        this.entities = new ConcurrentHashMap<String, Entity>();
+        this.items = new ArrayList<Item>();
+        
+        // Special nodes within the maze
+        this.start = null;
+        this.finish = null;
         this.doorStart = null;
         this.doorFinish = null;
         this.key = null;
         
-        // Maze generator connects nodes together and sets start/finish.
+        // Generate maze items
         mazeGenerator();
+        if (doorAndKey) {
+            doorAndKeyGenerator();
+        }
         generateCoins();
-        
-        //Synchronization (providing mutual exclusion to appropriate resources)
-        this.visibilitySemaphore = new Semaphore(1, true);
-        this.itemSemaphore = new Semaphore(1, true);
-        this.entitySemaphore = new Semaphore(1, true);
         
         // If visibility is turned off make all the tiles bright.
         if (maxVisDistance == -1) {
@@ -121,7 +204,11 @@ public class World {
         } else {
             calculateVisibility(start);            
         }
-        if (doorAndKey) doorAndKeyGenerator();
+        
+        // If enemies are enabled, create 1
+        if (enemiesEnabled) {
+            this.addEnemy("Enemy");
+        }  
     }
     
     /**
@@ -219,6 +306,10 @@ public class World {
             // Being attack check
             if (e.getName().equals("Moneymaker")) {
                 Entity enemyBeing = entities.get("Enemy");
+                // if there are no enemies
+                if (enemyBeing == null) {
+                    continue;
+                }
                 Node enemyNode = enemyBeing.getNode();
                 if (enemyBeing.isDead()) continue;
                 if (e.getNode().equals(enemyNode)) {
@@ -311,18 +402,18 @@ public class World {
     public void sendMessage(String[] message) {
         switch (message[1]) {
             case "move": entityMove(message[2], message[3]); break;
-            case "melee": entityMelee(message[2]); break;
-            case "range": entityRange(message[2]); break;
+            case "melee": entityMeleeAttack(message[2]); break;
+            case "range": entityRangeAttack(message[2]); break;
         
         }
     }
     
-    private void entityRange(String string) {
+    private void entityRangeAttack(String string) {
         // TODO Auto-generated method stub
         
     }
 
-    private void entityMelee(String entityName) {
+    private void entityMeleeAttack(String entityName) {
         try {
             this.entitySemaphore.acquire();
         } catch (InterruptedException e) {
@@ -426,15 +517,33 @@ public class World {
     public void addEnemy(String name) {
         Entity enemy = new Entity(this.finish, name);
         entities.put(name, enemy);
+        aiRunnable AIRunEnemy = new aiRunnable(new AIEnemy(this, "Enemy"));
+        aiPool.scheduleAtFixedRate(AIRunEnemy, AI_POOL_DELAY, AI_POOL_RATE, SCHEDULE_TIME_UNIT);
     }
 
     /**
      * Add enemy into the world.
      * @param name Name of the enemy
      */
-    public void addPlayer(String name) {
-        Entity player = new Entity(this.start, name);
+    public void addPlayer(String name, String opt) {
+        Node n = null;
+        if (name.equals("Moneymaker")) {
+            n = this.start;
+        } else if (name.equals("Teadrinker")) {
+            n = this.finish;
+        } 
+        Entity player = new Entity(n, name);
         entities.put(name, player);
+        if (opt.equals("Easy AI")) {
+            aiRunnable AIRun = new aiRunnable(new AIPlayer(this, name, "easy"));
+            aiPool.scheduleAtFixedRate(AIRun, AI_POOL_DELAY, AI_POOL_RATE, SCHEDULE_TIME_UNIT);
+        } else if (opt.equals("Med AI")) {
+            aiRunnable air = new aiRunnable(new AIPlayer(this, name, "med"));
+            aiPool.scheduleAtFixedRate(air, AI_POOL_DELAY, AI_POOL_RATE, SCHEDULE_TIME_UNIT);
+        } else if (opt.equals("Hard AI")) {
+            aiRunnable air = new aiRunnable(new AIPlayer(this, name, "hard"));
+            aiPool.scheduleAtFixedRate(air, AI_POOL_DELAY, AI_POOL_RATE, SCHEDULE_TIME_UNIT);
+        }
     }
     /**
      * Get's the name of the world
@@ -985,6 +1094,67 @@ public class World {
         }
         return vis;
         
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Makes a deep copy of the world except for parts of the world that
+     * need to remain independent from other worlds (e.g. ai pool).
+     * @return copy of world
+     */
+    public World copy() {
+        //
+        return new World(
+                this.app,
+                this.name,
+                this.height,
+                this.width,
+                this.start,
+                this.finish,
+                this.doorStart,
+                this.doorFinish,
+                this.key,
+                this.nodes,
+                this.items
+                );
+    }
+
+    /**
+     * Returns an array list of the entities
+     * @return array list of the entities
+     */
+    public ArrayList<Entity> getEntities() {
+        return new ArrayList<Entity>(entities.values());
+    }
+    
+
+
+    /**
+     * aiRunnable executes an ai's makeMove method and sends it to the app.
+     */
+    private class aiRunnable implements Runnable {
+        AI ai;
+        
+        public aiRunnable(AI ai) {
+            this.ai = ai;
+        }
+        
+        public void run() {
+            try {
+                sendMessageToApp(ai.makeMove());
+            } catch (Exception e){
+                System.out.println("AI runnable error.");
+                e.printStackTrace();
+            }
+        }
+    };
+    
+    public void endWorld () {
+        aiPool.shutdownNow();
+        worldTickTock.shutdownNow();
     }
 }
 
