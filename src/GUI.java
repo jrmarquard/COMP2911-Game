@@ -12,7 +12,6 @@ import javax.swing.text.BadLocationException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Queue;
 
 @SuppressWarnings("serial")
 public class GUI extends JFrame  {
@@ -483,7 +482,13 @@ public class GUI extends JFrame  {
         c.anchor = GridBagConstraints.EAST;
         gameSettingsPanel.add(heightSize, c);
 
-        String[] playerOptions = new String[]{"Human", "Easy AI", "Med AI", "Hard AI", "Off"};
+        String[] playerOptions = null;
+        
+        if(gameMode.equals("Battle")) {
+        	playerOptions = new String[]{"Human", "Battle AI"};
+        } else {
+        	playerOptions = new String[]{"Human", "Easy AI", "Med AI", "Hard AI", "Off"};
+        }
 
         for (int x = 1; x <= 4; x++) {
             row++;

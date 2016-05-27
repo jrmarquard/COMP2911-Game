@@ -51,7 +51,7 @@ public class Game {
             App.pref.setPreference("bool.enemy=false");
             
             // Create first world, add player, add it to worlds
-            World worldMaster = new World(manager, "world1", height, width, doorAndKey);
+            World worldMaster = new World(manager, "world1", height, width, doorAndKey, true);
             worldMaster.addPlayer("Moneymaker", App.pref.getText("player1"));
             worlds.put("world1", worldMaster);
             
@@ -72,14 +72,14 @@ public class Game {
             }
         } else if (gameMode.equals("Adventure")) {
             // Create world 1
-            World world1 = new World(manager, "world1", height, width, doorAndKey);
+            World world1 = new World(manager, "world1", height, width, doorAndKey, true);
             world1.addPlayer("Moneymaker", App.pref.getText("player1"));
             worlds.put("world1", world1);
             
             // If player2 is enabled, create a second world
             String opt = App.pref.getText("player2");
             if (!opt.equals("Off")) {
-                World world2 = new World(manager, "world2", height, width, doorAndKey);
+                World world2 = new World(manager, "world2", height, width, doorAndKey, true);
                 world2.addPlayer("Moneymaker", opt);
                 worlds.put("world2", world2);
                 
@@ -88,7 +88,7 @@ public class Game {
             App.pref.setPreference("value.visibleRange=-1");
             App.pref.setPreference("bool.enemy=false");
             
-            World world = new World(manager, "world1", height, width, false);
+            World world = new World(manager, "world1", height, width, false, false);
             worlds.put("world1", world);
             world.addPlayer("Moneymaker", App.pref.getText("player1"));
             world.addPlayer("Teadrinker", App.pref.getText("player2"));

@@ -50,18 +50,31 @@ public class AIPlayer implements AI {
      * @return a message which contains the move that the AI would like to make
      */
     private Message easyMove() {
-        String[] message = new String[4];
+    	Node current = this.world.getEntityNode(this.id);
+    	Node enemy = this.world.getEntityNode("Enemy");
+    	boolean attack = false;
+    	
+    	String[] message = new String[4];
         message[0] = worldName;
-        message[1] = "move";
         message[2] = id;
         
-        int randValue = (new Random()).nextInt(4);
-        switch(randValue) {
-            case 0:     message[3] = "up";      break;
-            case 1:     message[3] = "down";    break;
-            case 2:     message[3] = "left";    break;
-            case 3:     message[3] = "right";   break;
-            default:    message[3] = "";        break;
+        if(current.isConnected(enemy) && !this.attacked) {
+        	message[1] = "attack";
+        	attack = true;
+        	this.attacked = true;
+        } else {
+        	message[1] = "move";
+        }
+        
+        if(!attack) {
+        	int randValue = (new Random()).nextInt(4);
+            switch(randValue) {
+                case 0:     message[3] = "up";      break;
+                case 1:     message[3] = "down";    break;
+                case 2:     message[3] = "left";    break;
+                case 3:     message[3] = "right";   break;
+                default:    message[3] = "";        break;
+            }
         }
         
         return new Message(Message.GAME_MSG, message);
@@ -73,90 +86,102 @@ public class AIPlayer implements AI {
      * @return a message which contains the move that the AI would like to make
      */
     private Message medMove() {
+    	Node current = this.world.getEntityNode(this.id);
+    	Node enemy = this.world.getEntityNode("Enemy");
+    	boolean attack = false;
+    	
     	String[] message = new String[4];
         message[0] = worldName;
-        message[1] = "move";
         message[2] = id;
         
-        Node current = this.world.getEntityNode(this.id);
-        this.visited.put(current, 0);
-        int currX = current.getX();
-        int currY = current.getY();
-        
-        if(!this.explore.isEmpty()) {
-        	Node next = this.explore.remove();
-        	putDirectionInMessage(current, next, message);
+        if(current.isConnected(enemy) && !this.attacked) {
+        	message[1] = "attack";
+        	attack = true;
+        	this.attacked = true;
         } else {
-        	boolean deadEnd = current.isDeadEnd();
+        	message[1] = "move";
+        }
 
-        	if(deadEnd) {
-        		boolean addedToExplore = false;
-        		this.visited.clear();
+        if(!attack) {
+        	this.visited.put(current, 0);
+            int currX = current.getX();
+            int currY = current.getY();
+            
+            if(!this.explore.isEmpty()) {
+            	Node next = this.explore.remove();
+            	putDirectionInMessage(current, next, message);
+            } else {
+            	boolean deadEnd = current.isDeadEnd();
 
-        		while(this.world.getNode(currX, currY).getUp() != null) {
-        			this.explore.add(this.world.getNode(currX, currY).getUp());
-        			currY--;
-        			addedToExplore = true;
-        		}
-        		
-        		if(!addedToExplore) {
-        			while(this.world.getNode(currX, currY).getDown() != null) {
-            			this.explore.add(this.world.getNode(currX, currY).getDown());
-            			currY++;
+            	if(deadEnd) {
+            		boolean addedToExplore = false;
+            		this.visited.clear();
+
+            		while(this.world.getNode(currX, currY).getUp() != null) {
+            			this.explore.add(this.world.getNode(currX, currY).getUp());
+            			currY--;
             			addedToExplore = true;
             		}
-        		}
-        		
-        		if(!addedToExplore) {
-        			while(this.world.getNode(currX, currY).getLeft() != null) {
-            			this.explore.add(this.world.getNode(currX, currY).getLeft());
-            			currX--;
-            			addedToExplore = true;
-            		}
-        		}
-        		
-        		if(!addedToExplore) {
-        			while(this.world.getNode(currX, currY).getRight() != null) {
-            			this.explore.add(this.world.getNode(currX, currY).getRight());
-            			currX++;
-            			addedToExplore = true;
-            		}
-        		}
-        	} else {
-        		int randValue = (new Random()).nextInt(4);
-        		
-        		if(randValue == 0) {
-        			if(!this.visited.containsKey(this.world.getNode(currX, currY).getUp())) {
-            			while(this.world.getNode(currX, currY).getUp() != null) {
-                			this.explore.add(this.world.getNode(currX, currY).getUp());
-                			currY--;
-                		}
-            		}
-        		} else if(randValue == 1) {
-        			if(!this.visited.containsKey(this.world.getNode(currX, currY).getDown())) {
+            		
+            		if(!addedToExplore) {
             			while(this.world.getNode(currX, currY).getDown() != null) {
                 			this.explore.add(this.world.getNode(currX, currY).getDown());
                 			currY++;
+                			addedToExplore = true;
                 		}
-        			}
-        		} else if(randValue == 2) {
-        			if(!this.visited.containsKey(this.world.getNode(currX, currY).getLeft())) {
+            		}
+            		
+            		if(!addedToExplore) {
             			while(this.world.getNode(currX, currY).getLeft() != null) {
                 			this.explore.add(this.world.getNode(currX, currY).getLeft());
                 			currX--;
+                			addedToExplore = true;
                 		}
-        			}
-        		} else if(randValue == 3) {
-        			if(!this.visited.containsKey(this.world.getNode(currX, currY).getRight())) {
+            		}
+            		
+            		if(!addedToExplore) {
             			while(this.world.getNode(currX, currY).getRight() != null) {
                 			this.explore.add(this.world.getNode(currX, currY).getRight());
                 			currX++;
+                			addedToExplore = true;
                 		}
             		}
-        		}
-        	}
-        	
-        	message[3] = "";
+            	} else {
+            		int randValue = (new Random()).nextInt(4);
+            		
+            		if(randValue == 0) {
+            			if(!this.visited.containsKey(this.world.getNode(currX, currY).getUp())) {
+                			while(this.world.getNode(currX, currY).getUp() != null) {
+                    			this.explore.add(this.world.getNode(currX, currY).getUp());
+                    			currY--;
+                    		}
+                		}
+            		} else if(randValue == 1) {
+            			if(!this.visited.containsKey(this.world.getNode(currX, currY).getDown())) {
+                			while(this.world.getNode(currX, currY).getDown() != null) {
+                    			this.explore.add(this.world.getNode(currX, currY).getDown());
+                    			currY++;
+                    		}
+            			}
+            		} else if(randValue == 2) {
+            			if(!this.visited.containsKey(this.world.getNode(currX, currY).getLeft())) {
+                			while(this.world.getNode(currX, currY).getLeft() != null) {
+                    			this.explore.add(this.world.getNode(currX, currY).getLeft());
+                    			currX--;
+                    		}
+            			}
+            		} else if(randValue == 3) {
+            			if(!this.visited.containsKey(this.world.getNode(currX, currY).getRight())) {
+                			while(this.world.getNode(currX, currY).getRight() != null) {
+                    			this.explore.add(this.world.getNode(currX, currY).getRight());
+                    			currX++;
+                    		}
+                		}
+            		}
+            	}
+            	
+            	message[3] = "";
+            }
         }
         
         return new Message(Message.GAME_MSG, message);
@@ -179,7 +204,7 @@ public class AIPlayer implements AI {
         message[2] = id;
         
         if(current.isConnected(enemy) && !this.attacked) {
-        	message[1] = "attack";
+        	message[1] = "melee";
         	attack = true;
         	this.attacked = true;
         } else {

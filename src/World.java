@@ -137,7 +137,8 @@ public class World {
         }        
     }
     
-    public World (App app, String name, int width, int height, boolean doorAndKey) {        
+    public World (App app, String name, int width, int height, boolean doorAndKey, 
+    		boolean coins) {        
         // Global settings
         this.app = app;
         this.name = name;
@@ -192,7 +193,9 @@ public class World {
         if (doorAndKey) {
             doorAndKeyGenerator();
         }
-        generateCoins();
+        if (coins) {
+        	generateCoins();
+        }
         
         // If visibility is turned off make all the tiles bright.
         if (maxVisDistance == -1) {
@@ -544,6 +547,9 @@ public class World {
             aiPool.scheduleAtFixedRate(air, AI_POOL_DELAY, AI_POOL_RATE, SCHEDULE_TIME_UNIT);
         } else if (opt.equals("Hard AI")) {
             aiRunnable air = new aiRunnable(new AIPlayer(this, name, "hard"));
+            aiPool.scheduleAtFixedRate(air, AI_POOL_DELAY, AI_POOL_RATE, SCHEDULE_TIME_UNIT);
+        } else if (opt.equals("Battle AI")) {
+        	aiRunnable air = new aiRunnable(new AIFighter(this, name));
             aiPool.scheduleAtFixedRate(air, AI_POOL_DELAY, AI_POOL_RATE, SCHEDULE_TIME_UNIT);
         }
     }
