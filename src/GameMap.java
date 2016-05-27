@@ -392,7 +392,7 @@ public class GameMap extends JPanel {
 	            }
 	        }
     	}
-    	catch (Exception e1) {
+    	catch (Exception e2) {
     		//Occurs when map hasnt finished being created before being drawn
     	}
     }
