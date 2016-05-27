@@ -567,9 +567,9 @@ public class World {
                         }
                     }
                     if (entityNode.getX() + 1 == entityAttackingNode.getX()) {
-                        entityAttacking.setDirection("right");
+                        entityAttacking.setDirection("left");
                     } else if (entityNode.getX() - 1 == entityAttackingNode.getX()) {
-                        entityAttacking.setDirection("left");                            
+                        entityAttacking.setDirection("right");                            
                     } else if (entityNode.getY() + 1 == entityAttackingNode.getY()) {
                         entityAttacking.setDirection("up");
                     } else if (entityNode.getY() - 1 == entityAttackingNode.getY()) {
