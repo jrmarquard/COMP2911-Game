@@ -528,7 +528,7 @@ public class GUI extends JFrame  {
         c.anchor = GridBagConstraints.CENTER;
         JClickButton startGameButton = new JClickButton("Start Game");
         if (gameMode.equals("Battle")) {
-            if (false) {
+        	if (App.pref.getText("player1").equals("Off") || App.pref.getText("player2").equals("Off")) {
                 startGameButton.setEnabled(false);
             }
         } else {
@@ -639,7 +639,7 @@ public class GUI extends JFrame  {
         navPanel.add(backButton);
         
         // Settings panel to display all settings
-        JPanel settingsPanel = new JPanel(new GridLayout(10,1)) {
+        JPanel settingsPanel = new JPanel(new GridLayout(6,1)) {
             @Override
             public Dimension getPreferredSize() {
                 Dimension d = this.getParent().getSize();        
@@ -649,6 +649,7 @@ public class GUI extends JFrame  {
             }
         };
         windowPanel.add(settingsPanel);
+        settingsPanel.add(Box.createRigidArea(new Dimension(0,20)));
         
         /*for (String s : App.pref.getKeys("colour")) {
             Color c = App.pref.getColour(s);
@@ -715,7 +716,7 @@ public class GUI extends JFrame  {
         textureSelectPanel.add(textureCastle);
         textureSelectPanel.add(textureDesert);
         textureSelectPanel.add(textureSpace);
-        windowPanel.add(textureSelectPanel);
+        settingsPanel.add(textureSelectPanel);
 
         JPanel musicSliderPanel = new JPanel();
         JLabel musicSliderLabel = new JLabel("Music Volume: ");
@@ -732,7 +733,7 @@ public class GUI extends JFrame  {
         });
         musicSliderPanel.add(musicSliderLabel);
         musicSliderPanel.add(musicSlider);
-        windowPanel.add(musicSliderPanel);
+        settingsPanel.add(musicSliderPanel);
         
         JPanel effectsSliderPanel = new JPanel();
         JLabel effectsSliderLabel = new JLabel("Effects Volume: ");
@@ -750,7 +751,7 @@ public class GUI extends JFrame  {
         
         effectsSliderPanel.add(effectsSliderLabel);
         effectsSliderPanel.add(effectsSlider);
-        windowPanel.add(effectsSliderPanel);
+        settingsPanel.add(effectsSliderPanel);
         
         windowPanel.add(Box.createRigidArea(new Dimension(0,50)));
         
@@ -769,10 +770,12 @@ public class GUI extends JFrame  {
         windowPanel.add(titlePanel);
         windowPanel.add(gamePanel);
         windowPanel.add(gameMenuPanel);
+        
+        String pack = App.pref.getText("texturePack");
 
         // Title Panel
         titlePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
-        titlePanel.setBackground(App.pref.getColour("titleDefaultColour"));
+        titlePanel.setBackground(windowPanel.getBackground());
 
         ArrayList<Integer> coins = game.getPlayerCoins();
         for (Integer i : coins) {
@@ -819,7 +822,7 @@ public class GUI extends JFrame  {
         
         // Menu Panel
         gameMenuPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-        gameMenuPanel.setBackground(App.pref.getColour("menuColour"));
+        gameMenuPanel.setBackground(windowPanel.getBackground().darker());
         
         JClickButton closeButton = new JClickButton("Exit to menu");
         closeButton.addActionListener(new ActionListener() {
