@@ -13,13 +13,17 @@
 - Life sound effects and music    
 
 ### Screenshots:
-![](https://github.com/jrmarquard/COMP2911-Game/edit/master/screenshots/screenshot1-adventure-mode.PNG)
-![](https://github.com/jrmarquard/COMP2911-Game/edit/master/screenshots/screenshot2-game-options.PNG)
-![](https://github.com/jrmarquard/COMP2911-Game/edit/master/screenshots/screenshot3-multiplayer.PNG)
-![](https://github.com/jrmarquard/COMP2911-Game/edit/master/screenshots/screenshot4-desert.PNG)
-![](https://github.com/jrmarquard/COMP2911-Game/edit/master/screenshots/screenshot5-space.PNG)
+![](https://raw.githubusercontent.com/jrmarquard/COMP2911-Game/master/screenshots/screenshot1-adventure-mode.PNG)
+ 
+![](https://raw.githubusercontent.com/jrmarquard/COMP2911-Game/master/screenshots/screenshot2-game-options.PNG)
+ 
+![](https://raw.githubusercontent.com/jrmarquard/COMP2911-Game/master/screenshots/screenshot3-multiplayer.PNG)
+ 
+![](https://raw.githubusercontent.com/jrmarquard/COMP2911-Game/master/screenshots/screenshot4-desert.PNG)
+ 
+![](https://raw.githubusercontent.com/jrmarquard/COMP2911-Game/master/screenshots/screenshot5-space.PNG)
 
-======
+---
 
 ## Assignment Details
 
