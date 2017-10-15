@@ -1,5 +1,26 @@
 # COMP2911 Project (2016)
 
+## Game Features:
+- 3 Game modes
+    - Adventure: Endless maze generation, find more enemies the deeper you go)
+    - Race: Race the AI or a friend through the same maze design
+    - Battle: Fight each other in the maze
+- Lighting engine
+- Adjustable maze size
+- Maze elements: enemies, lock and key, coins
+- Up to 4 player multiplayer (with people or AI)
+- 3 Graphic Sets: Castle, Desert, Space
+- Life sound effects and music    
+
+### Screenshots:
+![](https://github.com/jrmarquard/COMP2911-Game/edit/master/screenshots/screenshot1-adventure-mode.PNG)
+![](https://github.com/jrmarquard/COMP2911-Game/edit/master/screenshots/screenshot2-game-options.PNG)
+![](https://github.com/jrmarquard/COMP2911-Game/edit/master/screenshots/screenshot3-multiplayer.PNG)
+![](https://github.com/jrmarquard/COMP2911-Game/edit/master/screenshots/screenshot4-desert.PNG)
+![](https://github.com/jrmarquard/COMP2911-Game/edit/master/screenshots/screenshot5-space.PNG)
+
+======
+
 ## Assignment Details
 
  **Due Date**: Week 12, Friday, May 27, 11:59 p.m.
@@ -14,7 +35,6 @@ In this assignment, the aim is to construct an interactive maze puzzle game that
 #### Scrum Roles:
 - John: Developer/Scrum Master/Project Owner
 - Joshua: Developer
-- Partrick: Developer
 - Tim: Developer
 - Tyler: Developer
 
@@ -89,8 +109,6 @@ In this assignment, the aim is to construct an interactive maze puzzle game that
 - Joshua
     - maze generation
     - multiplayer game mode
-- Patrick
-    - 
 - Tim
     - maze implementation
     - Sound
